@@ -27,6 +27,7 @@ namespace AlperKocasalih.Chess.Grid
         [Header("State")]
         [SerializeField, ReadOnly] private SelectionState currentState = SelectionState.None;
         [SerializeField, ReadOnly] private MovementPattern activePattern;
+        [SerializeField, ReadOnly] private CardData activeCardData;
         [SerializeField, ReadOnly] private Pawn selectedPawn;
 
         private List<HexCell> highlightedCells = new List<HexCell>();
@@ -89,29 +90,53 @@ namespace AlperKocasalih.Chess.Grid
         /// <summary>
         /// Simulates card selection. Call this from UI buttons.
         /// </summary>
-        public void SelectMovementCard(MovementPattern pattern)
+        public void SelectMovementCard(CardData card)
         {
             if (gridLookup.Count == 0) InitializeGrid();
             
             CancelSelection();
+            activeCardData = card;
+            activePattern = card.pattern;
+            currentState = SelectionState.CardSelected;
+
+            // Highlight all pawns that could move (simplified: all pawns)
+            foreach (var pObj in GameObject.FindObjectsOfType<Pawn>())
+            {
+                if (TurnManager.Instance != null && pObj.PlayerID != TurnManager.Instance.ActivePlayerID) continue;
+                
+                pObj.VisualHighlight(pawnHighlightColor);
+                highlightedPawns.Add(pObj);
+            }
+            
+            Debug.Log($"PawnMovementManager: Card '{card.cardName}' selected. Select a pawn.");
+        }
+
+        public void SelectMovementPattern(MovementPattern pattern)
+        {
+            if (gridLookup.Count == 0) InitializeGrid();
+            
+            CancelSelection();
+            activeCardData = null; // No card associated with test patterns
             activePattern = pattern;
             currentState = SelectionState.CardSelected;
 
             // Highlight all pawns that could move (simplified: all pawns)
             foreach (var pObj in GameObject.FindObjectsOfType<Pawn>())
             {
+                if (TurnManager.Instance != null && pObj.PlayerID != TurnManager.Instance.ActivePlayerID) continue;
+                
                 pObj.VisualHighlight(pawnHighlightColor);
                 highlightedPawns.Add(pObj);
             }
             
-            Debug.Log($"PawnMovementManager: Card '{pattern.patternName}' selected. Select a pawn.");
+            Debug.Log($"PawnMovementManager: Pattern '{pattern.patternName}' selected (Test Mode). Select a pawn.");
         }
 
         [ContextMenu("Test Pattern A")]
-        public void TestPatternA() => SelectMovementCard(testPatternA);
+        public void TestPatternA() => SelectMovementPattern(testPatternA);
 
         [ContextMenu("Test Pattern B")]
-        public void TestPatternB() => SelectMovementCard(testPatternB);
+        public void TestPatternB() => SelectMovementPattern(testPatternB);
 
         private void HandleSelection()
         {
@@ -185,6 +210,7 @@ namespace AlperKocasalih.Chess.Grid
             ClearPawnHighlights();
             selectedPawn = null;
             activePattern = null;
+            activeCardData = null;
             currentState = SelectionState.None;
         }
 
@@ -195,7 +221,7 @@ namespace AlperKocasalih.Chess.Grid
         private void ShowValidMoves(Pawn pawn)
         {
             ClearCellHighlights();
-            Vector2Int currentCoords = pawn.CurrentCell.Coordinates;
+            Vector2Int currentCoords = pawn.OccupiedCell.Coordinates;
             List<Vector2Int> offsets = activePattern.GetValidOffsets(currentCoords.x);
 
             foreach (var offset in offsets)
@@ -221,7 +247,7 @@ namespace AlperKocasalih.Chess.Grid
 
         private void ExecuteMove(Pawn pawn, HexCell targetCell)
         {
-            HexCell oldCell = pawn.CurrentCell;
+            HexCell oldCell = pawn.OccupiedCell;
             oldCell.IsOccupied = false;
             
             pawn.SetCell(targetCell);
@@ -230,6 +256,11 @@ namespace AlperKocasalih.Chess.Grid
             pawn.transform.DOMove(targetCell.transform.position + pawnVisualOffset, moveDuration)
                 .SetEase(Ease.OutQuad)
                 .OnComplete(() => {
+                    if (activeCardData != null && DraftManager.Instance != null && TurnManager.Instance != null)
+                    {
+                        DraftManager.Instance.RemoveCardFromHand(TurnManager.Instance.ActivePlayerID, activeCardData);
+                    }
+                    
                     CancelSelection();
                     if (TurnManager.Instance != null) TurnManager.Instance.NextTurn();
                     Debug.Log("PawnMovementManager: Move completed and turn ended.");
@@ -240,7 +271,7 @@ namespace AlperKocasalih.Chess.Grid
         {
             Debug.Log($"PawnMovementManager: Combat! {attacker.PawnType} vs {defender.PawnType}");
             
-            defender.CurrentCell.IsOccupied = false;
+            defender.OccupiedCell.IsOccupied = false;
             Destroy(defender.gameObject);
             
             ExecuteMove(attacker, targetCell);
@@ -251,7 +282,7 @@ namespace AlperKocasalih.Chess.Grid
             Pawn[] allPawns = GameObject.FindObjectsOfType<Pawn>();
             foreach (var p in allPawns)
             {
-                if (p.CurrentCell == cell) return p;
+                if (p.OccupiedCell == cell) return p;
             }
             return null;
         }

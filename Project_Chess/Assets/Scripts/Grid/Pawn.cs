@@ -13,6 +13,7 @@ namespace AlperKocasalih.Chess.Grid
         [Header("Pawn Data")]
         [SerializeField] private string pawnType;
         [SerializeField] private int playerID; // 1 or 2
+        [SerializeField] private int typeIndex;
         [SerializeField, ReadOnly] private HexCell currentCell;
 
         [Header("Visuals")]
@@ -24,8 +25,9 @@ namespace AlperKocasalih.Chess.Grid
         #region Properties
 
         public string PawnType => pawnType;
-        public HexCell CurrentCell => currentCell;
+        public HexCell OccupiedCell => currentCell;
         public int PlayerID { get => playerID; set => playerID = value; }
+        public int TypeIndex { get => typeIndex; set => typeIndex = value; }
 
         #endregion
 

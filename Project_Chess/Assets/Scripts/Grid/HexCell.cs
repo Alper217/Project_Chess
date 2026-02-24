@@ -74,6 +74,11 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        public void ClearOccupiedPawn()
+        {
+            IsOccupied = false;
+        }
+
         #endregion
     }
 }

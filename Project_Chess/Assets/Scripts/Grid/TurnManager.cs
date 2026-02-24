@@ -8,6 +8,7 @@ namespace AlperKocasalih.Chess.Grid
     public class TurnManager : MonoBehaviour
     {
         public static TurnManager Instance { get; private set; }
+        public System.Action<int> OnTurnChanged;
 
         #region Fields
 
@@ -101,6 +102,7 @@ namespace AlperKocasalih.Chess.Grid
             turnCount++;
             
             UpdateTurnInfoUI();
+            OnTurnChanged?.Invoke(activePlayerID);
             
             Debug.Log($"TurnManager: Player {activePlayerID}'s turn.");
 

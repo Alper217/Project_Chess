@@ -21,6 +21,10 @@ namespace AlperKocasalih.Chess.Grid
         private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
         private HashSet<int> p1SpawnedTypes = new HashSet<int>(); // P1: r 0-2
         private HashSet<int> p2SpawnedTypes = new HashSet<int>(); // P2: r 7-9
+        
+        private bool p1Confirmed = false;
+        private bool p2Confirmed = false;
+        
         private Camera mainCamera;
 
         #endregion
@@ -60,7 +64,8 @@ namespace AlperKocasalih.Chess.Grid
 
             if (Input.GetKeyDown(KeyCode.Space))
             {
-                FinishSetup();
+                // This is now handled via FinishSetup which checks for both confirmations
+                Debug.Log("PawnPlacementManager: Space pressed. Use UI buttons to confirm for each player.");
             }
         }
 
@@ -108,25 +113,66 @@ namespace AlperKocasalih.Chess.Grid
             // Validation 1: Already occupied?
             if (cell.IsOccupied)
             {
+                // Repositioning logic: If the player clicks their own pawn, remove it
+                Pawn existingPawn = cell.GetComponentInChildren<Pawn>();
+                if (existingPawn == null) existingPawn = FindPawnOnCell(cell);
+
+                if (existingPawn != null)
+                {
+                    int row = cell.Coordinates.y;
+                    bool isP1Region = row >= 0 && row <= 2;
+                    bool isP2Region = row >= 7 && row <= 9;
+
+                    // Only allow picking up if it's the correct region and player hasn't confirmed
+                    if (isP1Region && !p1Confirmed)
+                    {
+                        p1SpawnedTypes.Remove(existingPawn.TypeIndex); // Need to ensure Pawn has TypeIndex
+                        cell.ClearOccupiedPawn(); // Assuming HexCell has this or we manage it
+                        Destroy(existingPawn.gameObject);
+                        Debug.Log($"PawnPlacementManager: Player 1 picked up pawn type {existingPawn.TypeIndex}.");
+                        return;
+                    }
+                    else if (isP2Region && !p2Confirmed)
+                    {
+                        p2SpawnedTypes.Remove(existingPawn.TypeIndex);
+                        cell.ClearOccupiedPawn();
+                        Destroy(existingPawn.gameObject);
+                        Debug.Log($"PawnPlacementManager: Player 2 picked up pawn type {existingPawn.TypeIndex}.");
+                        return;
+                    }
+                }
+                
                 Debug.LogWarning($"PawnPlacementManager: Cell at {cell.Coordinates} is already occupied!");
                 return;
             }
 
             // Validation 2: Region check & Per-player Uniqueness
-            int row = cell.Coordinates.y;
-            bool isP1Region = row >= 0 && row <= 2;
-            bool isP2Region = row >= 7 && row <= 9;
+            int rowCheck = cell.Coordinates.y;
+            bool isP1 = rowCheck >= 0 && rowCheck <= 2;
+            bool isP2 = rowCheck >= 7 && rowCheck <= 9;
 
-            if (isP1Region)
+            if (isP1)
             {
+                if (p1Confirmed) return;
+                if (p1SpawnedTypes.Count >= pawnPrefabs.Length)
+                {
+                    Debug.LogWarning($"PawnPlacementManager: Player 1 has already placed {pawnPrefabs.Length} pawns!");
+                    return;
+                }
                 if (p1SpawnedTypes.Contains(selectedPawnIndex))
                 {
                     Debug.LogWarning($"PawnPlacementManager: Player 1 has already spawned pawn type {selectedPawnIndex}!");
                     return;
                 }
             }
-            else if (isP2Region)
+            else if (isP2)
             {
+                if (p2Confirmed) return;
+                if (p2SpawnedTypes.Count >= pawnPrefabs.Length)
+                {
+                    Debug.LogWarning($"PawnPlacementManager: Player 2 has already placed {pawnPrefabs.Length} pawns!");
+                    return;
+                }
                 if (p2SpawnedTypes.Contains(selectedPawnIndex))
                 {
                     Debug.LogWarning($"PawnPlacementManager: Player 2 has already spawned pawn type {selectedPawnIndex}!");
@@ -135,7 +181,7 @@ namespace AlperKocasalih.Chess.Grid
             }
             else
             {
-                Debug.LogWarning($"PawnPlacementManager: Row {row} is outside valid placement zones!");
+                Debug.LogWarning($"PawnPlacementManager: Row {rowCheck} is outside valid placement zones!");
                 return;
             }
 
@@ -163,19 +209,64 @@ namespace AlperKocasalih.Chess.Grid
             Pawn pawn = pawnObj.GetComponent<Pawn>();
             
             pawn.Initialize(cell);
-            pawn.PlayerID = isP1Region ? 1 : 2; // Assign Player ID
+            pawn.PlayerID = isP1 ? 1 : 2; // Assign Player ID
+            pawn.TypeIndex = selectedPawnIndex; // Store type index for repositioning
             
             // Track uniqueness per player
-            if (isP1Region) p1SpawnedTypes.Add(selectedPawnIndex);
-            else if (isP2Region) p2SpawnedTypes.Add(selectedPawnIndex);
+            if (isP1) p1SpawnedTypes.Add(selectedPawnIndex);
+            else if (isP2) p2SpawnedTypes.Add(selectedPawnIndex);
 
             StartCoroutine(AnimatePawnDrop(pawnObj, targetPos));
-            Debug.Log($"PawnPlacementManager: Successfully placed pawn type {selectedPawnIndex} for Player {(isP1Region ? "1" : "2")}.");
+            Debug.Log($"PawnPlacementManager: Successfully placed pawn type {selectedPawnIndex} for Player {(isP1 ? "1" : "2")}.");
+        }
+
+        private Pawn FindPawnOnCell(HexCell cell)
+        {
+            // Fallback to find pawn if not easily accessible
+            Pawn[] allPawns = FindObjectsOfType<Pawn>();
+            foreach (var p in allPawns)
+            {
+                if (p.OccupiedCell == cell) return p;
+            }
+            return null;
+        }
+
+        public void ConfirmPlayerPlacement(int playerID)
+        {
+            if (playerID == 1)
+            {
+                if (p1SpawnedTypes.Count == pawnPrefabs.Length)
+                {
+                    p1Confirmed = true;
+                    Debug.Log("PawnPlacementManager: Player 1 confirmed placement.");
+                }
+                else Debug.LogWarning($"PawnPlacementManager: Player 1 must place {pawnPrefabs.Length} pawns first!");
+            }
+            else if (playerID == 2)
+            {
+                if (p2SpawnedTypes.Count == pawnPrefabs.Length)
+                {
+                    p2Confirmed = true;
+                    Debug.Log("PawnPlacementManager: Player 2 confirmed placement.");
+                }
+                else Debug.LogWarning($"PawnPlacementManager: Player 2 must place {pawnPrefabs.Length} pawns first!");
+            }
+
+            if (p1Confirmed && p2Confirmed)
+            {
+                FinishSetup();
+            }
         }
 
         [ContextMenu("Finish Setup")]
         public void FinishSetup()
         {
+            if (!p1Confirmed || !p2Confirmed)
+            {
+                Debug.LogWarning("PawnPlacementManager: Both players must confirm before finishing setup.");
+                return;
+            }
+
             if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Setup)
             {
                 Debug.Log("PawnPlacementManager: Setup finished. Moving to RollDice state.");

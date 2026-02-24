@@ -82,9 +82,16 @@ namespace AlperKocasalih.Chess.Grid
                     }
                     break;
                 case GameState.DraftPhase:
-                    // Gelecekte kart çekme eklenecek
-                    // Şimdilik doğrudan ActionPhase'e geç
-                    ChangeState(GameState.ActionPhase);
+                    Debug.Log("GameManager: Draft phase started.");
+                    if (DraftManager.Instance != null)
+                    {
+                        DraftManager.Instance.StartDraft();
+                    }
+                    else
+                    {
+                        Debug.LogError("GameManager: DraftManager not found! Skipping to ActionPhase.");
+                        ChangeState(GameState.ActionPhase);
+                    }
                     break;
                 case GameState.ActionPhase:
                     Debug.Log("GameManager: Action phase started.");
