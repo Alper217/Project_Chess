@@ -35,6 +35,10 @@ namespace AlperKocasalih.Chess.Grid
 
         private void Update()
         {
+            // Do not handle placement if movement mode is active
+            if (PawnMovementManager.Instance != null && PawnMovementManager.Instance.IsActive)
+                return;
+
             if (Input.GetMouseButtonDown(0))
             {
                 HandlePlacementInput();
@@ -150,6 +154,7 @@ namespace AlperKocasalih.Chess.Grid
             Pawn pawn = pawnObj.GetComponent<Pawn>();
             
             pawn.Initialize(cell);
+            pawn.PlayerID = isP1Region ? 1 : 2; // Assign Player ID
             
             // Track uniqueness per player
             if (isP1Region) p1SpawnedTypes.Add(selectedPawnIndex);

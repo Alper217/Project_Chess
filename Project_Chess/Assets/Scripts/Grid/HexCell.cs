@@ -17,6 +17,10 @@ namespace AlperKocasalih.Chess.Grid
         [Header("Status")]
         [SerializeField, ReadOnly] private bool isOccupied;
 
+        [Header("Visuals")]
+        [SerializeField] private MeshRenderer meshRenderer;
+        private Color originalColor;
+
         #endregion
 
         #region Properties
@@ -43,6 +47,31 @@ namespace AlperKocasalih.Chess.Grid
         {
             this.q = q;
             this.r = r;
+            
+            if (meshRenderer == null) meshRenderer = GetComponent<MeshRenderer>();
+            if (meshRenderer != null) originalColor = meshRenderer.material.color;
+        }
+
+        /// <summary>
+        /// Highlights the cell with a specific color.
+        /// </summary>
+        public void Highlight(Color color)
+        {
+            if (meshRenderer != null)
+            {
+                meshRenderer.material.color = color;
+            }
+        }
+
+        /// <summary>
+        /// Resets the cell highlight to its original color.
+        /// </summary>
+        public void ResetHighlight()
+        {
+            if (meshRenderer != null)
+            {
+                meshRenderer.material.color = originalColor;
+            }
         }
 
         #endregion

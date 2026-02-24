@@ -12,7 +12,12 @@ namespace AlperKocasalih.Chess.Grid
 
         [Header("Pawn Data")]
         [SerializeField] private string pawnType;
+        [SerializeField] private int playerID; // 1 or 2
         [SerializeField, ReadOnly] private HexCell currentCell;
+
+        [Header("Visuals")]
+        [SerializeField] private MeshRenderer meshRenderer;
+        private Color originalColor;
 
         #endregion
 
@@ -20,6 +25,7 @@ namespace AlperKocasalih.Chess.Grid
 
         public string PawnType => pawnType;
         public HexCell CurrentCell => currentCell;
+        public int PlayerID { get => playerID; set => playerID = value; }
 
         #endregion
 
@@ -33,8 +39,35 @@ namespace AlperKocasalih.Chess.Grid
             currentCell = cell;
             currentCell.IsOccupied = true;
             
-            // Look at the center of the grid or keep original rotation
-            // transform.LookAt(new Vector3(0, transform.position.y, 0));
+            if (meshRenderer == null) meshRenderer = GetComponentInChildren<MeshRenderer>();
+            if (meshRenderer != null) originalColor = meshRenderer.material.color;
+        }
+
+        public void SetCell(HexCell cell)
+        {
+            currentCell = cell;
+        }
+
+        /// <summary>
+        /// Highlights the pawn visually.
+        /// </summary>
+        public void VisualHighlight(Color color)
+        {
+            if (meshRenderer != null)
+            {
+                meshRenderer.material.color = color;
+            }
+        }
+
+        /// <summary>
+        /// Resets the pawn's visual highlight.
+        /// </summary>
+        public void ResetHighlight()
+        {
+            if (meshRenderer != null)
+            {
+                meshRenderer.material.color = originalColor;
+            }
         }
 
         #endregion
