@@ -35,6 +35,10 @@ namespace AlperKocasalih.Chess.Grid
 
         private void Update()
         {
+            // Only allow placement during Setup phase
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.Setup)
+                return;
+
             // Do not handle placement if movement mode is active
             if (PawnMovementManager.Instance != null && PawnMovementManager.Instance.IsActive)
                 return;
@@ -52,6 +56,11 @@ namespace AlperKocasalih.Chess.Grid
                     selectedPawnIndex = i;
                     Debug.Log($"PawnPlacementManager: Selected Pawn Type {i}");
                 }
+            }
+
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                FinishSetup();
             }
         }
 
@@ -162,6 +171,16 @@ namespace AlperKocasalih.Chess.Grid
 
             StartCoroutine(AnimatePawnDrop(pawnObj, targetPos));
             Debug.Log($"PawnPlacementManager: Successfully placed pawn type {selectedPawnIndex} for Player {(isP1Region ? "1" : "2")}.");
+        }
+
+        [ContextMenu("Finish Setup")]
+        public void FinishSetup()
+        {
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Setup)
+            {
+                Debug.Log("PawnPlacementManager: Setup finished. Moving to RollDice state.");
+                GameManager.Instance.ChangeState(GameState.RollDice);
+            }
         }
 
         /// <summary>

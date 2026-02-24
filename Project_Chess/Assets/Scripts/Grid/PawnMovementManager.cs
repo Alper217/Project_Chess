@@ -115,6 +115,10 @@ namespace AlperKocasalih.Chess.Grid
 
         private void HandleSelection()
         {
+            // Only allow input during ActionPhase
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.ActionPhase)
+                return;
+
             Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, cellLayer))
             {
@@ -137,6 +141,13 @@ namespace AlperKocasalih.Chess.Grid
             Pawn pawn = FindPawnOnCell(cell);
             if (pawn != null)
             {
+                // Restrict to Active Player's pawn
+                if (TurnManager.Instance != null && pawn.PlayerID != TurnManager.Instance.ActivePlayerID)
+                {
+                    Debug.Log($"PawnMovementManager: It's Player {TurnManager.Instance.ActivePlayerID}'s turn!");
+                    return;
+                }
+
                 selectedPawn = pawn;
                 currentState = SelectionState.PawnSelected;
                 
@@ -220,7 +231,8 @@ namespace AlperKocasalih.Chess.Grid
                 .SetEase(Ease.OutQuad)
                 .OnComplete(() => {
                     CancelSelection();
-                    Debug.Log("PawnMovementManager: Move completed.");
+                    if (TurnManager.Instance != null) TurnManager.Instance.NextTurn();
+                    Debug.Log("PawnMovementManager: Move completed and turn ended.");
                 });
         }
 
