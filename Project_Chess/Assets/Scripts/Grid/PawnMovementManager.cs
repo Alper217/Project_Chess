@@ -208,6 +208,7 @@ namespace AlperKocasalih.Chess.Grid
         {
             ClearCellHighlights();
             ClearPawnHighlights();
+            if (selectedPawn != null) selectedPawn.ResetHighlight();
             selectedPawn = null;
             activePattern = null;
             activeCardData = null;
@@ -226,7 +227,13 @@ namespace AlperKocasalih.Chess.Grid
 
             foreach (var offset in offsets)
             {
-                Vector2Int targetCoords = currentCoords + offset;
+                Vector2Int finalOffset = offset;
+                if (pawn.PlayerID == 2)
+                {
+                    finalOffset = GetMirroredOffset(offset, currentCoords.x);
+                }
+
+                Vector2Int targetCoords = currentCoords + finalOffset;
                 if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
                 {
                     highlightedCells.Add(targetCell);
@@ -247,6 +254,10 @@ namespace AlperKocasalih.Chess.Grid
 
         private void ExecuteMove(Pawn pawn, HexCell targetCell)
         {
+            // Clear highlights immediately so the UI feels responsive
+            ClearCellHighlights();
+            pawn.ResetHighlight();
+
             HexCell oldCell = pawn.OccupiedCell;
             oldCell.IsOccupied = false;
             
@@ -271,10 +282,59 @@ namespace AlperKocasalih.Chess.Grid
         {
             Debug.Log($"PawnMovementManager: Combat! {attacker.PawnType} vs {defender.PawnType}");
             
+            int loserID = defender.PlayerID;
             defender.OccupiedCell.IsOccupied = false;
             Destroy(defender.gameObject);
             
             ExecuteMove(attacker, targetCell);
+
+            // Check if loser has any pawns left (ignoring the one just destroyed)
+            CheckWinCondition(loserID, defender);
+        }
+
+        private Vector2Int GetMirroredOffset(Vector2Int offset, int startingQ)
+        {
+            // Vertical reflection in Odd-Q Hex Grid mapping:
+            // 1. Horizontal offset (dq) stays the same.
+            // 2. Vertical offset (dr) is negated.
+            // 3. If dq is odd, the staggering shift depends on the starting column parity.
+            
+            int newDQ = offset.x;
+            int newDR = -offset.y;
+
+            if (Mathf.Abs(newDQ) % 2 != 0)
+            {
+                // If we cross an odd number of columns, we must account for the staggering flip
+                if (startingQ % 2 == 0) newDR -= 1; // Even -> Odd shift in mirror is Down
+                else newDR += 1;                  // Odd -> Even shift in mirror is Up
+            }
+
+            return new Vector2Int(newDQ, newDR);
+        }
+
+        private void CheckWinCondition(int loserID, Pawn ignoringPawn = null)
+        {
+            Pawn[] allPawns = GameObject.FindObjectsOfType<Pawn>();
+            bool hasPawnsLeft = false;
+            foreach (var p in allPawns)
+            {
+                // Unity's Destroy doesn't happen instantly, so we need to skip the pawn being destroyed
+                if (p != null && p != ignoringPawn && p.PlayerID == loserID)
+                {
+                    hasPawnsLeft = true;
+                    break;
+                }
+            }
+
+            if (!hasPawnsLeft)
+            {
+                int winnerID = loserID == 1 ? 2 : 1;
+                Debug.Log($"PawnMovementManager: Player {winnerID} wins!");
+                if (GameManager.Instance != null)
+                {
+                    GameManager.Instance.EndGame(winnerID);
+                }
+            }
         }
 
         private Pawn FindPawnOnCell(HexCell cell)

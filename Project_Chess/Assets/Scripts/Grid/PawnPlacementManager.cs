@@ -6,6 +6,8 @@ namespace AlperKocasalih.Chess.Grid
 {
     public class PawnPlacementManager : MonoBehaviour
     {
+        public static PawnPlacementManager Instance { get; private set; }
+
         #region Fields
 
         [Header("Prefabs")]
@@ -30,6 +32,12 @@ namespace AlperKocasalih.Chess.Grid
         #endregion
 
         #region Unity Methods
+
+        private void Awake()
+        {
+            if (Instance == null) Instance = this;
+            else Destroy(gameObject);
+        }
 
         private void Start()
         {
@@ -282,6 +290,8 @@ namespace AlperKocasalih.Chess.Grid
         {
             p1SpawnedTypes.Clear();
             p2SpawnedTypes.Clear();
+            p1Confirmed = false;
+            p2Confirmed = false;
             Debug.Log("PawnPlacementManager: Placement tracking reset.");
         }
 

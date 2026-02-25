@@ -91,6 +91,11 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        private void OnDestroy()
+        {
+            transform.DOKill();
+        }
+
         #endregion
     }
 }

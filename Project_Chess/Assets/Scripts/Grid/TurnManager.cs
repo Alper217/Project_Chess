@@ -124,6 +124,13 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        public void ResetManager()
+        {
+            activePlayerID = 1;
+            turnCount = 1;
+            UpdateTurnInfoUI();
+        }
+
         #endregion
     }
 }

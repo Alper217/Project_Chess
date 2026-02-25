@@ -94,7 +94,14 @@ namespace AlperKocasalih.Chess.Grid
         public void RefreshHand(List<CardData> hand)
         {
             // Clear existing
-            foreach (var card in spawnedCards) Destroy(card.gameObject);
+            foreach (var card in spawnedCards) 
+            {
+                if (card != null)
+                {
+                    card.transform.DOKill();
+                    Destroy(card.gameObject);
+                }
+            }
             spawnedCards.Clear();
 
             int count = hand.Count;

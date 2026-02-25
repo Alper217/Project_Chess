@@ -26,6 +26,7 @@ namespace AlperKocasalih.Chess.Grid
         #region Events
 
         public event Action<GameState> OnStateChanged;
+        public event Action<int> OnGameEnded;
 
         #endregion
 
@@ -100,6 +101,42 @@ namespace AlperKocasalih.Chess.Grid
                     Debug.Log("GameManager: Game Over!");
                     break;
             }
+        }
+
+        public void EndGame(int winnerID)
+        {
+            ChangeState(GameState.EndGame);
+            OnGameEnded?.Invoke(winnerID);
+        }
+
+        public void RestartGame()
+        {
+            Debug.Log("GameManager: Restarting Game...");
+
+            // 1. Clear Pawns
+            Pawn[] allPawns = FindObjectsOfType<Pawn>();
+            foreach (var pawn in allPawns)
+            {
+                if (pawn.OccupiedCell != null)
+                {
+                    pawn.OccupiedCell.IsOccupied = false;
+                    pawn.OccupiedCell.ClearOccupiedPawn();
+                }
+                Destroy(pawn.gameObject);
+            }
+
+            // 2. Reset Managers
+            if (TurnManager.Instance != null) TurnManager.Instance.ResetManager();
+            if (PawnPlacementManager.Instance != null) PawnPlacementManager.Instance.ResetTracking();
+            if (DraftManager.Instance != null) DraftManager.Instance.ResetManager();
+            // DraftManager hands are already cleared in StartDraft/Restart logic usually, 
+            // but let's ensure we have a clean slate if needed.
+
+            // 3. Reset Deck
+            if (DeckManager.Instance != null) DeckManager.Instance.InitializeDeck();
+
+            // 4. Return to Setup
+            ChangeState(GameState.Setup);
         }
 
         #endregion

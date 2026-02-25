@@ -199,6 +199,20 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        public void ResetManager()
+        {
+            isDraftingActive = false;
+            p1Hand.Clear();
+            p2Hand.Clear();
+            currentChoices.Clear();
+            usedActionsThisRound.Clear();
+            
+            OnHandUpdated?.Invoke(1, p1Hand);
+            OnHandUpdated?.Invoke(2, p2Hand);
+            
+            Debug.Log("DraftManager: Reset complete.");
+        }
+
         #endregion
     }
 
