@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace AlperKocasalih.Chess.Grid
 {
@@ -12,14 +13,14 @@ namespace AlperKocasalih.Chess.Grid
         EndGame
     }
 
-    public class GameManager : MonoBehaviour
+    public class GameManager : NetworkBehaviour
     {
         public static GameManager Instance { get; private set; }
 
         #region Fields
 
         [Header("Game State")]
-        [SerializeField, ReadOnly] private GameState currentState = GameState.Setup;
+        [SerializeField, ReadOnly] private NetworkVariable<GameState> currentState = new NetworkVariable<GameState>(GameState.Setup, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         #endregion
 
@@ -32,7 +33,7 @@ namespace AlperKocasalih.Chess.Grid
 
         #region Properties
 
-        public GameState CurrentState => currentState;
+        public GameState CurrentState => currentState.Value;
 
         #endregion
 
@@ -44,9 +45,24 @@ namespace AlperKocasalih.Chess.Grid
             else Destroy(gameObject);
         }
 
+        public override void OnNetworkSpawn()
+        {
+            currentState.OnValueChanged += (oldValue, newValue) => {
+                Debug.Log($"GameManager: State changed from {oldValue} to {newValue}");
+                HandleStateChange(newValue);
+                OnStateChanged?.Invoke(newValue);
+            };
+            
+            // Initial handle for current state
+            HandleStateChange(currentState.Value);
+        }
+
         private void Start()
         {
-            ChangeState(GameState.Setup);
+            if (IsServer)
+            {
+                ChangeState(GameState.Setup);
+            }
         }
 
         #endregion
@@ -55,13 +71,15 @@ namespace AlperKocasalih.Chess.Grid
 
         public void ChangeState(GameState newState)
         {
-            if (currentState == newState) return;
+            if (!IsServer)
+            {
+                Debug.LogWarning("GameManager: Only Server can change game state!");
+                return;
+            }
 
-            currentState = newState;
-            Debug.Log($"GameManager: State changed to {currentState}");
+            if (currentState.Value == newState) return;
 
-            HandleStateChange(newState);
-            OnStateChanged?.Invoke(newState);
+            currentState.Value = newState;
         }
 
         private void HandleStateChange(GameState newState)
@@ -69,17 +87,11 @@ namespace AlperKocasalih.Chess.Grid
             switch (newState)
             {
                 case GameState.Setup:
-                    // Piyon dizilimi PawnPlacementManager tarafından yapılıyor olabilir
-                    // Hazır olduğunda RollDice'a geç
                     break;
                 case GameState.RollDice:
-                    if (TurnManager.Instance != null)
+                    if (IsServer && TurnManager.Instance != null)
                     {
                         TurnManager.Instance.RollForTurn();
-                    }
-                    else
-                    {
-                        Debug.LogError("GameManager: TurnManager not found!");
                     }
                     break;
                 case GameState.DraftPhase:
@@ -88,7 +100,7 @@ namespace AlperKocasalih.Chess.Grid
                     {
                         DraftManager.Instance.StartDraft();
                     }
-                    else
+                    else if (IsServer)
                     {
                         Debug.LogError("GameManager: DraftManager not found! Skipping to ActionPhase.");
                         ChangeState(GameState.ActionPhase);
@@ -105,14 +117,22 @@ namespace AlperKocasalih.Chess.Grid
 
         public void EndGame(int winnerID)
         {
+            if (!IsServer) return;
             ChangeState(GameState.EndGame);
             OnGameEnded?.Invoke(winnerID);
         }
 
         public void RestartGame()
         {
+            if (!IsServer) return;
+            
             Debug.Log("GameManager: Restarting Game...");
+            RestartGameClientRpc();
+        }
 
+        [ClientRpc]
+        private void RestartGameClientRpc()
+        {
             // 1. Clear Pawns
             Pawn[] allPawns = FindObjectsOfType<Pawn>();
             foreach (var pawn in allPawns)
@@ -122,23 +142,25 @@ namespace AlperKocasalih.Chess.Grid
                     pawn.OccupiedCell.IsOccupied = false;
                     pawn.OccupiedCell.ClearOccupiedPawn();
                 }
-                Destroy(pawn.gameObject);
+                // On Server, NetworkObjects should be despawned. 
+                // Locally we might need to handle destruction if not a NetworkObject yet.
+                if (IsServer) pawn.GetComponent<NetworkObject>()?.Despawn();
+                else if (pawn.GetComponent<NetworkObject>() == null) Destroy(pawn.gameObject);
             }
 
             // 2. Reset Managers
             if (TurnManager.Instance != null) TurnManager.Instance.ResetManager();
             if (PawnPlacementManager.Instance != null) PawnPlacementManager.Instance.ResetTracking();
             if (DraftManager.Instance != null) DraftManager.Instance.ResetManager();
-            // DraftManager hands are already cleared in StartDraft/Restart logic usually, 
-            // but let's ensure we have a clean slate if needed.
 
             // 3. Reset Deck
             if (DeckManager.Instance != null) DeckManager.Instance.InitializeDeck();
 
             // 4. Return to Setup
-            ChangeState(GameState.Setup);
+            if (IsServer) ChangeState(GameState.Setup);
         }
 
         #endregion
     }
 }
+

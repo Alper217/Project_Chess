@@ -2,10 +2,11 @@ using System.Collections;
 using UnityEngine;
 using DG.Tweening;
 using TMPro;
+using Unity.Netcode;
 
 namespace AlperKocasalih.Chess.Grid
 {
-    public class TurnManager : MonoBehaviour
+    public class TurnManager : NetworkBehaviour
     {
         public static TurnManager Instance { get; private set; }
         public System.Action<int> OnTurnChanged;
@@ -18,14 +19,14 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private CanvasGroup diceUI;
 
         [Header("Turn State")]
-        [SerializeField, ReadOnly] private int activePlayerID = 1;
-        [SerializeField, ReadOnly] private int turnCount = 1;
+        [SerializeField, ReadOnly] private NetworkVariable<int> activePlayerID = new NetworkVariable<int>(1);
+        [SerializeField, ReadOnly] private NetworkVariable<int> turnCount = new NetworkVariable<int>(1);
 
         #endregion
 
         #region Properties
 
-        public int ActivePlayerID => activePlayerID;
+        public int ActivePlayerID => activePlayerID.Value;
 
         #endregion
 
@@ -37,58 +38,55 @@ namespace AlperKocasalih.Chess.Grid
             else Destroy(gameObject);
         }
 
+        public override void OnNetworkSpawn()
+        {
+            activePlayerID.OnValueChanged += (oldValue, newValue) => {
+                UpdateTurnInfoUI();
+                OnTurnChanged?.Invoke(newValue);
+            };
+            
+            UpdateTurnInfoUI();
+        }
+
         #endregion
 
         #region Turn Logic
 
         public void RollForTurn()
         {
+            if (!IsServer) return;
             StartCoroutine(RollDiceRoutine());
         }
 
         private IEnumerator RollDiceRoutine()
         {
-            if (diceUI != null)
-            {
-                diceUI.alpha = 0;
-                diceUI.gameObject.SetActive(true);
-                diceUI.DOFade(1, 0.5f);
-            }
+            // Dice UI animation and value syncing
+            ShowDiceUIClientRpc();
 
-            int player1Roll = 0;
-            int player2Roll = 0;
+            int p1Final = 0;
+            int p2Final = 0;
 
-            // Simple "animation" with DOTween and random numbers
             for (int i = 0; i < 10; i++)
             {
-                player1Roll = Random.Range(1, 101);
-                player2Roll = Random.Range(1, 101);
-                
-                if (diceResultText != null)
-                    diceResultText.text = $"P1: {player1Roll} | P2: {player2Roll}";
-                
+                p1Final = Random.Range(1, 101);
+                p2Final = Random.Range(1, 101);
+                UpdateDiceTextClientRpc(p1Final, p2Final, false);
                 yield return new WaitForSeconds(0.1f);
             }
 
-            // Tie breaker (very unlikely with 100 sides but just in case)
-            while (player1Roll == player2Roll)
+            while (p1Final == p2Final)
             {
-                player1Roll = Random.Range(1, 101);
-                player2Roll = Random.Range(1, 101);
+                p1Final = Random.Range(1, 101);
+                p2Final = Random.Range(1, 101);
             }
 
-            if (diceResultText != null)
-                diceResultText.text = $"Final - P1: {player1Roll} | P2: {player2Roll}";
+            UpdateDiceTextClientRpc(p1Final, p2Final, true);
 
-            activePlayerID = player1Roll > player2Roll ? 1 : 2;
-            UpdateTurnInfoUI();
+            activePlayerID.Value = p1Final > p2Final ? 1 : 2;
 
             yield return new WaitForSeconds(1.5f);
 
-            if (diceUI != null)
-            {
-                diceUI.DOFade(0, 0.5f).OnComplete(() => diceUI.gameObject.SetActive(false));
-            }
+            HideDiceUIClientRpc();
 
             if (GameManager.Instance != null)
             {
@@ -96,41 +94,70 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        [ClientRpc]
+        private void ShowDiceUIClientRpc()
+        {
+            if (diceUI != null)
+            {
+                diceUI.alpha = 0;
+                diceUI.gameObject.SetActive(true);
+                diceUI.DOFade(1, 0.5f);
+            }
+        }
+
+        [ClientRpc]
+        private void UpdateDiceTextClientRpc(int p1, int p2, bool isFinal)
+        {
+            if (diceResultText != null)
+                diceResultText.text = isFinal ? $"Final - P1: {p1} | P2: {p2}" : $"P1: {p1} | P2: {p2}";
+        }
+
+        [ClientRpc]
+        private void HideDiceUIClientRpc()
+        {
+            if (diceUI != null)
+            {
+                diceUI.DOFade(0, 0.5f).OnComplete(() => diceUI.gameObject.SetActive(false));
+            }
+        }
+
         public void NextTurn()
         {
-            activePlayerID = activePlayerID == 1 ? 2 : 1;
-            turnCount++;
-            
-            UpdateTurnInfoUI();
-            OnTurnChanged?.Invoke(activePlayerID);
-            
-            Debug.Log($"TurnManager: Player {activePlayerID}'s turn.");
-
-            // If we have states that repeat every turn, handle them here
-            if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.ActionPhase)
+            if (!IsServer)
             {
-                // ActionPhase within ActionPhase? 
-                // In some designs, we might go back to DraftPhase every turn.
-                // For now, let's keep it in ActionPhase.
+                NextTurnServerRpc();
+                return;
             }
+
+            activePlayerID.Value = activePlayerID.Value == 1 ? 2 : 1;
+            turnCount.Value++;
+            
+            Debug.Log($"TurnManager: Player {activePlayerID.Value}'s turn.");
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void NextTurnServerRpc()
+        {
+            NextTurn();
         }
 
         private void UpdateTurnInfoUI()
         {
             if (turnInfoText != null)
             {
-                turnInfoText.text = $"Turn: Player {activePlayerID}";
+                turnInfoText.text = $"Turn: Player {activePlayerID.Value}";
                 turnInfoText.transform.DOPunchScale(Vector3.one * 0.2f, 0.3f);
             }
         }
 
         public void ResetManager()
         {
-            activePlayerID = 1;
-            turnCount = 1;
-            UpdateTurnInfoUI();
+            if (!IsServer) return;
+            activePlayerID.Value = 1;
+            turnCount.Value = 1;
         }
 
         #endregion
     }
 }
+

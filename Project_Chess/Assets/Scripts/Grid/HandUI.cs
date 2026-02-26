@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Unity.Netcode;
 
 namespace AlperKocasalih.Chess.Grid
 {
@@ -37,34 +38,22 @@ namespace AlperKocasalih.Chess.Grid
             if (DraftManager.Instance != null)
             {
                 DraftManager.Instance.OnHandUpdated += OnHandUpdated;
-                DraftManager.Instance.OnDraftTurnChanged += (playerID) => RefreshHand(DraftManager.Instance.GetHand(playerID));
-            }
-
-            if (TurnManager.Instance != null)
-            {
-                // Refresh hand when turn changes
-                TurnManager.Instance.OnTurnChanged += (playerID) => {
-                    if (DraftManager.Instance != null)
-                        RefreshHand(DraftManager.Instance.GetHand(playerID));
-                };
             }
         }
 
         private void OnHandUpdated(int playerID, List<CardData> hand)
         {
-            // If the updated hand belongs to the current drafting player (or the active player in action phase)
-            // Update the UI
-            int activeID = 1;
-            if (DraftManager.Instance != null && GameManager.Instance.CurrentState == GameState.DraftPhase)
+            int localPlayerID = 1;
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
             {
-                // During draft, we might want to only show the CURRENT drafting player's hand?
-                // Or maybe the hand of the player who received the card.
-                // Let's assume for now we show the hand of the current player.
-                // activeID = DraftManager.Instance.DraftingPlayerID; // Need to expose this property
-                // But for simplicity, let's just refresh if it belongs to playerID = draftingPlayerID
+                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
             }
-            
-            RefreshHand(hand); // Simplified for local multiplayer
+
+            // Only update the hand UI if the updated hand belongs to the local player
+            if (playerID == localPlayerID)
+            {
+                RefreshHand(hand);
+            }
         }
 
         public void OnCardClicked(HandCard card)

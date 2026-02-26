@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using System;
+using Unity.Netcode;
 
 namespace AlperKocasalih.Chess.Grid
 {
-    public class DraftManager : MonoBehaviour
+    public class DraftManager : NetworkBehaviour
     {
         public static DraftManager Instance { get; private set; }
 
@@ -27,7 +28,7 @@ namespace AlperKocasalih.Chess.Grid
 
         #region Events
 
-        public event Action<List<CardData>> OnCardsDrawn;
+        public event Action<int, List<CardData>> OnCardsDrawn;
         public event Action<int> OnDraftTurnChanged; // current player ID
         public event Action<HashSet<DraftAction>> OnUsedActionsChanged;
         public event Action<int, List<CardData>> OnHandUpdated; // playerID, hand
@@ -62,7 +63,7 @@ namespace AlperKocasalih.Chess.Grid
         private void StartDraftRound()
         {
             usedActionsThisRound.Clear();
-            OnUsedActionsChanged?.Invoke(usedActionsThisRound);
+            NotifyUsedActionsClientRpc(new DraftAction[0]);
             
             if (DeckManager.Instance == null)
             {
@@ -70,11 +71,34 @@ namespace AlperKocasalih.Chess.Grid
                 return;
             }
 
+            if (!IsServer) return;
+
             currentChoices = DeckManager.Instance.DrawCards(3);
-            OnCardsDrawn?.Invoke(currentChoices);
-            OnDraftTurnChanged?.Invoke(draftingPlayerID);
+
+            // Send card indices to clients instead of ScriptableObjects
+            int[] drawnCardIndices = new int[currentChoices.Count];
+            for(int i = 0; i < currentChoices.Count; ++i)
+            {
+                drawnCardIndices[i] = DeckManager.Instance.GetCardIndex(currentChoices[i]);
+            }
+
+            NotifyCardsDrawnClientRpc(drawnCardIndices, draftingPlayerID);
             
             Debug.Log($"DraftManager: Player {draftingPlayerID} drafting. Round {roundCount}/3.");
+        }
+
+        [ClientRpc]
+        private void NotifyCardsDrawnClientRpc(int[] cardIndices, int playerID)
+        {
+            // On clients, reconstruct currentChoices from indices
+            currentChoices.Clear();
+            foreach(int idx in cardIndices)
+            {
+                currentChoices.Add(DeckManager.Instance.GetCardByIndex(idx));
+            }
+
+            OnCardsDrawn?.Invoke(playerID, currentChoices);
+            OnDraftTurnChanged?.Invoke(playerID);
         }
 
         /// <summary>
@@ -97,12 +121,12 @@ namespace AlperKocasalih.Chess.Grid
                     if (draftingPlayerID == 1)
                     {
                         p1Hand.Add(selected);
-                        OnHandUpdated?.Invoke(1, p1Hand);
+                        NotifyHandUpdatedClientRpc(1, DeckManager.Instance.GetCardIndex(selected), true);
                     }
                     else
                     {
                         p2Hand.Add(selected);
-                        OnHandUpdated?.Invoke(2, p2Hand);
+                        NotifyHandUpdatedClientRpc(2, DeckManager.Instance.GetCardIndex(selected), true);
                     }
                     Debug.Log($"DraftManager: Player {draftingPlayerID} kept {selected.cardName}");
                     break;
@@ -110,12 +134,12 @@ namespace AlperKocasalih.Chess.Grid
                     if (draftingPlayerID == 1)
                     {
                         p2Hand.Add(selected);
-                        OnHandUpdated?.Invoke(2, p2Hand);
+                        NotifyHandUpdatedClientRpc(2, DeckManager.Instance.GetCardIndex(selected), true);
                     }
                     else
                     {
                         p1Hand.Add(selected);
-                        OnHandUpdated?.Invoke(1, p1Hand);
+                        NotifyHandUpdatedClientRpc(1, DeckManager.Instance.GetCardIndex(selected), true);
                     }
                     Debug.Log($"DraftManager: Player {draftingPlayerID} gave {selected.cardName} to opponent");
                     break;
@@ -125,7 +149,10 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             usedActionsThisRound.Add(action);
-            OnUsedActionsChanged?.Invoke(usedActionsThisRound);
+            
+            DraftAction[] actionsArray = new DraftAction[usedActionsThisRound.Count];
+            usedActionsThisRound.CopyTo(actionsArray);
+            NotifyUsedActionsClientRpc(actionsArray);
             
             currentChoices.RemoveAt(cardIndex);
 
@@ -137,8 +164,37 @@ namespace AlperKocasalih.Chess.Grid
             else
             {
                 // UI should probably refresh to show remaining cards
-                OnCardsDrawn?.Invoke(currentChoices);
+                int[] remainingIndices = new int[currentChoices.Count];
+                for(int i = 0; i < currentChoices.Count; ++i)
+                {
+                    remainingIndices[i] = DeckManager.Instance.GetCardIndex(currentChoices[i]);
+                }
+                NotifyCardsDrawnClientRpc(remainingIndices, draftingPlayerID);
             }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void HandleChoiceServerRpc(int cardIndex, DraftAction action)
+        {
+            HandleChoice(cardIndex, action);
+        }
+
+        [ClientRpc]
+        private void NotifyHandUpdatedClientRpc(int playerID, int cardIndex, bool isAdd)
+        {
+            CardData card = DeckManager.Instance.GetCardByIndex(cardIndex);
+            List<CardData> hand = playerID == 1 ? p1Hand : p2Hand;
+
+            if (isAdd && !NetworkManager.Singleton.IsServer) // Server already added it
+            {
+                hand.Add(card);
+            }
+            else if (!isAdd && !NetworkManager.Singleton.IsServer)
+            {
+                hand.Remove(card);
+            }
+
+            OnHandUpdated?.Invoke(playerID, hand);
         }
 
         private void EndCurrentDraftTurn()
@@ -168,7 +224,8 @@ namespace AlperKocasalih.Chess.Grid
         {
             isDraftingActive = false;
             Debug.Log("DraftManager: Draft finished. Each player should have 6 cards.");
-            OnDraftFinished?.Invoke();
+            
+            NotifyDraftFinishedClientRpc();
 
             if (GameManager.Instance != null)
             {
@@ -176,27 +233,61 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        [ClientRpc]
+        private void NotifyDraftFinishedClientRpc()
+        {
+            OnDraftFinished?.Invoke();
+        }
+
+        [ClientRpc]
+        private void NotifyUsedActionsClientRpc(DraftAction[] actions)
+        {
+            if (!IsServer)
+            {
+                usedActionsThisRound.Clear();
+                foreach (var act in actions)
+                {
+                    usedActionsThisRound.Add(act);
+                }
+            }
+            OnUsedActionsChanged?.Invoke(usedActionsThisRound);
+        }
+
         public List<CardData> GetHand(int playerID) => playerID == 1 ? p1Hand : p2Hand;
 
         public void RemoveCardFromHand(int playerID, CardData card)
         {
-            List<CardData> hand = GetHand(playerID);
-            if (hand.Contains(card))
+            if (IsServer)
             {
-                hand.Remove(card);
-                OnHandUpdated?.Invoke(playerID, hand);
-                Debug.Log($"DraftManager: Removed {card.cardName} from Player {playerID}'s hand.");
-
-                // If both hands are empty, go back to drafting phase
-                if (p1Hand.Count == 0 && p2Hand.Count == 0)
+                List<CardData> hand = GetHand(playerID);
+                if (hand.Contains(card))
                 {
-                    if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.ActionPhase)
+                    hand.Remove(card);
+                    NotifyHandUpdatedClientRpc(playerID, DeckManager.Instance.GetCardIndex(card), false);
+                    Debug.Log($"DraftManager: Removed {card.cardName} from Player {playerID}'s hand.");
+
+                    // If both hands are empty, go back to drafting phase
+                    if (p1Hand.Count == 0 && p2Hand.Count == 0)
                     {
-                        Debug.Log("DraftManager: Both hands empty. Returning to DraftPhase.");
-                        GameManager.Instance.ChangeState(GameState.DraftPhase);
+                        if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.ActionPhase)
+                        {
+                            Debug.Log("DraftManager: Both hands empty. Returning to DraftPhase.");
+                            GameManager.Instance.ChangeState(GameState.DraftPhase);
+                        }
                     }
                 }
             }
+            else
+            {
+                RemoveCardFromHandServerRpc(playerID, DeckManager.Instance.GetCardIndex(card));
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void RemoveCardFromHandServerRpc(int playerID, int cardIndex)
+        {
+            CardData card = DeckManager.Instance.GetCardByIndex(cardIndex);
+            RemoveCardFromHand(playerID, card);
         }
 
         public void ResetManager()

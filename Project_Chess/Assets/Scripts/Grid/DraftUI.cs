@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using DG.Tweening;
+using Unity.Netcode;
 
 namespace AlperKocasalih.Chess.Grid
 {
@@ -69,23 +70,34 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
-        private void UpdateDraftUI(List<CardData> cards)
+        private void UpdateDraftUI(int playerID, List<CardData> cards)
         {
             ShowDraftUI();
+
+            int localPlayerID = 1;
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            }
+
+            bool isMyTurn = (localPlayerID == playerID);
 
             // Disable all slots first
             foreach (var slot in cardSlots) slot.SetActive(false);
 
-            for (int i = 0; i < cards.Count; i++)
+            if (isMyTurn)
             {
-                if (i >= cardSlots.Length) break;
+                for (int i = 0; i < cards.Count; i++)
+                {
+                    if (i >= cardSlots.Length) break;
 
-                cardSlots[i].SetActive(true);
-                if (cardNameTexts.Length > i) cardNameTexts[i].text = cards[i].cardName;
-                if (cardImages.Length > i) cardImages[i].sprite = cards[i].cardSprite;
-                
-                // Add simple animation
-                cardSlots[i].transform.DOPunchScale(Vector3.one * 0.1f, 0.2f);
+                    cardSlots[i].SetActive(true);
+                    if (cardNameTexts.Length > i) cardNameTexts[i].text = cards[i].cardName;
+                    if (cardImages.Length > i) cardImages[i].sprite = cards[i].cardSprite;
+                    
+                    // Add simple animation
+                    cardSlots[i].transform.DOPunchScale(Vector3.one * 0.1f, 0.2f);
+                }
             }
             
             if (choicePanel != null) choicePanel.SetActive(false);
@@ -93,10 +105,24 @@ namespace AlperKocasalih.Chess.Grid
 
         private void UpdateTurnStatus(int playerID)
         {
+            int localPlayerID = 1;
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            }
+
             if (turnStatusText != null)
             {
-                turnStatusText.text = $"Drafting: Player {playerID}";
-                turnStatusText.color = playerID == 1 ? Color.cyan : new Color(1f, 0.5f, 0f); // Match TurnManager colors (roughly)
+                if (localPlayerID == playerID)
+                {
+                    turnStatusText.text = "Senin S\u0131ran - Kart Se\u00E7";
+                    turnStatusText.color = Color.green;
+                }
+                else
+                {
+                    turnStatusText.text = "Rakibin S\u0131ras\u0131...";
+                    turnStatusText.color = Color.gray;
+                }
             }
         }
 
@@ -120,7 +146,7 @@ namespace AlperKocasalih.Chess.Grid
             
             if (DraftManager.Instance != null && currentPendingCardIndex != -1)
             {
-                DraftManager.Instance.HandleChoice(currentPendingCardIndex, action);
+                DraftManager.Instance.HandleChoiceServerRpc(currentPendingCardIndex, action);
                 currentPendingCardIndex = -1;
                 if (choicePanel != null) choicePanel.SetActive(false);
             }

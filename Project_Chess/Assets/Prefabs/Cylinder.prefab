@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 6154613540175851452}
   - component: {fileID: 3089352303615719147}
   - component: {fileID: 5395270852802321641}
+  - component: {fileID: 9064180846732008308}
   - component: {fileID: 9101167532626254544}
   m_Layer: 0
   m_Name: Cylinder
@@ -114,6 +115,31 @@ CapsuleCollider:
   m_Height: 2
   m_Direction: 1
   m_Center: {x: 0.000000059604645, y: 0, z: -0.00000008940697}
+--- !u!114 &9064180846732008308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9025542362197510009}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 1624419762
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &9101167532626254544
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -126,5 +152,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2a2f757b8ac984e4681e4238be532594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.Pawn
+  ShowTopMostFoldoutHeaderGroup: 1
   pawnType: Cylinder
+  playerID: 0
+  typeIndex: 0
   currentCell: {fileID: 0}
+  meshRenderer: {fileID: 0}

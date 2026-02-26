@@ -1,10 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace AlperKocasalih.Chess.Grid
 {
-    public class PawnPlacementManager : MonoBehaviour
+    public class PawnPlacementManager : NetworkBehaviour
     {
         public static PawnPlacementManager Instance { get; private set; }
 
@@ -43,6 +44,25 @@ namespace AlperKocasalih.Chess.Grid
         {
             mainCamera = Camera.main;
             InitializeGridLookup();
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            
+            // If we are Player 2 (Client), flip the camera 180 degrees so they see their pawns at the bottom
+            int localPlayerID = 1;
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            }
+
+            if (localPlayerID == 2 && mainCamera != null)
+            {
+                // Rotate 180 degrees around the Y axis
+                mainCamera.transform.RotateAround(Vector3.zero, Vector3.up, 180f);
+                Debug.Log("PawnPlacementManager: Flipped camera for Player 2.");
+            }
         }
 
         private void Update()
@@ -89,6 +109,7 @@ namespace AlperKocasalih.Chess.Grid
                 return;
             }
 
+            gridLookup.Clear();
             foreach (var hex in GridGenerator.Instance.SpawnedHexes)
             {
                 HexCell cell = hex.GetComponent<HexCell>();
@@ -118,6 +139,72 @@ namespace AlperKocasalih.Chess.Grid
 
         private void TryPlacePawn(HexCell cell)
         {
+            int localPlayerID = 1;
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            }
+
+            int rowCheck = cell.Coordinates.y;
+            bool isP1Region = rowCheck >= 0 && rowCheck <= 2;
+            bool isP2Region = rowCheck >= 7 && rowCheck <= 9;
+
+            if (!isP1Region && !isP2Region)
+            {
+                Debug.LogWarning($"PawnPlacementManager: Row {rowCheck} is outside valid placement zones!");
+                return;
+            }
+
+            if (isP1Region && localPlayerID != 1)
+            {
+                Debug.LogWarning("PawnPlacementManager: You can only interact with your own region (Player 1).");
+                return;
+            }
+            if (isP2Region && localPlayerID != 2)
+            {
+                Debug.LogWarning("PawnPlacementManager: You can only interact with your own region (Player 2).");
+                return;
+            }
+
+            // Client validates locally, then tells server to spawn
+            if (NetworkManager.Singleton != null && !NetworkManager.Singleton.IsServer)
+            {
+                TryPlacePawnServerRpc(cell.Coordinates, selectedPawnIndex, localPlayerID);
+                return;
+            }
+
+            // Server-side validation and spawn
+            SpawnPawnOnServer(cell, selectedPawnIndex, localPlayerID);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void TryPlacePawnServerRpc(Vector2Int coordinates, int pawnIndex, int playerID)
+        {
+            HexCell cell = GetCellByCoords(coordinates);
+            if (cell != null)
+            {
+                SpawnPawnOnServer(cell, pawnIndex, playerID);
+            }
+            else
+            {
+                Debug.LogError($"PawnPlacementManager: Server could not find cell at coordinates {coordinates}!");
+            }
+        }
+
+        private void SpawnPawnOnServer(HexCell cell, int pawnIndex, int playerID)
+        {
+            int rowCheck = cell.Coordinates.y;
+            bool isP1Region = rowCheck >= 0 && rowCheck <= 2;
+            bool isP2Region = rowCheck >= 7 && rowCheck <= 9;
+
+            // Network validation reporting mapping
+            ulong targetClientId = playerID == 1 ? 0UL : 1UL;
+            ClientRpcParams clientRpcParams = new ClientRpcParams
+            {
+                Send = new ClientRpcSendParams { TargetClientIds = new[] { targetClientId } }
+            };
+
+            // Only Server runs this logic
             // Validation 1: Already occupied?
             if (cell.IsOccupied)
             {
@@ -127,16 +214,16 @@ namespace AlperKocasalih.Chess.Grid
 
                 if (existingPawn != null)
                 {
-                    int row = cell.Coordinates.y;
-                    bool isP1Region = row >= 0 && row <= 2;
-                    bool isP2Region = row >= 7 && row <= 9;
-
                     // Only allow picking up if it's the correct region and player hasn't confirmed
                     if (isP1Region && !p1Confirmed)
                     {
                         p1SpawnedTypes.Remove(existingPawn.TypeIndex); // Need to ensure Pawn has TypeIndex
                         cell.ClearOccupiedPawn(); // Assuming HexCell has this or we manage it
-                        Destroy(existingPawn.gameObject);
+                        
+                        NetworkObject existingNetObj = existingPawn.GetComponent<NetworkObject>();
+                        if (existingNetObj != null && existingNetObj.IsSpawned) existingNetObj.Despawn();
+                        else Destroy(existingPawn.gameObject);
+                        
                         Debug.Log($"PawnPlacementManager: Player 1 picked up pawn type {existingPawn.TypeIndex}.");
                         return;
                     }
@@ -144,59 +231,71 @@ namespace AlperKocasalih.Chess.Grid
                     {
                         p2SpawnedTypes.Remove(existingPawn.TypeIndex);
                         cell.ClearOccupiedPawn();
-                        Destroy(existingPawn.gameObject);
+                        
+                        NetworkObject existingNetObj = existingPawn.GetComponent<NetworkObject>();
+                        if (existingNetObj != null && existingNetObj.IsSpawned) existingNetObj.Despawn();
+                        else Destroy(existingPawn.gameObject);
+                        
                         Debug.Log($"PawnPlacementManager: Player 2 picked up pawn type {existingPawn.TypeIndex}.");
                         return;
                     }
                 }
                 
-                Debug.LogWarning($"PawnPlacementManager: Cell at {cell.Coordinates} is already occupied!");
+                string msg = $"PawnPlacementManager: Cell at {cell.Coordinates} is already occupied!";
+                Debug.LogWarning(msg);
+                SendWarningToClientRpc(msg, clientRpcParams);
                 return;
             }
 
             // Validation 2: Region check & Per-player Uniqueness
-            int rowCheck = cell.Coordinates.y;
-            bool isP1 = rowCheck >= 0 && rowCheck <= 2;
-            bool isP2 = rowCheck >= 7 && rowCheck <= 9;
-
-            if (isP1)
+            if (isP1Region)
             {
                 if (p1Confirmed) return;
                 if (p1SpawnedTypes.Count >= pawnPrefabs.Length)
                 {
-                    Debug.LogWarning($"PawnPlacementManager: Player 1 has already placed {pawnPrefabs.Length} pawns!");
+                    string msg = $"PawnPlacementManager: Player 1 has already placed {pawnPrefabs.Length} pawns!";
+                    Debug.LogWarning(msg);
+                    SendWarningToClientRpc(msg, clientRpcParams);
                     return;
                 }
-                if (p1SpawnedTypes.Contains(selectedPawnIndex))
+                if (p1SpawnedTypes.Contains(pawnIndex))
                 {
-                    Debug.LogWarning($"PawnPlacementManager: Player 1 has already spawned pawn type {selectedPawnIndex}!");
+                    string msg = $"PawnPlacementManager: Player 1 has already spawned pawn type {pawnIndex}!";
+                    Debug.LogWarning(msg);
+                    SendWarningToClientRpc(msg, clientRpcParams);
                     return;
                 }
             }
-            else if (isP2)
+            else if (isP2Region)
             {
                 if (p2Confirmed) return;
                 if (p2SpawnedTypes.Count >= pawnPrefabs.Length)
                 {
-                    Debug.LogWarning($"PawnPlacementManager: Player 2 has already placed {pawnPrefabs.Length} pawns!");
+                    string msg = $"PawnPlacementManager: Player 2 has already placed {pawnPrefabs.Length} pawns!";
+                    Debug.LogWarning(msg);
+                    SendWarningToClientRpc(msg, clientRpcParams);
                     return;
                 }
-                if (p2SpawnedTypes.Contains(selectedPawnIndex))
+                if (p2SpawnedTypes.Contains(pawnIndex))
                 {
-                    Debug.LogWarning($"PawnPlacementManager: Player 2 has already spawned pawn type {selectedPawnIndex}!");
+                    string msg = $"PawnPlacementManager: Player 2 has already spawned pawn type {pawnIndex}!";
+                    Debug.LogWarning(msg);
+                    SendWarningToClientRpc(msg, clientRpcParams);
                     return;
                 }
             }
             else
             {
-                Debug.LogWarning($"PawnPlacementManager: Row {rowCheck} is outside valid placement zones!");
+                string msg = $"PawnPlacementManager: Row {rowCheck} is outside valid placement zones!";
+                Debug.LogWarning(msg);
+                SendWarningToClientRpc(msg, clientRpcParams);
                 return;
             }
 
-            GameObject prefab = pawnPrefabs[selectedPawnIndex];
+            GameObject prefab = pawnPrefabs[pawnIndex];
             if (prefab == null) 
             {
-                Debug.LogError($"PawnPlacementManager: No prefab assigned for index {selectedPawnIndex}!");
+                Debug.LogError($"PawnPlacementManager: No prefab assigned for index {pawnIndex}!");
                 return;
             }
 
@@ -217,15 +316,62 @@ namespace AlperKocasalih.Chess.Grid
             Pawn pawn = pawnObj.GetComponent<Pawn>();
             
             pawn.Initialize(cell);
-            pawn.PlayerID = isP1 ? 1 : 2; // Assign Player ID
-            pawn.TypeIndex = selectedPawnIndex; // Store type index for repositioning
+            // PlayerID and TypeIndex will be set via SetNetworkData after Spawn
             
             // Track uniqueness per player
-            if (isP1) p1SpawnedTypes.Add(selectedPawnIndex);
-            else if (isP2) p2SpawnedTypes.Add(selectedPawnIndex);
+            if (isP1Region) p1SpawnedTypes.Add(pawnIndex);
+            else if (isP2Region) p2SpawnedTypes.Add(pawnIndex);
+
+            // Network spawn for pawn if server
+            NetworkObject netObj = pawnObj.GetComponent<NetworkObject>();
+            if (netObj != null && NetworkManager.Singleton.IsServer)
+            {
+                netObj.Spawn(true);
+            }
+
+            // Sync state via NetworkVariables
+            pawn.SetNetworkData(isP1Region ? 1 : 2, pawnIndex, cell.Coordinates);
 
             StartCoroutine(AnimatePawnDrop(pawnObj, targetPos));
-            Debug.Log($"PawnPlacementManager: Successfully placed pawn type {selectedPawnIndex} for Player {(isP1 ? "1" : "2")}.");
+            
+            string successMsg = $"PawnPlacementManager: Successfully placed pawn type {pawnIndex} for Player {(isP1Region ? "1" : "2")}.";
+            Debug.Log(successMsg);
+            SendLogToClientRpc(successMsg, clientRpcParams);
+        }
+
+        [ClientRpc]
+        private void SendWarningToClientRpc(string msg, ClientRpcParams clientRpcParams = default)
+        {
+            Debug.LogWarning(msg);
+        }
+
+        [ClientRpc]
+        private void SendLogToClientRpc(string msg, ClientRpcParams clientRpcParams = default)
+        {
+            Debug.Log(msg);
+        }
+
+        public HexCell GetCellByCoords(Vector2Int coords)
+        {
+            if (gridLookup == null || gridLookup.Count == 0)
+            {
+                InitializeGridLookup();
+            }
+
+            if (gridLookup.TryGetValue(coords, out HexCell cell)) return cell;
+            return null;
+        }
+
+        public void RegisterPawnLocally(Pawn pawn)
+        {
+            if (pawn.PlayerID == 1) p1SpawnedTypes.Add(pawn.TypeIndex);
+            else if (pawn.PlayerID == 2) p2SpawnedTypes.Add(pawn.TypeIndex);
+
+            if (pawn.OccupiedCell != null)
+            {
+                Vector3 targetPos = pawn.OccupiedCell.transform.position + pawnVisualOffset;
+                StartCoroutine(AnimatePawnDrop(pawn.gameObject, targetPos));
+            }
         }
 
         private Pawn FindPawnOnCell(HexCell cell)
@@ -237,6 +383,22 @@ namespace AlperKocasalih.Chess.Grid
                 if (p.OccupiedCell == cell) return p;
             }
             return null;
+        }
+
+        public void ConfirmLocalPlayerPlacement()
+        {
+            int localPlayerID = 1;
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            }
+            ConfirmPlayerPlacementServerRpc(localPlayerID);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void ConfirmPlayerPlacementServerRpc(int playerID)
+        {
+            ConfirmPlayerPlacement(playerID);
         }
 
         public void ConfirmPlayerPlacement(int playerID)
@@ -262,7 +424,20 @@ namespace AlperKocasalih.Chess.Grid
 
             if (p1Confirmed && p2Confirmed)
             {
-                FinishSetup();
+                // Setup finished logic
+                if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
+                {
+                    FinishSetupServer();
+                }
+            }
+        }
+
+        private void FinishSetupServer()
+        {
+            if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Setup)
+            {
+                Debug.Log("PawnPlacementManager: Setup finished. Moving to RollDice state.");
+                GameManager.Instance.ChangeState(GameState.RollDice);
             }
         }
 
@@ -275,10 +450,9 @@ namespace AlperKocasalih.Chess.Grid
                 return;
             }
 
-            if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Setup)
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsServer)
             {
-                Debug.Log("PawnPlacementManager: Setup finished. Moving to RollDice state.");
-                GameManager.Instance.ChangeState(GameState.RollDice);
+                FinishSetupServer();
             }
         }
 
@@ -302,6 +476,8 @@ namespace AlperKocasalih.Chess.Grid
 
             while (elapsed < animationDuration)
             {
+                if (pawn == null) yield break;
+
                 elapsed += Time.deltaTime;
                 float t = elapsed / animationDuration;
                 
@@ -312,7 +488,10 @@ namespace AlperKocasalih.Chess.Grid
                 yield return null;
             }
 
-            pawn.transform.position = targetPos;
+            if (pawn != null)
+            {
+                pawn.transform.position = targetPos;
+            }
         }
 
         #endregion

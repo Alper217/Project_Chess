@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using Unity.Netcode;
 
 namespace AlperKocasalih.Chess.Grid
 {
-    public class PawnMovementManager : MonoBehaviour
+    public class PawnMovementManager : NetworkBehaviour
     {
         public static PawnMovementManager Instance { get; private set; }
         public enum SelectionState { None, CardSelected, PawnSelected }
@@ -50,12 +51,20 @@ namespace AlperKocasalih.Chess.Grid
         private void Start()
         {
             mainCamera = Camera.main;
-            // gridLookup will be initialized when needed or on start
             InitializeGrid();
         }
 
         private void Update()
         {
+            if (!IsSpawned) return;
+
+            // Only allow interaction if it's our turn
+            if (TurnManager.Instance != null)
+            {
+                int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                if (TurnManager.Instance.ActivePlayerID != localPlayerID) return;
+            }
+
             if (Input.GetMouseButtonDown(0))
             {
                 HandleSelection();
@@ -87,9 +96,6 @@ namespace AlperKocasalih.Chess.Grid
 
         #region State Management
 
-        /// <summary>
-        /// Simulates card selection. Call this from UI buttons.
-        /// </summary>
         public void SelectMovementCard(CardData card)
         {
             if (gridLookup.Count == 0) InitializeGrid();
@@ -99,10 +105,11 @@ namespace AlperKocasalih.Chess.Grid
             activePattern = card.pattern;
             currentState = SelectionState.CardSelected;
 
-            // Highlight all pawns that could move (simplified: all pawns)
+            int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+
             foreach (var pObj in GameObject.FindObjectsOfType<Pawn>())
             {
-                if (TurnManager.Instance != null && pObj.PlayerID != TurnManager.Instance.ActivePlayerID) continue;
+                if (pObj.PlayerID != localPlayerID) continue;
                 
                 pObj.VisualHighlight(pawnHighlightColor);
                 highlightedPawns.Add(pObj);
@@ -116,31 +123,23 @@ namespace AlperKocasalih.Chess.Grid
             if (gridLookup.Count == 0) InitializeGrid();
             
             CancelSelection();
-            activeCardData = null; // No card associated with test patterns
+            activeCardData = null; 
             activePattern = pattern;
             currentState = SelectionState.CardSelected;
 
-            // Highlight all pawns that could move (simplified: all pawns)
+            int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+
             foreach (var pObj in GameObject.FindObjectsOfType<Pawn>())
             {
-                if (TurnManager.Instance != null && pObj.PlayerID != TurnManager.Instance.ActivePlayerID) continue;
+                if (pObj.PlayerID != localPlayerID) continue;
                 
                 pObj.VisualHighlight(pawnHighlightColor);
                 highlightedPawns.Add(pObj);
             }
-            
-            Debug.Log($"PawnMovementManager: Pattern '{pattern.patternName}' selected (Test Mode). Select a pawn.");
         }
-
-        [ContextMenu("Test Pattern A")]
-        public void TestPatternA() => SelectMovementPattern(testPatternA);
-
-        [ContextMenu("Test Pattern B")]
-        public void TestPatternB() => SelectMovementPattern(testPatternB);
 
         private void HandleSelection()
         {
-            // Only allow input during ActionPhase
             if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.ActionPhase)
                 return;
 
@@ -166,17 +165,17 @@ namespace AlperKocasalih.Chess.Grid
             Pawn pawn = FindPawnOnCell(cell);
             if (pawn != null)
             {
-                // Restrict to Active Player's pawn
-                if (TurnManager.Instance != null && pawn.PlayerID != TurnManager.Instance.ActivePlayerID)
+                int localPlayerID = 1;
+                if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
                 {
-                    Debug.Log($"PawnMovementManager: It's Player {TurnManager.Instance.ActivePlayerID}'s turn!");
-                    return;
+                    localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
                 }
+
+                if (pawn.PlayerID != localPlayerID) return;
 
                 selectedPawn = pawn;
                 currentState = SelectionState.PawnSelected;
                 
-                // Clear pawn highlights, highlight selected one
                 ClearPawnHighlights();
                 selectedPawn.VisualHighlight(Color.yellow);
                 
@@ -191,12 +190,28 @@ namespace AlperKocasalih.Chess.Grid
                 Pawn enemy = FindPawnOnCell(cell);
                 if (enemy != null)
                 {
-                    ExecuteCombat(selectedPawn, enemy, cell);
+                    ExecuteCombatServerRpc(selectedPawn.NetworkObjectId, enemy.NetworkObjectId, cell.Coordinates);
                 }
                 else
                 {
-                    ExecuteMove(selectedPawn, cell);
+                    ExecuteMoveServerRpc(selectedPawn.NetworkObjectId, cell.Coordinates);
                 }
+                
+                // Discard the played card locally (and sync via DraftManager)
+                if (activeCardData != null && DraftManager.Instance != null)
+                {
+                    int localPlayerID = 1;
+                    if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+                    {
+                        localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                    }
+                    DraftManager.Instance.RemoveCardFromHand(localPlayerID, activeCardData);
+                }
+
+                // Clear locally immediately for responsiveness
+                ClearCellHighlights();
+                selectedPawn.ResetHighlight();
+                CancelSelection();
             }
             else
             {
@@ -252,74 +267,90 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
-        private void ExecuteMove(Pawn pawn, HexCell targetCell)
+        [ServerRpc(RequireOwnership = false)]
+        private void ExecuteMoveServerRpc(ulong pawnNetworkID, Vector2Int targetCoords)
         {
-            // Clear highlights immediately so the UI feels responsive
-            ClearCellHighlights();
-            pawn.ResetHighlight();
+            NetworkObject pawnObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[pawnNetworkID];
+            if (pawnObj == null) return;
 
-            HexCell oldCell = pawn.OccupiedCell;
-            oldCell.IsOccupied = false;
-            
-            pawn.SetCell(targetCell);
-            targetCell.IsOccupied = true;
-
-            pawn.transform.DOMove(targetCell.transform.position + pawnVisualOffset, moveDuration)
-                .SetEase(Ease.OutQuad)
-                .OnComplete(() => {
-                    if (activeCardData != null && DraftManager.Instance != null && TurnManager.Instance != null)
-                    {
-                        DraftManager.Instance.RemoveCardFromHand(TurnManager.Instance.ActivePlayerID, activeCardData);
-                    }
-                    
-                    CancelSelection();
-                    if (TurnManager.Instance != null) TurnManager.Instance.NextTurn();
-                    Debug.Log("PawnMovementManager: Move completed and turn ended.");
-                });
+            Pawn pawn = pawnObj.GetComponent<Pawn>();
+            if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
+            {
+                HexCell oldCell = pawn.OccupiedCell;
+                if (oldCell != null) oldCell.IsOccupied = false;
+                
+                pawn.SetCell(targetCell);
+                targetCell.IsOccupied = true;
+                
+                ExecuteMoveClientRpc(pawnNetworkID, targetCoords);
+                
+                if (TurnManager.Instance != null) TurnManager.Instance.NextTurn();
+            }
         }
 
-        private void ExecuteCombat(Pawn attacker, Pawn defender, HexCell targetCell)
+        [ClientRpc]
+        private void ExecuteMoveClientRpc(ulong pawnNetworkID, Vector2Int targetCoords)
         {
-            Debug.Log($"PawnMovementManager: Combat! {attacker.PawnType} vs {defender.PawnType}");
-            
-            int loserID = defender.PlayerID;
-            defender.OccupiedCell.IsOccupied = false;
-            Destroy(defender.gameObject);
-            
-            ExecuteMove(attacker, targetCell);
+            NetworkObject pawnObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[pawnNetworkID];
+            if (pawnObj == null) return;
 
-            // Check if loser has any pawns left (ignoring the one just destroyed)
-            CheckWinCondition(loserID, defender);
+            Pawn pawn = pawnObj.GetComponent<Pawn>();
+            if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
+            {
+                HexCell oldCell = pawn.OccupiedCell;
+                if (oldCell != null) oldCell.IsOccupied = false;
+                
+                pawn.SetCell(targetCell);
+                targetCell.IsOccupied = true;
+
+                pawn.transform.DOMove(targetCell.transform.position + pawnVisualOffset, moveDuration)
+                    .SetEase(Ease.OutQuad);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void ExecuteCombatServerRpc(ulong attackerID, ulong defenderID, Vector2Int targetCoords)
+        {
+            NetworkObject attackerObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[attackerID];
+            NetworkObject defenderObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[defenderID];
+
+            if (attackerObj != null && defenderObj != null)
+            {
+                Pawn defender = defenderObj.GetComponent<Pawn>();
+                int loserID = defender.PlayerID;
+                
+                defenderObj.Despawn(); // This destroys it on all clients
+
+                ExecuteMoveServerRpc(attackerID, targetCoords); // Calls ServerRpc from ServerRpc, safe
+                
+                // Win check on Server
+                CheckWinCondition(loserID);
+            }
         }
 
         private Vector2Int GetMirroredOffset(Vector2Int offset, int startingQ)
         {
-            // Vertical reflection in Odd-Q Hex Grid mapping:
-            // 1. Horizontal offset (dq) stays the same.
-            // 2. Vertical offset (dr) is negated.
-            // 3. If dq is odd, the staggering shift depends on the starting column parity.
-            
             int newDQ = offset.x;
             int newDR = -offset.y;
 
             if (Mathf.Abs(newDQ) % 2 != 0)
             {
-                // If we cross an odd number of columns, we must account for the staggering flip
-                if (startingQ % 2 == 0) newDR -= 1; // Even -> Odd shift in mirror is Down
-                else newDR += 1;                  // Odd -> Even shift in mirror is Up
+                if (startingQ % 2 == 0) newDR -= 1; 
+                else newDR += 1;                  
             }
 
             return new Vector2Int(newDQ, newDR);
         }
 
-        private void CheckWinCondition(int loserID, Pawn ignoringPawn = null)
+        private void CheckWinCondition(int loserID)
         {
+            if (!IsServer) return;
+
             Pawn[] allPawns = GameObject.FindObjectsOfType<Pawn>();
             bool hasPawnsLeft = false;
             foreach (var p in allPawns)
             {
-                // Unity's Destroy doesn't happen instantly, so we need to skip the pawn being destroyed
-                if (p != null && p != ignoringPawn && p.PlayerID == loserID)
+                if (p != null && p.IsSpawned && p.PlayerID == loserID)
                 {
                     hasPawnsLeft = true;
                     break;
@@ -329,7 +360,6 @@ namespace AlperKocasalih.Chess.Grid
             if (!hasPawnsLeft)
             {
                 int winnerID = loserID == 1 ? 2 : 1;
-                Debug.Log($"PawnMovementManager: Player {winnerID} wins!");
                 if (GameManager.Instance != null)
                 {
                     GameManager.Instance.EndGame(winnerID);
@@ -362,3 +392,4 @@ namespace AlperKocasalih.Chess.Grid
         #endregion
     }
 }
+

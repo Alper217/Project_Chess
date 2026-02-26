@@ -81,6 +81,18 @@ namespace AlperKocasalih.Chess.Grid
             return drawn;
         }
 
+        public int GetCardIndex(CardData card)
+        {
+            if (allAvailableCards == null) return -1;
+            return allAvailableCards.IndexOf(card);
+        }
+
+        public CardData GetCardByIndex(int index)
+        {
+            if (allAvailableCards == null || index < 0 || index >= allAvailableCards.Count) return null;
+            return allAvailableCards[index];
+        }
+
         #endregion
     }
 }
