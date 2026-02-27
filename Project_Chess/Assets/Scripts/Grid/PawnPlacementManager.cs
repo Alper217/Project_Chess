@@ -27,8 +27,6 @@ namespace AlperKocasalih.Chess.Grid
         
         private bool p1Confirmed = false;
         private bool p2Confirmed = false;
-        
-        private Camera mainCamera;
 
         #endregion
 
@@ -42,27 +40,12 @@ namespace AlperKocasalih.Chess.Grid
 
         private void Start()
         {
-            mainCamera = Camera.main;
             InitializeGridLookup();
         }
 
         public override void OnNetworkSpawn()
         {
             base.OnNetworkSpawn();
-            
-            // If we are Player 2 (Client), flip the camera 180 degrees so they see their pawns at the bottom
-            int localPlayerID = 1;
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
-            {
-                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-            }
-
-            if (localPlayerID == 2 && mainCamera != null)
-            {
-                // Rotate 180 degrees around the Y axis
-                mainCamera.transform.RotateAround(Vector3.zero, Vector3.up, 180f);
-                Debug.Log("PawnPlacementManager: Flipped camera for Player 2.");
-            }
         }
 
         private void Update()
@@ -124,7 +107,8 @@ namespace AlperKocasalih.Chess.Grid
 
         private void HandlePlacementInput()
         {
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            if (Camera.main == null) return;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             
             // IMPORTANT: Use cellLayer to ignore pawns or other objects blocking the cell
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, cellLayer))
@@ -142,12 +126,12 @@ namespace AlperKocasalih.Chess.Grid
             int localPlayerID = 1;
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
             {
-                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                localPlayerID = NetworkManager.Singleton.IsServer ? 1 : 2;
             }
 
             int rowCheck = cell.Coordinates.y;
-            bool isP1Region = rowCheck >= 0 && rowCheck <= 2;
-            bool isP2Region = rowCheck >= 7 && rowCheck <= 9;
+            bool isP1Region = rowCheck >= 7 && rowCheck <= 9;
+            bool isP2Region = rowCheck >= 0 && rowCheck <= 2;
 
             if (!isP1Region && !isP2Region)
             {
@@ -390,7 +374,7 @@ namespace AlperKocasalih.Chess.Grid
             int localPlayerID = 1;
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
             {
-                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                localPlayerID = NetworkManager.Singleton.IsServer ? 1 : 2;
             }
             ConfirmPlayerPlacementServerRpc(localPlayerID);
         }

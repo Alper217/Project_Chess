@@ -55,21 +55,33 @@ namespace AlperKocasalih.Chess.Grid
 
         private void OnRestartClicked()
         {
-            if (gameOverPanel != null)
+            if (restartButton != null)
             {
-                gameOverPanel.DOFade(0, 0.3f).OnComplete(() => {
-                    gameOverPanel.gameObject.SetActive(false);
-                    if (GameManager.Instance != null)
-                    {
-                        GameManager.Instance.RestartGame();
-                    }
-                });
+                restartButton.interactable = false;
+            }
+
+            if (winnerText != null)
+            {
+                winnerText.text = "Waiting for opponent...";
+                winnerText.color = Color.white;
+            }
+
+            if (GameManager.Instance != null && GameManager.Instance.NetworkObject.IsSpawned)
+            {
+                GameManager.Instance.RequestRestartServerRpc();
             }
             else
             {
-                if (GameManager.Instance != null)
+                // Fallback for single player/offline testing
+                if (gameOverPanel != null)
                 {
-                    GameManager.Instance.RestartGame();
+                    gameOverPanel.DOFade(0, 0.3f).OnComplete(() => {
+                        gameOverPanel.gameObject.SetActive(false);
+                        if (GameManager.Instance != null)
+                        {
+                            GameManager.Instance.RestartGame();
+                        }
+                    });
                 }
             }
         }

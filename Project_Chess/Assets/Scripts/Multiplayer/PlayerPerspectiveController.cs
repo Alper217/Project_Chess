@@ -1,33 +1,67 @@
 using Unity.Netcode;
 using UnityEngine;
+using AlperKocasalih.Chess.Grid;
 
 namespace AlperKocasalih.Chess.Multiplayer
 {
     public class PlayerPerspectiveController : NetworkBehaviour
     {
+        private bool isCameraAssigned = false;
+
         public override void OnNetworkSpawn()
         {
             if (!IsLocalPlayer) return;
 
-            // Player IDs are usually 0 for Host, 1 for Client in simple setups
-            // Or we check NetworkManager.Singleton.LocalClientId
-            
-            // If we are Player 2 (Client), rotate camera
-            if (NetworkManager.Singleton.LocalClientId > 0)
-            {
-                RotateCameraForPlayer2();
-            }
+            TryAssignCamera();
         }
 
-        private void RotateCameraForPlayer2()
+        private void Update()
         {
-            Camera mainCam = Camera.main;
-            if (mainCam != null)
+            if (!IsLocalPlayer || isCameraAssigned) return;
+
+            TryAssignCamera();
+        }
+
+        private void TryAssignCamera()
+        {
+            if (Grid.GameManager.Instance == null) return;
+            
+            bool isHost = NetworkManager.Singleton.IsServer;
+            
+            if (Grid.GameManager.Instance.player1Camera != null && Grid.GameManager.Instance.player2Camera != null)
             {
-                Debug.Log("Rotating camera for Player 2 perspective.");
-                mainCam.transform.rotation = Quaternion.Euler(45, 180, 0); 
-                // Note: Adjust 45 based on your original camera angle. 
-                // Default often is (45, 0, 0)
+                Grid.GameManager.Instance.player1Camera.SetActive(isHost);
+                var cam1 = Grid.GameManager.Instance.player1Camera.GetComponent<Camera>();
+                if (cam1 != null) cam1.tag = isHost ? "MainCamera" : "Untagged";
+                
+                Grid.GameManager.Instance.player2Camera.SetActive(!isHost);
+                var cam2 = Grid.GameManager.Instance.player2Camera.GetComponent<Camera>();
+                if (cam2 != null) cam2.tag = !isHost ? "MainCamera" : "Untagged";
+
+                if (!isHost)
+                {
+                    // Rotate Player 2 camera to look from the opposite side
+                    Transform p2Cam = Grid.GameManager.Instance.player2Camera.transform;
+                    Vector3 center = Vector3.zero;
+                    
+                    if (GridGenerator.Instance != null)
+                    {
+                        center = GridGenerator.Instance.transform.position; 
+                    }
+                    
+                    // We copy player1Camera's transform to player2Camera, then rotate it 180 degrees.
+                    // This guarantees the client has the exact opposite perspective.
+                    if (Grid.GameManager.Instance.player1Camera != null)
+                    {
+                        p2Cam.position = Grid.GameManager.Instance.player1Camera.transform.position;
+                        p2Cam.rotation = Grid.GameManager.Instance.player1Camera.transform.rotation;
+                    }
+
+                    p2Cam.RotateAround(center, Vector3.up, 180f);
+                }
+
+                isCameraAssigned = true;
+                Debug.Log($"Assigned Camera. IsHost: {isHost}");
             }
         }
     }

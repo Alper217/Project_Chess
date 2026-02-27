@@ -22,6 +22,15 @@ namespace AlperKocasalih.Chess.Grid
         [Header("Game State")]
         [SerializeField, ReadOnly] private NetworkVariable<GameState> currentState = new NetworkVariable<GameState>(GameState.Setup, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+        [Header("Restart Readiness")]
+        [SerializeField, ReadOnly] private NetworkVariable<bool> hostWantsRestart = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        [SerializeField, ReadOnly] private NetworkVariable<bool> clientWantsRestart = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+        [Header("Cameras")]
+        public GameObject player1Camera;
+        public GameObject player2Camera;
+
+
         #endregion
 
         #region Events
@@ -120,6 +129,42 @@ namespace AlperKocasalih.Chess.Grid
             if (!IsServer) return;
             ChangeState(GameState.EndGame);
             OnGameEnded?.Invoke(winnerID);
+            EndGameClientRpc(winnerID);
+        }
+
+        [ClientRpc]
+        private void EndGameClientRpc(int winnerID)
+        {
+            if (!IsServer)
+            {
+                OnGameEnded?.Invoke(winnerID);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void RequestRestartServerRpc(ServerRpcParams serverRpcParams = default)
+        {
+            ulong clientId = serverRpcParams.Receive.SenderClientId;
+            if (clientId == NetworkManager.ServerClientId)
+            {
+                hostWantsRestart.Value = true;
+            }
+            else
+            {
+                clientWantsRestart.Value = true;
+            }
+
+            CheckForRestart();
+        }
+
+        private void CheckForRestart()
+        {
+            if (hostWantsRestart.Value && clientWantsRestart.Value)
+            {
+                hostWantsRestart.Value = false;
+                clientWantsRestart.Value = false;
+                RestartGame();
+            }
         }
 
         public void RestartGame()
@@ -129,6 +174,7 @@ namespace AlperKocasalih.Chess.Grid
             Debug.Log("GameManager: Restarting Game...");
             RestartGameClientRpc();
         }
+
 
         [ClientRpc]
         private void RestartGameClientRpc()

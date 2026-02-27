@@ -34,7 +34,6 @@ namespace AlperKocasalih.Chess.Grid
         private List<HexCell> highlightedCells = new List<HexCell>();
         private List<Pawn> highlightedPawns = new List<Pawn>();
         private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
-        private Camera mainCamera;
 
         public bool IsActive => currentState != SelectionState.None;
 
@@ -50,7 +49,6 @@ namespace AlperKocasalih.Chess.Grid
 
         private void Start()
         {
-            mainCamera = Camera.main;
             InitializeGrid();
         }
 
@@ -143,7 +141,13 @@ namespace AlperKocasalih.Chess.Grid
             if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.ActionPhase)
                 return;
 
-            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            if (Camera.main == null) return;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            
+            // Check UI blocks before placing/selecting etc.
+            if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject()) 
+                return;
+
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, cellLayer))
             {
                 HexCell cell = hit.collider.GetComponent<HexCell>();
