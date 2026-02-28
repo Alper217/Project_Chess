@@ -126,7 +126,7 @@ namespace AlperKocasalih.Chess.Grid
             int localPlayerID = 1;
             if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
             {
-                localPlayerID = NetworkManager.Singleton.IsServer ? 1 : 2;
+                localPlayerID = NetworkManager.Singleton.IsHost ? 1 : 2;
             }
 
             int rowCheck = cell.Coordinates.y;
@@ -178,8 +178,8 @@ namespace AlperKocasalih.Chess.Grid
         private void SpawnPawnOnServer(HexCell cell, int pawnIndex, int playerID)
         {
             int rowCheck = cell.Coordinates.y;
-            bool isP1Region = rowCheck >= 0 && rowCheck <= 2;
-            bool isP2Region = rowCheck >= 7 && rowCheck <= 9;
+            bool isP1Region = rowCheck >= 7 && rowCheck <= 9;
+            bool isP2Region = rowCheck >= 0 && rowCheck <= 2;
 
             // Network validation reporting mapping
             ulong targetClientId = playerID == 1 ? 0UL : 1UL;

@@ -37,7 +37,8 @@ namespace AlperKocasalih.Chess.Multiplayer
                 Grid.GameManager.Instance.player2Camera.SetActive(!isHost);
                 var cam2 = Grid.GameManager.Instance.player2Camera.GetComponent<Camera>();
                 if (cam2 != null) cam2.tag = !isHost ? "MainCamera" : "Untagged";
-
+                
+                /*
                 if (!isHost)
                 {
                     // Rotate Player 2 camera to look from the opposite side
@@ -59,7 +60,7 @@ namespace AlperKocasalih.Chess.Multiplayer
 
                     p2Cam.RotateAround(center, Vector3.up, 180f);
                 }
-
+*/ 
                 isCameraAssigned = true;
                 Debug.Log($"Assigned Camera. IsHost: {isHost}");
             }
