@@ -194,6 +194,11 @@ namespace AlperKocasalih.Chess.Grid
                 Pawn enemy = FindPawnOnCell(cell);
                 if (enemy != null)
                 {
+                    if (selectedPawn != null && enemy.PlayerID == selectedPawn.PlayerID)
+                    {
+                        Debug.LogWarning("PawnMovementManager: Friendly pawn selected as target. Move ignored.");
+                        return;
+                    }
                     ExecuteCombatServerRpc(selectedPawn.NetworkObjectId, enemy.NetworkObjectId, cell.Coordinates);
                 }
                 else
@@ -255,16 +260,18 @@ namespace AlperKocasalih.Chess.Grid
                 Vector2Int targetCoords = currentCoords + finalOffset;
                 if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
                 {
-                    highlightedCells.Add(targetCell);
-                    
                     Pawn occupant = FindPawnOnCell(targetCell);
                     if (occupant != null)
                     {
                         if (occupant.PlayerID != pawn.PlayerID)
+                        {
+                            highlightedCells.Add(targetCell);
                             targetCell.Highlight(combatHighlightColor);
+                        }
                     }
                     else
                     {
+                        highlightedCells.Add(targetCell);
                         targetCell.Highlight(moveHighlightColor);
                     }
                 }
@@ -320,7 +327,14 @@ namespace AlperKocasalih.Chess.Grid
 
             if (attackerObj != null && defenderObj != null)
             {
+                Pawn attacker = attackerObj.GetComponent<Pawn>();
                 Pawn defender = defenderObj.GetComponent<Pawn>();
+                if (attacker == null || defender == null) return;
+                if (attacker.PlayerID == defender.PlayerID)
+                {
+                    Debug.LogWarning("PawnMovementManager: Friendly fire attempt blocked on server.");
+                    return;
+                }
                 int loserID = defender.PlayerID;
                 
                 defenderObj.Despawn(); // This destroys it on all clients

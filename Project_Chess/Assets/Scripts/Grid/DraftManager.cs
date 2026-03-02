@@ -52,7 +52,7 @@ namespace AlperKocasalih.Chess.Grid
         {
             isDraftingActive = true;
             roundCount = 1;
-            draftingPlayerID = 1;
+            draftingPlayerID = TurnManager.Instance.ActivePlayerID;
             
             p1Hand.Clear();
             p2Hand.Clear();

@@ -30,6 +30,7 @@ namespace AlperKocasalih.Chess.UI
             else
             {
                 if (setupPanel != null) setupPanel.SetActive(false);
+                if (confirmButton != null) confirmButton.interactable = false;
             }
         }
 
@@ -47,6 +48,11 @@ namespace AlperKocasalih.Chess.UI
             {
                 setupPanel.SetActive(newState == GameState.Setup);
             }
+
+            if (confirmButton != null)
+            {
+                confirmButton.interactable = (newState == GameState.Setup);
+            }
         }
 
         private void OnConfirmClicked()
@@ -54,7 +60,7 @@ namespace AlperKocasalih.Chess.UI
             if (PawnPlacementManager.Instance != null)
             {
                 PawnPlacementManager.Instance.ConfirmLocalPlayerPlacement();
-                // Optionally disable the button to prevent multiple clicks
+                // Disable after confirm to prevent double-submit until next Setup state.
                 if (confirmButton != null) confirmButton.interactable = false;
             }
         }

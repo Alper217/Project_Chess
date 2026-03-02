@@ -17,6 +17,7 @@ namespace AlperKocasalih.Chess.Grid
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.OnGameEnded += ShowGameOver;
+                GameManager.Instance.OnStateChanged += HandleStateChanged;
             }
 
             if (restartButton != null)
@@ -32,6 +33,23 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        private void OnDestroy()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnGameEnded -= ShowGameOver;
+                GameManager.Instance.OnStateChanged -= HandleStateChanged;
+            }
+        }
+
+        private void HandleStateChanged(GameState newState)
+        {
+            if (newState != GameState.EndGame)
+            {
+                HideGameOver();
+            }
+        }
+
         private void ShowGameOver(int winnerID)
         {
             if (gameOverPanel == null) return;
@@ -44,6 +62,11 @@ namespace AlperKocasalih.Chess.Grid
 
             gameOverPanel.gameObject.SetActive(true);
             gameOverPanel.DOFade(1, 0.5f);
+
+            if (restartButton != null)
+            {
+                restartButton.interactable = true;
+            }
             
             // Subtle animation for text
             if (winnerText != null)
@@ -51,6 +74,17 @@ namespace AlperKocasalih.Chess.Grid
                 winnerText.transform.localScale = Vector3.zero;
                 winnerText.transform.DOScale(Vector3.one, 0.8f).SetEase(Ease.OutBack);
             }
+        }
+
+        private void HideGameOver()
+        {
+            if (gameOverPanel == null) return;
+
+            gameOverPanel.DOKill();
+            gameOverPanel.DOFade(0, 0.3f).OnComplete(() =>
+            {
+                gameOverPanel.gameObject.SetActive(false);
+            });
         }
 
         private void OnRestartClicked()
@@ -73,15 +107,11 @@ namespace AlperKocasalih.Chess.Grid
             else
             {
                 // Fallback for single player/offline testing
-                if (gameOverPanel != null)
+                HideGameOver();
+                
+                if (GameManager.Instance != null)
                 {
-                    gameOverPanel.DOFade(0, 0.3f).OnComplete(() => {
-                        gameOverPanel.gameObject.SetActive(false);
-                        if (GameManager.Instance != null)
-                        {
-                            GameManager.Instance.RestartGame();
-                        }
-                    });
+                    GameManager.Instance.RestartGame();
                 }
             }
         }

@@ -96,6 +96,7 @@ namespace AlperKocasalih.Chess.Grid
             switch (newState)
             {
                 case GameState.Setup:
+                    
                     break;
                 case GameState.RollDice:
                     if (IsServer && TurnManager.Instance != null)
