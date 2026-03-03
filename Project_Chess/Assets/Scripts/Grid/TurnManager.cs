@@ -145,9 +145,22 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (turnInfoText != null)
             {
+                int localPlayerID = 1;
+                if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+                {
+                    localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                }
+
+                bool isMyTurn = localPlayerID == activePlayerID.Value;
                 turnInfoText.text = $"Turn: Player {activePlayerID.Value}";
+                turnInfoText.color = isMyTurn ? Color.green : Color.gray;
                 turnInfoText.transform.DOPunchScale(Vector3.one * 0.2f, 0.3f);
             }
+        }
+
+        public void RefreshTurnInfoUI()
+        {
+            UpdateTurnInfoUI();
         }
 
         public void ResetManager()

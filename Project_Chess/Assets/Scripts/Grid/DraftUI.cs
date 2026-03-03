@@ -64,6 +64,11 @@ namespace AlperKocasalih.Chess.Grid
 
         private void HideDraftUI()
         {
+            if (TurnManager.Instance != null)
+            {
+                TurnManager.Instance.RefreshTurnInfoUI();
+            }
+
             if (draftPanel != null)
             {
                 draftPanel.DOFade(0, 0.5f).OnComplete(() => draftPanel.gameObject.SetActive(false));

@@ -38,12 +38,10 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
-        }
-
-        private void Start()
-        {
             GenerateGrid();
         }
+
+       
 
         #endregion
 
