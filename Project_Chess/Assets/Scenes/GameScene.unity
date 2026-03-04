@@ -3369,8 +3369,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.PawnPlacementManager
   ShowTopMostFoldoutHeaderGroup: 1
   pawnPrefabs:
-  - {fileID: 9025542362197510009, guid: b8ec8e60658849148b8aaa758de8b40c, type: 3}
-  - {fileID: 890610842641824481, guid: 5f6779f6a985c83408e9bb17bfdf1a1f, type: 3}
+  - {fileID: 1035406743255426654, guid: b57442fb11d70ee4c86d96e81bc6c6b0, type: 3}
+  - {fileID: 6189865163471943641, guid: 0d5319640508d1547b5391af2f313384, type: 3}
   selectedPawnIndex: 0
   cellLayer:
     serializedVersion: 2
@@ -3878,7 +3878,8 @@ MonoBehaviour:
   cellLayer:
     serializedVersion: 2
     m_Bits: 64
-  pawnHighlightColor: {r: 0, g: 1, b: 1, a: 1}
+  pawnHighlightMat: {fileID: 2100000, guid: 820fd05d371deac48b240e93a4dfc74f, type: 2}
+  selectedPawnHighlightMat: {fileID: 2100000, guid: 8ea1e78ded56b794dba2b69584c42156, type: 2}
   moveHighlightColor: {r: 1, g: 0.5, b: 0, a: 1}
   combatHighlightColor: {r: 1, g: 0, b: 0, a: 1}
   moveDuration: 1

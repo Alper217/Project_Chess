@@ -15,7 +15,8 @@ namespace AlperKocasalih.Chess.Grid
 
         [Header("Settings")]
         [SerializeField] private LayerMask cellLayer;
-        [SerializeField] private Color pawnHighlightColor = Color.cyan;
+        [SerializeField] private Material pawnHighlightMat;
+        [SerializeField] private Material selectedPawnHighlightMat;
         [SerializeField] private Color moveHighlightColor = new Color(1f, 0.5f, 0f); // Orange
         [SerializeField] private Color combatHighlightColor = Color.red;
         [SerializeField] private float moveDuration = 0.5f;
@@ -109,7 +110,7 @@ namespace AlperKocasalih.Chess.Grid
             {
                 if (pObj.PlayerID != localPlayerID) continue;
                 
-                pObj.VisualHighlight(pawnHighlightColor);
+                pObj.VisualHighlight(pawnHighlightMat);
                 highlightedPawns.Add(pObj);
             }
             
@@ -131,7 +132,7 @@ namespace AlperKocasalih.Chess.Grid
             {
                 if (pObj.PlayerID != localPlayerID) continue;
                 
-                pObj.VisualHighlight(pawnHighlightColor);
+                pObj.VisualHighlight(pawnHighlightMat);
                 highlightedPawns.Add(pObj);
             }
         }
@@ -181,7 +182,7 @@ namespace AlperKocasalih.Chess.Grid
                 currentState = SelectionState.PawnSelected;
                 
                 ClearPawnHighlights();
-                selectedPawn.VisualHighlight(Color.yellow);
+                selectedPawn.VisualHighlight(selectedPawnHighlightMat);
                 
                 ShowValidMoves(selectedPawn);
             }

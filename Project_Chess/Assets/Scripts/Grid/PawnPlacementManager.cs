@@ -293,14 +293,14 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             // Placement
+            Quaternion spawnRot = isP1Region? Quaternion.Euler(0,180,0) : Quaternion.identity;
             Vector3 targetPos = cell.transform.position + pawnVisualOffset;
             Vector3 spawnPos = targetPos + Vector3.up * dropHeight;
             
-            GameObject pawnObj = Instantiate(prefab, spawnPos, Quaternion.identity);
+            GameObject pawnObj = Instantiate(prefab, spawnPos, spawnRot);
             Pawn pawn = pawnObj.GetComponent<Pawn>();
             
             pawn.Initialize(cell);
-            // PlayerID and TypeIndex will be set via SetNetworkData after Spawn
             
             // Track uniqueness per player
             if (isP1Region) p1SpawnedTypes.Add(pawnIndex);
@@ -313,7 +313,7 @@ namespace AlperKocasalih.Chess.Grid
                 netObj.Spawn(true);
             }
 
-            // Sync state via NetworkVariables
+            // Sync state via NetworkVariables after spawn.
             pawn.SetNetworkData(isP1Region ? 1 : 2, pawnIndex, cell.Coordinates);
 
             StartCoroutine(AnimatePawnDrop(pawnObj, targetPos));

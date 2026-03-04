@@ -22,7 +22,8 @@ namespace AlperKocasalih.Chess.Grid
 
         [Header("Visuals")]
         [SerializeField] private MeshRenderer meshRenderer;
-        private Color originalColor;
+        [SerializeField, Min(0)] private int highlightMaterialIndex = 0;
+        private Material[] originalMaterials;
         private bool isInitialized = false;
 
         #endregion
@@ -40,11 +41,9 @@ namespace AlperKocasalih.Chess.Grid
 
         public override void OnNetworkSpawn()
         {
-            if (meshRenderer == null) meshRenderer = GetComponentInChildren<MeshRenderer>();
-            if (meshRenderer != null) originalColor = meshRenderer.material.color;
+            if (meshRenderer == null) meshRenderer = GetComponent<MeshRenderer>();
 
             netCellCoords.OnValueChanged += OnCellCoordsChanged;
-
             // If we are a client joining late, or just receiving the spawn AFTER data is set:
             if (netCellCoords.Value.x != -999)
             {
@@ -101,9 +100,7 @@ namespace AlperKocasalih.Chess.Grid
             currentCell = cell;
             currentCell.IsOccupied = true;
             isInitialized = true;
-            
-            if (meshRenderer == null) meshRenderer = GetComponentInChildren<MeshRenderer>();
-            if (meshRenderer != null) originalColor = meshRenderer.material.color;
+            if (meshRenderer == null) meshRenderer = GetComponent<MeshRenderer>();
         }
 
         public void SetCell(HexCell cell)
@@ -115,12 +112,16 @@ namespace AlperKocasalih.Chess.Grid
         /// <summary>
         /// Highlights the pawn visually.
         /// </summary>
-        public void VisualHighlight(Color color)
+        public void VisualHighlight(Material mat)
         {
-            if (meshRenderer != null)
-            {
-                meshRenderer.material.color = color;
-            }
+            if (meshRenderer == null) return;
+
+            Material[] mats = meshRenderer.materials;
+            if (mats == null || mats.Length == 0) return;
+
+            int index = Mathf.Clamp(highlightMaterialIndex, 0, mats.Length - 1);
+            mats[index] = mat;
+            meshRenderer.materials = mats;
         }
 
         /// <summary>
@@ -128,12 +129,11 @@ namespace AlperKocasalih.Chess.Grid
         /// </summary>
         public void ResetHighlight()
         {
-            if (meshRenderer != null)
-            {
-                meshRenderer.material.color = originalColor;
-            }
+            if (meshRenderer == null || originalMaterials == null || originalMaterials.Length == 0) return;
+            meshRenderer.materials = originalMaterials;
         }
 
+     
         #endregion
     }
 }
