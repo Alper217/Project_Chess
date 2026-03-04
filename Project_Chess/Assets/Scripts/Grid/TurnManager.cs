@@ -27,6 +27,7 @@ namespace AlperKocasalih.Chess.Grid
         #region Properties
 
         public int ActivePlayerID => activePlayerID.Value;
+        public int TurnCount => turnCount.Value;
 
         #endregion
 

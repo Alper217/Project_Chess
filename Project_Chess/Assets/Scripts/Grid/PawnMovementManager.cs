@@ -9,7 +9,7 @@ namespace AlperKocasalih.Chess.Grid
     public class PawnMovementManager : NetworkBehaviour
     {
         public static PawnMovementManager Instance { get; private set; }
-        public enum SelectionState { None, CardSelected, PawnSelected }
+        public enum SelectionState { None, CardSelected, PawnSelected, ObstacleTargeting }
 
         #region Fields
 
@@ -36,6 +36,14 @@ namespace AlperKocasalih.Chess.Grid
         private List<Pawn> highlightedPawns = new List<Pawn>();
         private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
 
+        [System.Serializable]
+        private struct ObstacleRecord
+        {
+            public Vector2Int coordinate;
+            public int placedTurn;
+        }
+        private List<ObstacleRecord> activeObstacles = new List<ObstacleRecord>();
+
         public bool IsActive => currentState != SelectionState.None;
 
         #endregion
@@ -51,6 +59,24 @@ namespace AlperKocasalih.Chess.Grid
         private void Start()
         {
             InitializeGrid();
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            if (IsServer && TurnManager.Instance != null)
+            {
+                TurnManager.Instance.OnTurnChanged += HandleTurnChanged;
+            }
+        }
+
+        public override void OnNetworkDespawn()
+        {
+            base.OnNetworkDespawn();
+            if (IsServer && TurnManager.Instance != null)
+            {
+                TurnManager.Instance.OnTurnChanged -= HandleTurnChanged;
+            }
         }
 
         private void Update()
@@ -102,19 +128,27 @@ namespace AlperKocasalih.Chess.Grid
             CancelSelection();
             activeCardData = card;
             activePattern = card.pattern;
-            currentState = SelectionState.CardSelected;
 
-            int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-
-            foreach (var pObj in GameObject.FindObjectsOfType<Pawn>())
+            if (card.isObstacleCard)
             {
-                if (pObj.PlayerID != localPlayerID) continue;
-                
-                pObj.VisualHighlight(pawnHighlightMat);
-                highlightedPawns.Add(pObj);
+                currentState = SelectionState.ObstacleTargeting;
+                Debug.Log($"PawnMovementManager: Obstacle Card '{card.cardName}' selected. Select an empty cell to place the pattern.");
             }
-            
-            Debug.Log($"PawnMovementManager: Card '{card.cardName}' selected. Select a pawn.");
+            else
+            {
+                currentState = SelectionState.CardSelected;
+                int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+
+                foreach (var pObj in GameObject.FindObjectsOfType<Pawn>())
+                {
+                    if (pObj.PlayerID != localPlayerID) continue;
+                    
+                    pObj.VisualHighlight(pawnHighlightMat);
+                    highlightedPawns.Add(pObj);
+                }
+                
+                Debug.Log($"PawnMovementManager: Card '{card.cardName}' selected. Select a pawn.");
+            }
         }
 
         public void SelectMovementPattern(MovementPattern pattern)
@@ -157,6 +191,10 @@ namespace AlperKocasalih.Chess.Grid
                 if (currentState == SelectionState.CardSelected)
                 {
                     HandlePawnSelection(cell);
+                }
+                else if (currentState == SelectionState.ObstacleTargeting)
+                {
+                    HandleObstaclePlacement(cell);
                 }
                 else if (currentState == SelectionState.PawnSelected)
                 {
@@ -229,6 +267,34 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        private void HandleObstaclePlacement(HexCell cell)
+        {
+            if (activeCardData == null || activeCardData.obstaclePattern == null) return;
+            
+            if (cell.IsOccupied || cell.IsObstacle)
+            {
+                Debug.Log("PawnMovementManager: Cannot place obstacle with its center on an occupied or obstructed cell.");
+                return; // Optionally we could still allow placement but not on center. For now, strict center empty.
+            }
+
+            int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            List<Vector2Int> localOffsets = activeCardData.obstaclePattern.GetObstacleOffsets(cell.Coordinates.x);
+            
+            bool isPlayer2 = (localPlayerID == 2);
+            List<Vector2Int> absoluteWorldOffsets = GenerateAccurateWorldOffsetsFromPattern(cell.Coordinates, localOffsets, isPlayer2);
+
+            // Execute placement over network
+            ExecuteObstaclePlacementServerRpc(absoluteWorldOffsets.ToArray());
+
+            // Discard card
+            if (activeCardData != null && DraftManager.Instance != null)
+            {
+                DraftManager.Instance.RemoveCardFromHand(localPlayerID, activeCardData);
+            }
+
+            CancelSelection();
+        }
+
         private void CancelSelection()
         {
             ClearCellHighlights();
@@ -250,6 +316,8 @@ namespace AlperKocasalih.Chess.Grid
             Vector2Int currentCoords = pawn.OccupiedCell.Coordinates;
             List<Vector2Int> offsets = activePattern.GetValidOffsets(currentCoords.x);
 
+            Vector3Int startCube = OffsetToCube(currentCoords);
+
             foreach (var offset in offsets)
             {
                 Vector2Int finalOffset = offset;
@@ -259,6 +327,37 @@ namespace AlperKocasalih.Chess.Grid
                 }
 
                 Vector2Int targetCoords = currentCoords + finalOffset;
+                
+                // --- LINE OF SIGHT CHECK ---
+                bool isBlocked = false;
+                Vector3Int targetCube = OffsetToCube(targetCoords);
+                int dist = CubeDistance(startCube, targetCube);
+                
+                for (int i = 1; i <= dist; i++)
+                {
+                    // LERP to find all hexes exactly on the line
+                    Vector3 cubeFloat = CubeLerp(startCube, targetCube, 1f / dist * i);
+                    Vector3Int cubePoint = CubeRound(cubeFloat);
+                    Vector2Int pathCoord = CubeToOffset(cubePoint);
+                    
+                    if (gridLookup.TryGetValue(pathCoord, out HexCell pathCell))
+                    {
+                        if (pathCell.IsObstacle)
+                        {
+                            isBlocked = true;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        isBlocked = true; // Path goes out of bounds
+                        break;
+                    }
+                }
+                
+                if (isBlocked) continue; // Skip to next target option
+                // --------------------------
+
                 if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
                 {
                     Pawn occupant = FindPawnOnCell(targetCell);
@@ -317,6 +416,76 @@ namespace AlperKocasalih.Chess.Grid
 
                 pawn.transform.DOMove(targetCell.transform.position + pawnVisualOffset, moveDuration)
                     .SetEase(Ease.OutQuad);
+            }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        private void ExecuteObstaclePlacementServerRpc(Vector2Int[] worldCoords)
+        {
+            int currentTurn = TurnManager.Instance != null ? TurnManager.Instance.TurnCount : 1;
+
+            foreach (var coord in worldCoords)
+            {
+                if (gridLookup.TryGetValue(coord, out HexCell cell) && !cell.IsOccupied)
+                {
+                    cell.SetObstacle(true);
+                    activeObstacles.Add(new ObstacleRecord { coordinate = coord, placedTurn = currentTurn });
+                }
+            }
+            ExecuteObstaclePlacementClientRpc(worldCoords);
+            if (TurnManager.Instance != null) TurnManager.Instance.NextTurn();
+        }
+
+        [ClientRpc]
+        private void ExecuteObstaclePlacementClientRpc(Vector2Int[] worldCoords)
+        {
+            foreach (var coord in worldCoords)
+            {
+                if (gridLookup.TryGetValue(coord, out HexCell cell) && !cell.IsOccupied)
+                {
+                    cell.SetObstacle(true);
+                }
+            }
+        }
+
+        private void HandleTurnChanged(int newActivePlayerID)
+        {
+            if (!IsServer) return;
+            if (TurnManager.Instance == null) return;
+
+            int currentTurn = TurnManager.Instance.TurnCount;
+            List<Vector2Int> expiredCoords = new List<Vector2Int>();
+
+            // An obstacle placed on Turn X expires when TurnCount > X + 3
+            for (int i = activeObstacles.Count - 1; i >= 0; i--)
+            {
+                if (currentTurn > activeObstacles[i].placedTurn + 3)
+                {
+                    expiredCoords.Add(activeObstacles[i].coordinate);
+                    
+                    if (gridLookup.TryGetValue(activeObstacles[i].coordinate, out HexCell cell))
+                    {
+                        cell.SetObstacle(false);
+                    }
+                    activeObstacles.RemoveAt(i);
+                }
+            }
+
+            if (expiredCoords.Count > 0)
+            {
+                RemoveObstaclesClientRpc(expiredCoords.ToArray());
+            }
+        }
+
+        [ClientRpc]
+        private void RemoveObstaclesClientRpc(Vector2Int[] coords)
+        {
+            foreach (var coord in coords)
+            {
+                if (gridLookup.TryGetValue(coord, out HexCell cell))
+                {
+                    cell.SetObstacle(false);
+                }
             }
         }
 
@@ -406,6 +575,97 @@ namespace AlperKocasalih.Chess.Grid
         {
             foreach (var p in highlightedPawns) if (p != null) p.ResetHighlight();
             highlightedPawns.Clear();
+        }
+
+        #endregion
+
+        #region Hex Math (Odd-Q / Cube)
+
+        private List<Vector2Int> GenerateAccurateWorldOffsetsFromPattern(Vector2Int centerWorldCoords, List<Vector2Int> localPatternOffsets, bool rotate180 = false)
+        {
+            // The localPatternOffsets are generated from an Odd-Q grid with center (3,3).
+            // Odd-Q properties means offsets depend on whether the center Q is odd or even.
+            // Since the local grid has an ODD center (x=3), if the world target has an EVEN center, 
+            // we must properly translate it so the shape stays consistent geometrically.
+            // Using Cube Coordinates handles this flawlessly.
+            
+            List<Vector2Int> worldCoords = new List<Vector2Int>();
+            Vector3Int worldCenterCube = OffsetToCube(centerWorldCoords);
+            Vector3Int localCenterCube = OffsetToCube(new Vector2Int(3, 3)); // 3,3 is the pattern center
+
+            foreach (var localOffsetCoord in localPatternOffsets)
+            {
+                Vector2Int absoluteLocalCoord = new Vector2Int(3 + localOffsetCoord.x, 3 + localOffsetCoord.y);
+                Vector3Int localCube = OffsetToCube(absoluteLocalCoord);
+                
+                // Difference in cube space
+                Vector3Int diff = localCube - localCenterCube;
+                
+                if (rotate180)
+                {
+                    // Rotating 180 degrees in hex cube coords is simply negating the cube vector coords
+                    diff = new Vector3Int(-diff.x, -diff.y, -diff.z);
+                }
+
+                // Add diff to world center in cube space
+                Vector3Int newWorldCube = worldCenterCube + diff;
+                
+                Vector2Int finalWorldOffset = CubeToOffset(newWorldCube);
+                worldCoords.Add(finalWorldOffset);
+            }
+
+            return worldCoords;
+        }
+
+        private Vector3Int OffsetToCube(Vector2Int hex)
+        {
+            int q = hex.x;
+            int r = hex.y;
+            int x = q;
+            int z = r - (q - (q & 1)) / 2;
+            int y = -x - z;
+            return new Vector3Int(x, y, z);
+        }
+
+        private Vector2Int CubeToOffset(Vector3Int cube)
+        {
+            int q = cube.x;
+            int r = cube.z + (cube.x - (cube.x & 1)) / 2;
+            return new Vector2Int(q, r);
+        }
+
+        private int CubeDistance(Vector3Int a, Vector3Int b)
+        {
+            return (Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y) + Mathf.Abs(a.z - b.z)) / 2;
+        }
+
+        private Vector3 CubeLerp(Vector3Int a, Vector3Int b, float t)
+        {
+            return new Vector3(
+                Mathf.Lerp(a.x, b.x, t),
+                Mathf.Lerp(a.y, b.y, t),
+                Mathf.Lerp(a.z, b.z, t)
+            );
+        }
+
+        private Vector3Int CubeRound(Vector3 frac)
+        {
+            int q = Mathf.RoundToInt(frac.x);
+            int r = Mathf.RoundToInt(frac.y);
+            int s = Mathf.RoundToInt(frac.z);
+
+            float q_diff = Mathf.Abs(q - frac.x);
+            float r_diff = Mathf.Abs(r - frac.y);
+            float s_diff = Mathf.Abs(s - frac.z);
+
+            if (q_diff > r_diff && q_diff > s_diff)
+                q = -r - s;
+            else if (r_diff > s_diff)
+                r = -q - s;
+            else
+                s = -q - r;
+
+            return new Vector3Int(q, r, s);
         }
 
         #endregion

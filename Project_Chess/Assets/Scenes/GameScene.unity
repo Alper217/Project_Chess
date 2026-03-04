@@ -2433,6 +2433,7 @@ MonoBehaviour:
   allAvailableCards:
   - {fileID: 11400000, guid: 5805567aea5ec8048b7b52cc3c4ab93b, type: 2}
   - {fileID: 11400000, guid: ec2c6cd505f8a05458ad7e9712f25409, type: 2}
+  - {fileID: 11400000, guid: 4444fe951717a0442ac82f74cced862b, type: 2}
   initialDeckSize: 100
   deck: []
 --- !u!114 &1073880200
@@ -3369,8 +3370,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.PawnPlacementManager
   ShowTopMostFoldoutHeaderGroup: 1
   pawnPrefabs:
-  - {fileID: 1035406743255426654, guid: b57442fb11d70ee4c86d96e81bc6c6b0, type: 3}
-  - {fileID: 6189865163471943641, guid: 0d5319640508d1547b5391af2f313384, type: 3}
+  - {fileID: 551251837077093740, guid: 2380069d5e9c6d84e9b749c9ed2cf867, type: 3}
+  - {fileID: 3522383260281977880, guid: d71d99ee798c91d48a399d431ddd8bdd, type: 3}
+  - {fileID: 3168573310417710798, guid: b57442fb11d70ee4c86d96e81bc6c6b0, type: 3}
+  - {fileID: 7182019095934932763, guid: f7a5ec264204f7646b7b363ec6dc34a2, type: 3}
+  - {fileID: 6345218074573445507, guid: 0d5319640508d1547b5391af2f313384, type: 3}
   selectedPawnIndex: 0
   cellLayer:
     serializedVersion: 2

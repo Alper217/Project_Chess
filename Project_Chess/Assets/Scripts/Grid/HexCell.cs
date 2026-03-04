@@ -16,6 +16,7 @@ namespace AlperKocasalih.Chess.Grid
 
         [Header("Status")]
         [SerializeField, ReadOnly] private bool isOccupied;
+        [SerializeField, ReadOnly] private bool isObstacle;
 
         [Header("Visuals")]
         [SerializeField] private MeshRenderer meshRenderer;
@@ -33,6 +34,7 @@ namespace AlperKocasalih.Chess.Grid
             get => isOccupied;
             set => isOccupied = value;
         }
+        public bool IsObstacle => isObstacle;
 
         #endregion
 
@@ -64,14 +66,20 @@ namespace AlperKocasalih.Chess.Grid
         }
 
         /// <summary>
-        /// Resets the cell highlight to its original color.
+        /// Resets the cell highlight to its original color, or black if it is an obstacle.
         /// </summary>
         public void ResetHighlight()
         {
             if (meshRenderer != null)
             {
-                meshRenderer.material.color = originalColor;
+                meshRenderer.material.color = isObstacle ? Color.black : originalColor;
             }
+        }
+
+        public void SetObstacle(bool isObstruction)
+        {
+            this.isObstacle = isObstruction;
+            ResetHighlight();
         }
 
         public void ClearOccupiedPawn()
