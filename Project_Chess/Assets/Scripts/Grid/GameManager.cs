@@ -133,6 +133,28 @@ namespace AlperKocasalih.Chess.Grid
             EndGameClientRpc(winnerID);
         }
 
+        public void CheckWinCondition(int loserID)
+        {
+            if (!IsServer) return;
+
+            Pawn[] allPawns = GameObject.FindObjectsOfType<Pawn>();
+            bool hasPawnsLeft = false;
+            foreach (var p in allPawns)
+            {
+                if (p != null && p.IsSpawned && p.PlayerID == loserID)
+                {
+                    hasPawnsLeft = true;
+                    break;
+                }
+            }
+
+            if (!hasPawnsLeft)
+            {
+                int winnerID = loserID == 1 ? 2 : 1;
+                EndGame(winnerID);
+            }
+        }
+
         [ClientRpc]
         private void EndGameClientRpc(int winnerID)
         {

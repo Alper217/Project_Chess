@@ -70,9 +70,9 @@ namespace AlperKocasalih.Chess.Grid
             // In local multiplayer, we assume the person clicking is the active player 
             // but we can add a check if HandCard stores playerID
 
-            if (PawnMovementManager.Instance != null)
+            if (PlayerInputController.Instance != null)
             {
-                PawnMovementManager.Instance.SelectMovementCard(card.CardData);
+                PlayerInputController.Instance.SelectMovementCard(card.CardData);
             }
         }
 

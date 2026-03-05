@@ -55,8 +55,11 @@ namespace AlperKocasalih.Chess.Grid
                 return;
 
             // Do not handle placement if movement mode is active
-            if (PawnMovementManager.Instance != null && PawnMovementManager.Instance.IsActive)
+            if (PlayerInputController.Instance != null && PlayerInputController.Instance.IsActive)
+            {
+                // PlayerInputController is handling an action (move/attack), ignore placement
                 return;
+            }
 
             if (Input.GetMouseButtonDown(0))
             {
