@@ -11,15 +11,20 @@ namespace AlperKocasalih.Chess.Grid
 
         #region Fields
 
+        [Header("Pawn Placement Settings")] 
+        private PawnSelectionUI currentSelectedPawn;
+        [SerializeField] private PawnSelectionUI[] allPawnUIItems;
+ 
         [Header("Prefabs")]
         [SerializeField] private GameObject[] pawnPrefabs;
-        [SerializeField] private int selectedPawnIndex = 0;
+        [SerializeField] private int selectedPawnIndex;
 
         [Header("Settings")]
         [SerializeField] private LayerMask cellLayer;
         [SerializeField] private float dropHeight = 5f;
         [SerializeField] private float animationDuration = 0.5f;
         [SerializeField] private Vector3 pawnVisualOffset = new Vector3(0, 0.5f, 0);
+        [SerializeField] private int maxPawns = 5;
 
         private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
         private HashSet<int> p1SpawnedTypes = new HashSet<int>(); // P1: r 0-2
@@ -30,12 +35,20 @@ namespace AlperKocasalih.Chess.Grid
 
         #endregion
 
+        private int GetPlacementCap()
+        {
+            int prefabCount = pawnPrefabs != null ? pawnPrefabs.Length : 0;
+            return Mathf.Clamp(maxPawns, 0, prefabCount);
+        }
+
         #region Unity Methods
 
         private void Awake()
         {
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
+            currentSelectedPawn = PawnSelectionUI.instance;
+            
         }
 
         private void Start()
@@ -65,27 +78,23 @@ namespace AlperKocasalih.Chess.Grid
             {
                 HandlePlacementInput();
             }
-
-            // Quick index selection for testing (1-5 keys)
-            for (int i = 0; i < Mathf.Min(pawnPrefabs.Length, 5); i++)
-            {
-                if (Input.GetKeyDown(KeyCode.Alpha1 + i))
-                {
-                    selectedPawnIndex = i;
-                    Debug.Log($"PawnPlacementManager: Selected Pawn Type {i}");
-                }
-            }
-
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                // This is now handled via FinishSetup which checks for both confirmations
-                Debug.Log("PawnPlacementManager: Space pressed. Use UI buttons to confirm for each player.");
-            }
         }
 
         #endregion
 
         #region Methods
+
+        public void SelectedPawn(PawnSelectionUI selectedPawnUı)
+        {
+            if (currentSelectedPawn != null)
+            {
+                currentSelectedPawn.SetSelected(false);
+            }
+            
+            currentSelectedPawn = selectedPawnUı;
+            selectedPawnIndex = selectedPawnUı.pawnTypeIndex;
+            currentSelectedPawn.SetSelected(true);
+        }
 
         private void InitializeGridLookup()
         {
@@ -183,6 +192,7 @@ namespace AlperKocasalih.Chess.Grid
             int rowCheck = cell.Coordinates.y;
             bool isP1Region = rowCheck >= 7 && rowCheck <= 9;
             bool isP2Region = rowCheck >= 0 && rowCheck <= 2;
+            int placementCap = GetPlacementCap();
 
             // Network validation reporting mapping
             ulong targetClientId = playerID == 1 ? 0UL : 1UL;
@@ -190,6 +200,14 @@ namespace AlperKocasalih.Chess.Grid
             {
                 Send = new ClientRpcSendParams { TargetClientIds = new[] { targetClientId } }
             };
+
+            if (placementCap <= 0)
+            {
+                string msg = "PawnPlacementManager: maxPawns must be greater than 0 and less than or equal to pawn prefab count.";
+                Debug.LogWarning(msg);
+                SendWarningToClientRpc(msg, clientRpcParams);
+                return;
+            }
 
             // Only Server runs this logic
             // Validation 1: Already occupied?
@@ -201,6 +219,7 @@ namespace AlperKocasalih.Chess.Grid
 
                 if (existingPawn != null)
                 {
+                    int typeIndexToReset = existingPawn.TypeIndex;
                     // Only allow picking up if it's the correct region and player hasn't confirmed
                     if (isP1Region && !p1Confirmed)
                     {
@@ -210,6 +229,7 @@ namespace AlperKocasalih.Chess.Grid
                         NetworkObject existingNetObj = existingPawn.GetComponent<NetworkObject>();
                         if (existingNetObj != null && existingNetObj.IsSpawned) existingNetObj.Despawn();
                         else Destroy(existingPawn.gameObject);
+                        NotifyPawnPickedUpClientRpc(typeIndexToReset, 1 , new ClientRpcParams());
                         
                         Debug.Log($"PawnPlacementManager: Player 1 picked up pawn type {existingPawn.TypeIndex}.");
                         return;
@@ -222,7 +242,7 @@ namespace AlperKocasalih.Chess.Grid
                         NetworkObject existingNetObj = existingPawn.GetComponent<NetworkObject>();
                         if (existingNetObj != null && existingNetObj.IsSpawned) existingNetObj.Despawn();
                         else Destroy(existingPawn.gameObject);
-                        
+                        NotifyPawnPickedUpClientRpc(typeIndexToReset, 2 , new ClientRpcParams());
                         Debug.Log($"PawnPlacementManager: Player 2 picked up pawn type {existingPawn.TypeIndex}.");
                         return;
                     }
@@ -238,9 +258,9 @@ namespace AlperKocasalih.Chess.Grid
             if (isP1Region)
             {
                 if (p1Confirmed) return;
-                if (p1SpawnedTypes.Count >= pawnPrefabs.Length)
+                if (p1SpawnedTypes.Count >= placementCap)
                 {
-                    string msg = $"PawnPlacementManager: Player 1 has already placed {pawnPrefabs.Length} pawns!";
+                    string msg = $"PawnPlacementManager: Player 1 has already placed {placementCap} pawns!";
                     Debug.LogWarning(msg);
                     SendWarningToClientRpc(msg, clientRpcParams);
                     return;
@@ -256,9 +276,9 @@ namespace AlperKocasalih.Chess.Grid
             else if (isP2Region)
             {
                 if (p2Confirmed) return;
-                if (p2SpawnedTypes.Count >= pawnPrefabs.Length)
+                if (p2SpawnedTypes.Count >= placementCap)
                 {
-                    string msg = $"PawnPlacementManager: Player 2 has already placed {pawnPrefabs.Length} pawns!";
+                    string msg = $"PawnPlacementManager: Player 2 has already placed {placementCap} pawns!";
                     Debug.LogWarning(msg);
                     SendWarningToClientRpc(msg, clientRpcParams);
                     return;
@@ -321,9 +341,41 @@ namespace AlperKocasalih.Chess.Grid
 
             StartCoroutine(AnimatePawnDrop(pawnObj, targetPos));
             
+            NotifyPlacementSuccessClientRpc(pawnIndex, isP1Region? 1 : 2, clientRpcParams);
             string successMsg = $"PawnPlacementManager: Successfully placed pawn type {pawnIndex} for Player {(isP1Region ? "1" : "2")}.";
             Debug.Log(successMsg);
             SendLogToClientRpc(successMsg, clientRpcParams);
+        }
+
+        [ClientRpc]
+        private void NotifyPlacementSuccessClientRpc(int placedPawnIndex, int playerID, ClientRpcParams clientRpcParams = default)
+        {
+            int localPlayerID = NetworkManager.Singleton.IsHost ?  1 : 2;
+            if (localPlayerID == playerID)
+            {
+                if (currentSelectedPawn.pawnTypeIndex == placedPawnIndex)
+                {
+                    currentSelectedPawn.MarkAsPlaced();
+                    currentSelectedPawn = null;
+                }
+            }
+        }
+
+        [ClientRpc]
+        private void NotifyPawnPickedUpClientRpc(int pickedPawnIndex, int playerID, ClientRpcParams clientRpcParams)
+        {
+            int localPlayerID = NetworkManager.Singleton.IsHost ? 1 : 2;
+            if (localPlayerID == playerID)
+            {
+                foreach (PawnSelectionUI pawn in allPawnUIItems)
+                {
+                    if (pawn.pawnTypeIndex == pickedPawnIndex)
+                    {
+                        pawn.ResetItem();
+                        break;
+                    }
+                }
+            }
         }
 
         [ClientRpc]
@@ -390,23 +442,25 @@ namespace AlperKocasalih.Chess.Grid
 
         public void ConfirmPlayerPlacement(int playerID)
         {
+            int placementCap = GetPlacementCap();
+
             if (playerID == 1)
             {
-                if (p1SpawnedTypes.Count == pawnPrefabs.Length)
+                if (p1SpawnedTypes.Count == placementCap)
                 {
                     p1Confirmed = true;
                     Debug.Log("PawnPlacementManager: Player 1 confirmed placement.");
                 }
-                else Debug.LogWarning($"PawnPlacementManager: Player 1 must place {pawnPrefabs.Length} pawns first!");
+                else Debug.LogWarning($"PawnPlacementManager: Player 1 must place {placementCap} pawns first!");
             }
             else if (playerID == 2)
             {
-                if (p2SpawnedTypes.Count == pawnPrefabs.Length)
+                if (p2SpawnedTypes.Count == placementCap)
                 {
                     p2Confirmed = true;
                     Debug.Log("PawnPlacementManager: Player 2 confirmed placement.");
                 }
-                else Debug.LogWarning($"PawnPlacementManager: Player 2 must place {pawnPrefabs.Length} pawns first!");
+                else Debug.LogWarning($"PawnPlacementManager: Player 2 must place {placementCap} pawns first!");
             }
 
             if (p1Confirmed && p2Confirmed)

@@ -100,7 +100,7 @@ namespace AlperKocasalih.Chess.Grid
             currentCell = cell;
             currentCell.IsOccupied = true;
             isInitialized = true;
-            if (meshRenderer == null) meshRenderer = GetComponent<MeshRenderer>();
+            if (meshRenderer == null) meshRenderer = GetComponent<MeshRenderer>();  
         }
 
         public void SetCell(HexCell cell)
