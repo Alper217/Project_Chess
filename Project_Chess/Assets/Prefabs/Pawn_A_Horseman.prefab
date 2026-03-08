@@ -89,6 +89,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3142be89e8035d44a9108e3cb1645c79, type: 3}
       insertIndex: -1
       addedObject: {fileID: 6808423002925826876}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 3142be89e8035d44a9108e3cb1645c79, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3829837908385880707}
   m_SourcePrefab: {fileID: 100100000, guid: 3142be89e8035d44a9108e3cb1645c79, type: 3}
 --- !u!1 &3168573310417710798 stripped
 GameObject:
@@ -159,6 +162,24 @@ MonoBehaviour:
   currentCell: {fileID: 0}
   meshRenderer: {fileID: 3529120971750674203}
   highlightMaterialIndex: 2
+--- !u!114 &3829837908385880707
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3168573310417710798}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1dbaa5955f979743ae9a8c150e66383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PawnHealthController
+  ShowTopMostFoldoutHeaderGroup: 1
+  maxHealth: 100
+  currentHealth:
+    m_InternalValue: 100
+  damage: 10
+  pawn: {fileID: 3168573310417710798}
 --- !u!23 &3529120971750674203 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 3142be89e8035d44a9108e3cb1645c79, type: 3}

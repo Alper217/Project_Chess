@@ -1,51 +1,103 @@
 using UnityEngine;
-using UnityEngine.UI;
+using Unity.Netcode;
 
-public class PawnHealthController : MonoBehaviour
+public class PawnHealthController : NetworkBehaviour, IHoverable
 {
-    [SerializeField] private GameObject visualRoot;
-    [SerializeField] private GameObject pawn;
-    [SerializeField] private int maxHealth;
-    private int currentHealth;
-    [SerializeField] private Slider slider;
-    [SerializeField] private int damage;
-    void Start()
+    public int maxHealth = 100;
+    public NetworkVariable<int> currentHealth = new NetworkVariable<int>(100, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    public int damage = 10;
+    public GameObject pawn;
+
+    private bool isHovered = false;
+
+    public override void OnNetworkSpawn()
     {
-        maxHealth = 100;
-        currentHealth = maxHealth;
-        slider.maxValue = maxHealth;
-        slider.value = currentHealth;
+        base.OnNetworkSpawn();
+
+        if (IsServer)
+        {
+            currentHealth.Value = maxHealth;
+        }
+
+        currentHealth.OnValueChanged += OnHealthChanged;
     }
 
-    private void OnMouseEnter()
+    public override void OnNetworkDespawn()
     {
-        visualRoot.SetActive(true);
+        base.OnNetworkDespawn();
+        currentHealth.OnValueChanged -= OnHealthChanged;
     }
 
-    private void OnMouseExit()
+    private void OnHealthChanged(int previousValue, int newValue)
     {
-        visualRoot.SetActive(false);
+        if (isHovered && HealthUIManager.Instance != null)
+        {
+            // Eğer UI açıksa yeni can değeri ile güncellenmesini sağla
+            HealthUIManager.Instance.ShowHealthBar(transform, newValue, maxHealth);
+        }
     }
+
+    // Fare piyonun üstüne gelince
+    public void OnHoverEnter()
+    {
+        isHovered = true;
+        if (HealthUIManager.Instance != null)
+            HealthUIManager.Instance.ShowHealthBar(transform, currentHealth.Value, maxHealth);
+    }
+
+    // Fare piyondan çıkınca
+    public void OnHoverExit()
+    {
+        isHovered = false;
+        if (HealthUIManager.Instance != null)
+            HealthUIManager.Instance.HideHealthBar();
+    }
+
     void Update()
     {
-          if (Camera.main != null) 
-    {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        
-        if (Physics.Raycast(ray, out hit))
+        // Örnek hasar alma kodu (Yalnızca piyonun üzerine gelindiğinde ve sol tıklandığında test için hasar al)
+        if (Input.GetMouseButtonDown(0) && isHovered)
         {
-            Debug.Log("Fare şu an şuna değiyor: " + hit.transform.name);
+            TakeDamageServerRpc(damage);
         }
     }
-        if (Input.GetMouseButtonDown(0))
+
+    [ServerRpc(RequireOwnership = false)]
+    private void TakeDamageServerRpc(int damageAmount)
+    {
+        if (!IsServer) return;
+
+        currentHealth.Value -= damageAmount;
+
+        if (currentHealth.Value <= 0)
         {
-            currentHealth -= damage;
-            slider.value = currentHealth;
+            Die();
         }
-        if (currentHealth <= 0)
+    }
+
+    private void Die()
+    {
+        if (!IsServer) return;
+
+        // Piyon öldüğünde UI'yi gizleme (istemcilerde de tetiklenmesi için OnNetworkDespawn kullanılabilir)
+        // Objenin ağ üzerindeki varlığını sonlandır
+        if (pawn != null)
         {
-            Destroy(pawn);
+            NetworkObject pawnNetworkObject = pawn.GetComponent<NetworkObject>();
+            if (pawnNetworkObject != null && pawnNetworkObject.IsSpawned)
+            {
+                pawnNetworkObject.Despawn();
+                return;
+            }
+        }
+        
+        if (NetworkObject.IsSpawned)
+        {
+            NetworkObject.Despawn();
+        }
+        else
+        {
+            Destroy(gameObject);
         }
     }
 }
