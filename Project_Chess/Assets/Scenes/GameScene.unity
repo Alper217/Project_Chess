@@ -5875,8 +5875,6 @@ MonoBehaviour:
   cellLayer:
     serializedVersion: 2
     m_Bits: 64
-  pawnHighlightMat: {fileID: 2100000, guid: 820fd05d371deac48b240e93a4dfc74f, type: 2}
-  selectedPawnHighlightMat: {fileID: 2100000, guid: 8ea1e78ded56b794dba2b69584c42156, type: 2}
   moveHighlightColor: {r: 1, g: 0.5, b: 0, a: 1}
   combatHighlightColor: {r: 1, g: 0, b: 0, a: 1}
   testPatternA: {fileID: 11400000, guid: 1430dad23950a99439d9fed19599b806, type: 2}
