@@ -6,14 +6,18 @@ namespace AlperKocasalih.Chess.Grid
     /// <summary>
     /// Represents a pawn in the game.
     /// Manages its relationship with the HexCell it occupies.
-    /// </summary>
+    /// </summary>,
+    
     public class Pawn : NetworkBehaviour
     {
         #region Fields
 
         [Header("Pawn Data")]
-        [SerializeField] private string pawnType;
+        [SerializeField] private PawnData pawnType;
         [SerializeField, ReadOnly] private HexCell currentCell;
+        public NetworkVariable<int> maxHealth = new NetworkVariable<int>();
+        public NetworkVariable<int> currentHealth = new NetworkVariable<int>(100, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        public NetworkVariable<int> damage = new NetworkVariable<int>();
         
         [Header("Sync Data")]
         private NetworkVariable<int> netPlayerID = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -30,11 +34,11 @@ namespace AlperKocasalih.Chess.Grid
 
         #region Properties
 
-        public string PawnType => pawnType;
+        public PawnData PawnType => pawnType;
         public HexCell OccupiedCell => currentCell;
         public int PlayerID { get => netPlayerID.Value; set { if (IsServer) netPlayerID.Value = value; } }
         public int TypeIndex { get => netTypeIndex.Value; set { if (IsServer) netTypeIndex.Value = value; } }
-
+        public NetworkVariable<bool> hasSynergy = new NetworkVariable<bool>(false);
         #endregion
 
         #region Methods
@@ -49,6 +53,14 @@ namespace AlperKocasalih.Chess.Grid
             {
                 AttachToGridLocally(netCellCoords.Value);
             }
+            if (IsServer)
+            {
+                maxHealth.Value = pawnType.maxHealth;
+                damage.Value = pawnType.damage;
+                currentHealth.Value = pawnType.currentHealth;
+                currentHealth.Value = maxHealth.Value;
+            }
+
         }
 
         public override void OnNetworkDespawn()
@@ -63,6 +75,8 @@ namespace AlperKocasalih.Chess.Grid
                 AttachToGridLocally(newValue);
             }
         }
+        
+        
 
         private void AttachToGridLocally(Vector2Int coords)
         {
@@ -131,6 +145,29 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (meshRenderer == null || originalMaterials == null || originalMaterials.Length == 0) return;
             meshRenderer.materials = originalMaterials;
+        }
+
+        public void ResetSynergyServer()
+        {
+            if(!IsServer) return;
+            hasSynergy.Value = false;
+            maxHealth.Value = pawnType.maxHealth;
+            damage.Value = pawnType.damage;
+
+            if (currentHealth.Value > maxHealth.Value)
+            {
+                currentHealth.Value = maxHealth.Value;
+            }
+        }
+
+        public void ApplyBuffsServer(int bonusHealth, int bonusDamage)
+        {
+            if (!IsServer) return;
+            hasSynergy.Value = true;
+            
+            maxHealth.Value += bonusHealth;
+            damage.Value += bonusDamage;
+            currentHealth.Value += bonusHealth;
         }
 
      

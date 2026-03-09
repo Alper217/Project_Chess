@@ -1,31 +1,29 @@
+using System;
+using AlperKocasalih.Chess.Grid;
 using UnityEngine;
 using Unity.Netcode;
 
 public class PawnHealthController : NetworkBehaviour, IHoverable
 {
-    public int maxHealth = 100;
-    public NetworkVariable<int> currentHealth = new NetworkVariable<int>(100, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-    public int damage = 10;
+    private Pawn _pawn;
     public GameObject pawn;
-
     private bool isHovered = false;
+
+    private void Awake()
+    {
+        _pawn = GetComponent<Pawn>();
+    }
 
     public override void OnNetworkSpawn()
     {
         base.OnNetworkSpawn();
-
-        if (IsServer)
-        {
-            currentHealth.Value = maxHealth;
-        }
-
-        currentHealth.OnValueChanged += OnHealthChanged;
+        _pawn.currentHealth.OnValueChanged += OnHealthChanged;
     }
 
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
-        currentHealth.OnValueChanged -= OnHealthChanged;
+        _pawn.currentHealth.OnValueChanged -= OnHealthChanged;
     }
 
     private void OnHealthChanged(int previousValue, int newValue)
@@ -33,7 +31,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         if (isHovered && HealthUIManager.Instance != null)
         {
             // Eğer UI açıksa yeni can değeri ile güncellenmesini sağla
-            HealthUIManager.Instance.ShowHealthBar(transform, newValue, maxHealth);
+            HealthUIManager.Instance.ShowHealthBar(transform, newValue, _pawn.maxHealth.Value);
         }
     }
 
@@ -42,7 +40,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     {
         isHovered = true;
         if (HealthUIManager.Instance != null)
-            HealthUIManager.Instance.ShowHealthBar(transform, currentHealth.Value, maxHealth);
+            HealthUIManager.Instance.ShowHealthBar(transform, _pawn.currentHealth.Value, _pawn.maxHealth.Value);
     }
 
     // Fare piyondan çıkınca
@@ -58,7 +56,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         // Örnek hasar alma kodu (Yalnızca piyonun üzerine gelindiğinde ve sol tıklandığında test için hasar al)
         if (Input.GetMouseButtonDown(0) && isHovered)
         {
-            TakeDamageServerRpc(damage);
+            TakeDamageServerRpc(_pawn.damage.Value);
         }
     }
 
@@ -67,9 +65,9 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     {
         if (!IsServer) return;
 
-        currentHealth.Value -= damageAmount;
+        _pawn.currentHealth.Value -= damageAmount;
 
-        if (currentHealth.Value <= 0)
+        if (_pawn.currentHealth.Value <= 0)
         {
             Die();
         }

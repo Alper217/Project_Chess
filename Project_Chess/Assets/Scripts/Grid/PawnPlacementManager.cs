@@ -48,7 +48,7 @@ namespace AlperKocasalih.Chess.Grid
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
             currentSelectedPawn = PawnSelectionUI.instance;
-            
+            selectedPawnIndex = -1;
         }
 
         private void Start()
@@ -77,6 +77,11 @@ namespace AlperKocasalih.Chess.Grid
             if (Input.GetMouseButtonDown(0))
             {
                 HandlePlacementInput();
+            }
+
+            if (Input.GetKeyDown(KeyCode.P))
+            {
+                SynergyManager.instance.EvaluateSynergiesOnServer(1);
             }
         }
 
@@ -230,7 +235,6 @@ namespace AlperKocasalih.Chess.Grid
                         if (existingNetObj != null && existingNetObj.IsSpawned) existingNetObj.Despawn();
                         else Destroy(existingPawn.gameObject);
                         NotifyPawnPickedUpClientRpc(typeIndexToReset, 1 , new ClientRpcParams());
-                        
                         Debug.Log($"PawnPlacementManager: Player 1 picked up pawn type {existingPawn.TypeIndex}.");
                         return;
                     }
@@ -342,6 +346,7 @@ namespace AlperKocasalih.Chess.Grid
             StartCoroutine(AnimatePawnDrop(pawnObj, targetPos));
             
             NotifyPlacementSuccessClientRpc(pawnIndex, isP1Region? 1 : 2, clientRpcParams);
+            SynergyManager.instance.EvaluateSynergiesOnServer(isP1Region ? 1 : 2);
             string successMsg = $"PawnPlacementManager: Successfully placed pawn type {pawnIndex} for Player {(isP1Region ? "1" : "2")}.";
             Debug.Log(successMsg);
             SendLogToClientRpc(successMsg, clientRpcParams);
@@ -478,6 +483,8 @@ namespace AlperKocasalih.Chess.Grid
             if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Setup)
             {
                 Debug.Log("PawnPlacementManager: Setup finished. Moving to RollDice state.");
+                SynergyManager.instance.EvaluateSynergiesOnServer(1);
+                SynergyManager.instance.EvaluateSynergiesOnServer(2);
                 GameManager.Instance.ChangeState(GameState.RollDice);
             }
         }

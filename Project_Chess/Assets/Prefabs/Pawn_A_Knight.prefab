@@ -158,10 +158,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.Pawn
   ShowTopMostFoldoutHeaderGroup: 1
-  pawnType: 
+  pawnType: {fileID: 11400000, guid: 5cdfb4c163de9cf4098dfc78df80369d, type: 2}
   currentCell: {fileID: 0}
+  maxHealth:
+    m_InternalValue: 0
+  currentHealth:
+    m_InternalValue: 100
+  damage:
+    m_InternalValue: 0
   meshRenderer: {fileID: 8695136005774751438}
   highlightMaterialIndex: 2
+  hasSynergy:
+    m_InternalValue: 0
+  SynergyGroup: 0
 --- !u!114 &1645552941133063497
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -175,10 +184,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PawnHealthController
   ShowTopMostFoldoutHeaderGroup: 1
-  maxHealth: 100
-  currentHealth:
-    m_InternalValue: 100
-  damage: 10
   pawn: {fileID: 7182019095934932763}
 --- !u!23 &8695136005774751438 stripped
 MeshRenderer:
