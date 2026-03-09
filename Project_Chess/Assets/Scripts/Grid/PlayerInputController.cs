@@ -16,8 +16,6 @@ namespace AlperKocasalih.Chess.Grid
 
         [Header("Settings")]
         [SerializeField] private LayerMask cellLayer;
-        [SerializeField] private Material pawnHighlightMat;
-        [SerializeField] private Material selectedPawnHighlightMat;
         [SerializeField] private Color moveHighlightColor = new Color(1f, 0.5f, 0f); // Orange
         [SerializeField] private Color combatHighlightColor = Color.red;
 
@@ -130,10 +128,10 @@ namespace AlperKocasalih.Chess.Grid
                 {
                     if (pObj.PlayerID != localPlayerID) continue;
                     
-                    pObj.VisualHighlight(pawnHighlightMat);
+                    SetPawnLayer(pObj.gameObject, "Outline_Selectable");
                     highlightedPawns.Add(pObj);
                 }
-                
+
                 Debug.Log($"PlayerInputController: Card '{card.cardName}' selected. Select a pawn.");
             }
         }
@@ -153,7 +151,7 @@ namespace AlperKocasalih.Chess.Grid
             {
                 if (pObj.PlayerID != localPlayerID) continue;
                 
-                pObj.VisualHighlight(pawnHighlightMat);
+                SetPawnLayer(pObj.gameObject, "Outline_Selectable");
                 highlightedPawns.Add(pObj);
             }
         }
@@ -207,7 +205,7 @@ namespace AlperKocasalih.Chess.Grid
                 currentState = SelectionState.PawnSelected;
                 
                 ClearPawnHighlights();
-                selectedPawn.VisualHighlight(selectedPawnHighlightMat);
+                SetPawnLayer(selectedPawn.gameObject, "Outline");
                 
                 ShowValidMoves(selectedPawn);
             }
@@ -251,7 +249,6 @@ namespace AlperKocasalih.Chess.Grid
 
                 // Clear locally immediately for responsiveness
                 ClearCellHighlights();
-                selectedPawn.ResetHighlight();
                 CancelSelection();
             }
             else
@@ -295,7 +292,10 @@ namespace AlperKocasalih.Chess.Grid
         {
             ClearCellHighlights();
             ClearPawnHighlights();
-            if (selectedPawn != null) selectedPawn.ResetHighlight();
+            if (selectedPawn != null) 
+            {
+                SetPawnLayer(selectedPawn.gameObject, "Default");
+            }
             selectedPawn = null;
             activePattern = null;
             activeCardData = null;
@@ -395,8 +395,26 @@ namespace AlperKocasalih.Chess.Grid
 
         private void ClearPawnHighlights()
         {
-            foreach (var p in highlightedPawns) if (p != null) p.ResetHighlight();
+            foreach (var p in highlightedPawns)
+            {
+                if (p != null && selectedPawn != p)
+                {
+                    SetPawnLayer(p.gameObject, "Default");
+                }
+            }
             highlightedPawns.Clear();
+        }
+
+        private void SetPawnLayer(GameObject pawnObj, string layerName)
+        {
+            int layerIndex = LayerMask.NameToLayer(layerName);
+            if (layerIndex == -1) layerIndex = 0;
+
+            pawnObj.layer = layerIndex;
+            foreach (Transform child in pawnObj.transform)
+            {
+                child.gameObject.layer = layerIndex;
+            }
         }
 
         #endregion
