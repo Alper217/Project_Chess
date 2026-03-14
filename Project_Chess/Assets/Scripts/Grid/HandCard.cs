@@ -12,6 +12,8 @@ namespace AlperKocasalih.Chess.Grid
 
         private CardData cardData;
         public CardData CardData => cardData;
+        private int handIndex;
+        public int HandIndex => handIndex;
 
         [Header("UI References")]
         [SerializeField] private TextMeshProUGUI cardNameText;
@@ -55,6 +57,11 @@ namespace AlperKocasalih.Chess.Grid
             originalPosition = pos;
             originalSiblingIndex = siblingIndex;
             rectTransform.localPosition = pos;
+        }
+
+        public void SetHandIndex(int index)
+        {
+            handIndex = index;
         }
 
         #endregion

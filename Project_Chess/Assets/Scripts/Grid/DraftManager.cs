@@ -16,10 +16,21 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, ReadOnly] private int draftingPlayerID = 1;
         [SerializeField, ReadOnly] private int roundCount = 1;
         [SerializeField, ReadOnly] private bool isDraftingActive = false;
+        [SerializeField, ReadOnly] private bool isActionDraftActive = false;
+        [SerializeField, ReadOnly] private bool skipTurnOnActionDraftComplete = false;
 
         [Header("Player Hands")]
         [SerializeField, ReadOnly] private List<CardData> p1Hand = new List<CardData>();
         [SerializeField, ReadOnly] private List<CardData> p2Hand = new List<CardData>();
+
+        [Header("Hand Limits")]
+        [SerializeField] private int maxHandSize = 6;
+        [SerializeField, ReadOnly] private int lastSkipDrawTurnP1 = -1;
+        [SerializeField, ReadOnly] private int lastSkipDrawTurnP2 = -1;
+        [SerializeField, ReadOnly] private int pendingOverflowBurnPlayerID = 0;
+        [SerializeField, ReadOnly] private int pendingOverflowBurnCount = 0;
+        [SerializeField, ReadOnly] private List<CardData> p1PendingIncoming = new List<CardData>();
+        [SerializeField, ReadOnly] private List<CardData> p2PendingIncoming = new List<CardData>();
 
         private List<CardData> currentChoices = new List<CardData>();
         private HashSet<DraftAction> usedActionsThisRound = new HashSet<DraftAction>();
@@ -33,6 +44,7 @@ namespace AlperKocasalih.Chess.Grid
         public event Action<HashSet<DraftAction>> OnUsedActionsChanged;
         public event Action<int, List<CardData>> OnHandUpdated; // playerID, hand
         public event Action OnDraftFinished;
+        public event Action<int, int> OnOverflowBurnRequested; // playerID, burnCount
 
         #endregion
 
@@ -51,11 +63,17 @@ namespace AlperKocasalih.Chess.Grid
         public void StartDraft()
         {
             isDraftingActive = true;
+            isActionDraftActive = false;
+            skipTurnOnActionDraftComplete = false;
+            pendingOverflowBurnPlayerID = 0;
+            pendingOverflowBurnCount = 0;
             roundCount = 1;
             draftingPlayerID = TurnManager.Instance.ActivePlayerID;
             
             p1Hand.Clear();
             p2Hand.Clear();
+            p1PendingIncoming.Clear();
+            p2PendingIncoming.Clear();
 
             StartDraftRound();
         }
@@ -87,9 +105,37 @@ namespace AlperKocasalih.Chess.Grid
             Debug.Log($"DraftManager: Player {draftingPlayerID} drafting. Round {roundCount}/3.");
         }
 
+        private void StartActionDraftRound()
+        {
+            usedActionsThisRound.Clear();
+            NotifyUsedActionsClientRpc(new DraftAction[0]);
+
+            if (DeckManager.Instance == null)
+            {
+                Debug.LogError("DraftManager: DeckManager Instance not found!");
+                return;
+            }
+
+            if (!IsServer) return;
+
+            currentChoices = DeckManager.Instance.DrawCards(3);
+
+            int[] drawnCardIndices = new int[currentChoices.Count];
+            for (int i = 0; i < currentChoices.Count; ++i)
+            {
+                drawnCardIndices[i] = DeckManager.Instance.GetCardIndex(currentChoices[i]);
+            }
+
+            NotifyCardsDrawnClientRpc(drawnCardIndices, draftingPlayerID);
+
+            Debug.Log($"DraftManager: Action draft for Player {draftingPlayerID}.");
+        }
+
         [ClientRpc]
         private void NotifyCardsDrawnClientRpc(int[] cardIndices, int playerID)
         {
+            isDraftingActive = true;
+
             // On clients, reconstruct currentChoices from indices
             currentChoices.Clear();
             foreach(int idx in cardIndices)
@@ -107,6 +153,11 @@ namespace AlperKocasalih.Chess.Grid
         public void HandleChoice(int cardIndex, DraftAction action)
         {
             if (!isDraftingActive || currentChoices.Count <= cardIndex) return;
+            if (pendingOverflowBurnCount > 0)
+            {
+                Debug.LogWarning("DraftManager: Resolve overflow burn before continuing.");
+                return;
+            }
             if (usedActionsThisRound.Contains(action))
             {
                 Debug.LogWarning($"DraftManager: Action {action} already used this round!");
@@ -118,29 +169,13 @@ namespace AlperKocasalih.Chess.Grid
             switch (action)
             {
                 case DraftAction.Keep:
-                    if (draftingPlayerID == 1)
-                    {
-                        p1Hand.Add(selected);
-                        NotifyHandUpdatedClientRpc(1, DeckManager.Instance.GetCardIndex(selected), true);
-                    }
-                    else
-                    {
-                        p2Hand.Add(selected);
-                        NotifyHandUpdatedClientRpc(2, DeckManager.Instance.GetCardIndex(selected), true);
-                    }
+                    if (draftingPlayerID == 1) AddCardToHandOrQueue(1, selected);
+                    else AddCardToHandOrQueue(2, selected);
                     Debug.Log($"DraftManager: Player {draftingPlayerID} kept {selected.cardName}");
                     break;
                 case DraftAction.Give:
-                    if (draftingPlayerID == 1)
-                    {
-                        p2Hand.Add(selected);
-                        NotifyHandUpdatedClientRpc(2, DeckManager.Instance.GetCardIndex(selected), true);
-                    }
-                    else
-                    {
-                        p1Hand.Add(selected);
-                        NotifyHandUpdatedClientRpc(1, DeckManager.Instance.GetCardIndex(selected), true);
-                    }
+                    if (draftingPlayerID == 1) AddCardToHandOrQueue(2, selected);
+                    else AddCardToHandOrQueue(1, selected);
                     Debug.Log($"DraftManager: Player {draftingPlayerID} gave {selected.cardName} to opponent");
                     break;
                 case DraftAction.Burn:
@@ -197,8 +232,26 @@ namespace AlperKocasalih.Chess.Grid
             OnHandUpdated?.Invoke(playerID, hand);
         }
 
+        [ClientRpc]
+        private void NotifyOverflowBurnRequestedClientRpc(int playerID, int burnCount)
+        {
+            if (!IsServer)
+            {
+                pendingOverflowBurnPlayerID = playerID;
+                pendingOverflowBurnCount = burnCount;
+            }
+
+            OnOverflowBurnRequested?.Invoke(playerID, burnCount);
+        }
+
         private void EndCurrentDraftTurn()
         {
+            if (isActionDraftActive)
+            {
+                FinishDraft();
+                return;
+            }
+
             // Turn order: 1 -> 2 -> 1 -> 2 -> 1 -> 2 (3 rounds each)
             if (draftingPlayerID == 1)
             {
@@ -223,9 +276,23 @@ namespace AlperKocasalih.Chess.Grid
         private void FinishDraft()
         {
             isDraftingActive = false;
-            Debug.Log("DraftManager: Draft finished. Each player should have 6 cards.");
+            Debug.Log(isActionDraftActive
+                ? $"DraftManager: Action draft finished for Player {draftingPlayerID}."
+                : "DraftManager: Draft finished. Each player should have 6 cards.");
             
             NotifyDraftFinishedClientRpc();
+
+            if (isActionDraftActive)
+            {
+                if (skipTurnOnActionDraftComplete && TurnManager.Instance != null)
+                {
+                    TurnManager.Instance.NextTurn();
+                }
+
+                isActionDraftActive = false;
+                skipTurnOnActionDraftComplete = false;
+                return;
+            }
 
             if (GameManager.Instance != null)
             {
@@ -236,6 +303,12 @@ namespace AlperKocasalih.Chess.Grid
         [ClientRpc]
         private void NotifyDraftFinishedClientRpc()
         {
+            if (!IsServer)
+            {
+                isDraftingActive = false;
+                isActionDraftActive = false;
+                skipTurnOnActionDraftComplete = false;
+            }
             OnDraftFinished?.Invoke();
         }
 
@@ -254,6 +327,153 @@ namespace AlperKocasalih.Chess.Grid
         }
 
         public List<CardData> GetHand(int playerID) => playerID == 1 ? p1Hand : p2Hand;
+        public bool IsDraftingActive => isDraftingActive;
+        public bool IsOverflowBurnPending => pendingOverflowBurnCount > 0;
+        public int DraftingPlayerID => draftingPlayerID;
+
+        public List<CardData> GetCurrentChoices()
+        {
+            return new List<CardData>(currentChoices);
+        }
+
+        private void AddCardToHandOrQueue(int playerID, CardData card)
+        {
+            if (maxHandSize <= 0)
+            {
+                AddCardToHandNow(playerID, card);
+                return;
+            }
+
+            List<CardData> hand = GetHand(playerID);
+            List<CardData> pending = GetPendingIncoming(playerID);
+
+            if (hand.Count + pending.Count + 1 > maxHandSize)
+            {
+                pending.Add(card);
+                RequestOverflowBurn(playerID);
+                return;
+            }
+
+            AddCardToHandNow(playerID, card);
+        }
+
+        private void AddCardToHandNow(int playerID, CardData card)
+        {
+            List<CardData> hand = GetHand(playerID);
+            hand.Add(card);
+            NotifyHandUpdatedClientRpc(playerID, DeckManager.Instance.GetCardIndex(card), true);
+        }
+
+        private List<CardData> GetPendingIncoming(int playerID)
+        {
+            return playerID == 1 ? p1PendingIncoming : p2PendingIncoming;
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void DrawOneAndSkipTurnServerRpc(ServerRpcParams serverRpcParams = default)
+        {
+            if (!IsServer) return;
+            if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.ActionPhase) return;
+            if (TurnManager.Instance == null || DeckManager.Instance == null) return;
+            if (isDraftingActive) return;
+
+            int playerID = GetPlayerIdFromClientId(serverRpcParams.Receive.SenderClientId);
+            if (TurnManager.Instance.ActivePlayerID != playerID) return;
+
+            int currentTurn = TurnManager.Instance.TurnCount;
+            if (playerID == 1 && lastSkipDrawTurnP1 == currentTurn) return;
+            if (playerID == 2 && lastSkipDrawTurnP2 == currentTurn) return;
+
+            if (playerID == 1) lastSkipDrawTurnP1 = currentTurn;
+            else lastSkipDrawTurnP2 = currentTurn;
+
+            isDraftingActive = true;
+            isActionDraftActive = true;
+            skipTurnOnActionDraftComplete = true;
+            draftingPlayerID = playerID;
+
+            StartActionDraftRound();
+        }
+
+        private int GetPlayerIdFromClientId(ulong clientId)
+        {
+            if (NetworkManager.Singleton == null) return 1;
+            return clientId == NetworkManager.ServerClientId ? 1 : 2;
+        }
+
+        private void RequestOverflowBurn(int playerID)
+        {
+            List<CardData> hand = GetHand(playerID);
+            List<CardData> pending = GetPendingIncoming(playerID);
+            int overflow = (hand.Count + pending.Count) - maxHandSize;
+            if (overflow <= 0) return;
+
+            pendingOverflowBurnPlayerID = playerID;
+            pendingOverflowBurnCount = overflow;
+
+            NotifyOverflowBurnRequestedClientRpc(playerID, pendingOverflowBurnCount);
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void BurnOverflowCardAtIndexServerRpc(int playerID, int handIndex)
+        {
+            if (!IsServer) return;
+            if (pendingOverflowBurnCount <= 0 || pendingOverflowBurnPlayerID != playerID) return;
+
+            List<CardData> hand = GetHand(playerID);
+            if (handIndex < 0 || handIndex >= hand.Count) return;
+
+            CardData burned = hand[handIndex];
+            hand.RemoveAt(handIndex);
+            NotifyHandUpdatedClientRpc(playerID, DeckManager.Instance.GetCardIndex(burned), false);
+
+            ResolveOverflowAndApplyPending(playerID);
+        }
+
+        private void ResolveOverflowAndApplyPending(int playerID)
+        {
+            int overflow = 0;
+            if (maxHandSize > 0)
+            {
+                List<CardData> hand = GetHand(playerID);
+                List<CardData> pending = GetPendingIncoming(playerID);
+                overflow = (hand.Count + pending.Count) - maxHandSize;
+            }
+
+            if (overflow > 0)
+            {
+                pendingOverflowBurnPlayerID = playerID;
+                pendingOverflowBurnCount = overflow;
+                NotifyOverflowBurnRequestedClientRpc(playerID, pendingOverflowBurnCount);
+                return;
+            }
+
+            pendingOverflowBurnPlayerID = 0;
+            pendingOverflowBurnCount = 0;
+            NotifyOverflowBurnRequestedClientRpc(playerID, 0);
+
+            ApplyPendingIncoming(playerID);
+
+            // If the other player has pending overflow, request it now.
+            int otherPlayerID = playerID == 1 ? 2 : 1;
+            if (GetPendingIncoming(otherPlayerID).Count > 0)
+            {
+                RequestOverflowBurn(otherPlayerID);
+            }
+        }
+
+        private void ApplyPendingIncoming(int playerID)
+        {
+            List<CardData> pending = GetPendingIncoming(playerID);
+            if (pending.Count == 0) return;
+
+            foreach (var card in pending)
+            {
+                AddCardToHandNow(playerID, card);
+            }
+
+            pending.Clear();
+        }
 
         public void RemoveCardFromHand(int playerID, CardData card)
         {
@@ -293,10 +513,18 @@ namespace AlperKocasalih.Chess.Grid
         public void ResetManager()
         {
             isDraftingActive = false;
+            isActionDraftActive = false;
+            skipTurnOnActionDraftComplete = false;
             p1Hand.Clear();
             p2Hand.Clear();
             currentChoices.Clear();
             usedActionsThisRound.Clear();
+            lastSkipDrawTurnP1 = -1;
+            lastSkipDrawTurnP2 = -1;
+            pendingOverflowBurnPlayerID = 0;
+            pendingOverflowBurnCount = 0;
+            p1PendingIncoming.Clear();
+            p2PendingIncoming.Clear();
             
             OnHandUpdated?.Invoke(1, p1Hand);
             OnHandUpdated?.Invoke(2, p2Hand);

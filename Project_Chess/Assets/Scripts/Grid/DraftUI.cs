@@ -26,6 +26,7 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private Button burnButton;
         
         private int currentPendingCardIndex = -1;
+        private bool isBurnBlockingDraft = false;
 
         #region Unity Methods
 
@@ -37,6 +38,7 @@ namespace AlperKocasalih.Chess.Grid
                 DraftManager.Instance.OnDraftTurnChanged += UpdateTurnStatus;
                 DraftManager.Instance.OnUsedActionsChanged += UpdateActionButtons;
                 DraftManager.Instance.OnDraftFinished += HideDraftUI;
+                DraftManager.Instance.OnOverflowBurnRequested += HandleOverflowBurnRequested;
             }
 
             // Initially hide the Draft UI
@@ -49,6 +51,18 @@ namespace AlperKocasalih.Chess.Grid
             if (choicePanel != null) choicePanel.SetActive(false);
         }
 
+        private void OnDestroy()
+        {
+            if (DraftManager.Instance != null)
+            {
+                DraftManager.Instance.OnCardsDrawn -= UpdateDraftUI;
+                DraftManager.Instance.OnDraftTurnChanged -= UpdateTurnStatus;
+                DraftManager.Instance.OnUsedActionsChanged -= UpdateActionButtons;
+                DraftManager.Instance.OnDraftFinished -= HideDraftUI;
+                DraftManager.Instance.OnOverflowBurnRequested -= HandleOverflowBurnRequested;
+            }
+        }
+
         #endregion
 
         #region Draft UI Logic
@@ -59,6 +73,7 @@ namespace AlperKocasalih.Chess.Grid
             {
                 draftPanel.gameObject.SetActive(true);
                 draftPanel.DOFade(1, 0.5f);
+                draftPanel.blocksRaycasts = !isBurnBlockingDraft;
             }
         }
 
@@ -136,6 +151,7 @@ namespace AlperKocasalih.Chess.Grid
         /// </summary>
         public void OnCardClicked(int index)
         {
+            if (isBurnBlockingDraft) return;
             Debug.Log($"DraftUI: Card slot {index} clicked.");
             currentPendingCardIndex = index;
             if (choicePanel != null) choicePanel.SetActive(true);
@@ -146,6 +162,7 @@ namespace AlperKocasalih.Chess.Grid
         /// </summary>
         public void SelectAction(int actionInt)
         {
+            if (isBurnBlockingDraft) return;
             DraftAction action = (DraftAction)actionInt;
             Debug.Log($"DraftUI: Action {action} selected for card index {currentPendingCardIndex}.");
             
@@ -165,5 +182,46 @@ namespace AlperKocasalih.Chess.Grid
         }
 
         #endregion
+
+        private void HandleOverflowBurnRequested(int playerID, int burnCount)
+        {
+            int localPlayerID = 1;
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            }
+
+            if (playerID != localPlayerID) return;
+
+            isBurnBlockingDraft = burnCount > 0;
+
+            if (draftPanel != null)
+            {
+                draftPanel.blocksRaycasts = !isBurnBlockingDraft;
+                draftPanel.alpha = isBurnBlockingDraft ? 0.2f : 1f;
+            }
+
+            if (choicePanel != null) choicePanel.SetActive(false);
+
+            if (turnStatusText != null && isBurnBlockingDraft)
+            {
+                turnStatusText.text = $"Kart yak: {burnCount}";
+                turnStatusText.color = Color.red;
+            }
+
+            if (!isBurnBlockingDraft)
+            {
+                RefreshDraftUIAfterBurn();
+            }
+        }
+
+        private void RefreshDraftUIAfterBurn()
+        {
+            if (DraftManager.Instance == null) return;
+            if (!DraftManager.Instance.IsDraftingActive) return;
+
+            List<CardData> choices = DraftManager.Instance.GetCurrentChoices();
+            UpdateDraftUI(DraftManager.Instance.DraftingPlayerID, choices);
+        }
     }
 }

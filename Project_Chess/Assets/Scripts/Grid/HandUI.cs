@@ -22,6 +22,8 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private float yOffset = -450f;
 
         private List<HandCard> spawnedCards = new List<HandCard>();
+        private bool isBurnSelectionActive = false;
+        private int pendingBurnCount = 0;
 
         #endregion
 
@@ -38,6 +40,16 @@ namespace AlperKocasalih.Chess.Grid
             if (DraftManager.Instance != null)
             {
                 DraftManager.Instance.OnHandUpdated += OnHandUpdated;
+                DraftManager.Instance.OnOverflowBurnRequested += OnOverflowBurnRequested;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (DraftManager.Instance != null)
+            {
+                DraftManager.Instance.OnHandUpdated -= OnHandUpdated;
+                DraftManager.Instance.OnOverflowBurnRequested -= OnOverflowBurnRequested;
             }
         }
 
@@ -58,6 +70,12 @@ namespace AlperKocasalih.Chess.Grid
 
         public void OnCardClicked(HandCard card)
         {
+            if (isBurnSelectionActive)
+            {
+                TryBurnSelectedCard(card);
+                return;
+            }
+
             if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.ActionPhase)
             {
                 Debug.Log("HandUI: Cards can only be used in Action Phase.");
@@ -102,6 +120,7 @@ namespace AlperKocasalih.Chess.Grid
                 HandCard handCard = cardObj.GetComponent<HandCard>();
                 
                 handCard.Setup(hand[i]);
+                handCard.SetHandIndex(i);
                 
                 // Calculate position on arc
                 float angle = startAngle + (i * angleStep);
@@ -120,5 +139,39 @@ namespace AlperKocasalih.Chess.Grid
         }
 
         #endregion
+
+        private void OnOverflowBurnRequested(int playerID, int burnCount)
+        {
+            int localPlayerID = 1;
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            }
+
+            if (playerID != localPlayerID) return;
+
+            pendingBurnCount = burnCount;
+            isBurnSelectionActive = burnCount > 0;
+
+            if (isBurnSelectionActive)
+            {
+                Debug.Log($"HandUI: Choose {pendingBurnCount} card(s) to burn.");
+            }
+        }
+
+        private void TryBurnSelectedCard(HandCard card)
+        {
+            int localPlayerID = 1;
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            }
+
+            if (DraftManager.Instance != null)
+            {
+                DraftManager.Instance.BurnOverflowCardAtIndexServerRpc(localPlayerID, card.HandIndex);
+                isBurnSelectionActive = false; // will be re-enabled if more burns are required
+            }
+        }
     }
 }

@@ -6,29 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="3d9e23b9-49f8-4e62-afbc-c164cc147016" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards/Card_MovementA.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards/Card_MovementA.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards/Card_MovementB.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards/Card_MovementB.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards/Card_ObstacleA.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards/Card_ObstacleA.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards/MovementA.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards/MovementA.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards/MovementB.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards/MovementB.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards/SampleObstacle.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Cards/SampleObstacle.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DefaultNetworkPrefabs.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DefaultNetworkPrefabs.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Archer.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Archer.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Cannon.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Cannon.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Horseman.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Horseman.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Knight.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Knight.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Queen.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Queen.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnPlacementManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnPlacementManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/HandCard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/HandCard.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/HandUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/HandUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -127,6 +110,8 @@
       <workItem from="1772875508609" duration="1972000" />
       <workItem from="1772878715271" duration="10178000" />
       <workItem from="1773056739987" duration="14946000" />
+      <workItem from="1773225436151" duration="6124000" />
+      <workItem from="1773476968750" duration="421000" />
     </task>
     <servers />
   </component>
