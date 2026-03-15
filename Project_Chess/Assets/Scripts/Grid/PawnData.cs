@@ -6,7 +6,9 @@ public enum SynergyGroup
     Knight,
     Queen,
     Horseman,
-    Commander
+    Commander,
+    Ninja,
+    Cheriff
 }
 [CreateAssetMenu(fileName = "PawnSO", menuName = "Scriptable Objects/PawnSO")]
 public class PawnData: ScriptableObject

@@ -1,0 +1,154 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1001 &7041335134331892115
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 92.43987
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 88.59397
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 80
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -272.17755
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -527.32385
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.49999997
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      propertyPath: m_Name
+      value: Pawn_Cheriff
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8485067164060518350}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5376552993974603119}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4956948031604352088}
+  m_SourcePrefab: {fileID: 100100000, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+--- !u!1 &7887686610229742786 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+  m_PrefabInstance: {fileID: 7041335134331892115}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &8485067164060518350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887686610229742786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
+  GlobalObjectIdHash: 3432622386
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 0
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
+--- !u!114 &5376552993974603119
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887686610229742786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a2f757b8ac984e4681e4238be532594, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.Pawn
+  ShowTopMostFoldoutHeaderGroup: 1
+  pawnType: {fileID: 11400000, guid: 8df1ab86ad9228546bf49956885cfe30, type: 2}
+  currentCell: {fileID: 0}
+  maxHealth:
+    m_InternalValue: 0
+  currentHealth:
+    m_InternalValue: 100
+  damage:
+    m_InternalValue: 0
+  meshRenderer: {fileID: 8536095211207978263}
+  highlightMaterialIndex: 0
+  hasSynergy:
+    m_InternalValue: 0
+--- !u!114 &4956948031604352088
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7887686610229742786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1dbaa5955f979743ae9a8c150e66383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PawnHealthController
+  ShowTopMostFoldoutHeaderGroup: 1
+  pawn: {fileID: 7887686610229742786}
+--- !u!23 &8536095211207978263 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 71f1859d3a6abbf4bb1390f57bd03ec7, type: 3}
+  m_PrefabInstance: {fileID: 7041335134331892115}
+  m_PrefabAsset: {fileID: 0}
