@@ -51,7 +51,6 @@ namespace AlperKocasalih.Chess.Multiplayer
             {
                 Allocation allocation = await RelayService.Instance.CreateAllocationAsync(1);
                 string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-                
                 Debug.Log($"Relay Host Created. Join Code: {joinCode}");
                 
                 if (relayCodeText != null)

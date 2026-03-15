@@ -116,11 +116,23 @@ namespace AlperKocasalih.Chess.Grid
 
             if (card.isObstacleCard)
             {
+                if (card.obstaclePattern == null)
+                {
+                    Debug.LogWarning($"PlayerInputController: Obstacle Card '{card.cardName}' has no ObstaclePattern assigned.");
+                    CancelSelection();
+                    return;
+                }
                 currentState = SelectionState.ObstacleTargeting;
                 Debug.Log($"PlayerInputController: Obstacle Card '{card.cardName}' selected. Select an empty cell to place the pattern.");
             }
             else
             {
+                if (card.pattern == null)
+                {
+                    Debug.LogWarning($"PlayerInputController: Card '{card.cardName}' has no MovementPattern assigned.");
+                    CancelSelection();
+                    return;
+                }
                 currentState = SelectionState.CardSelected;
                 int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
 
@@ -225,6 +237,15 @@ namespace AlperKocasalih.Chess.Grid
                     }
                     if (Core.PawnActionExecutor.Instance != null)
                     {
+                        int cardIndex = -1;
+                        if (activeCardData != null && DeckManager.Instance != null)
+                        {
+                            cardIndex = DeckManager.Instance.GetCardIndex(activeCardData);
+                        }
+                        if (cardIndex >= 0)
+                        {
+                            Core.PawnActionExecutor.Instance.ApplyCardEffectServerRpc(selectedPawn.NetworkObjectId, cardIndex);
+                        }
                         Core.PawnActionExecutor.Instance.ExecuteCombatServerRpc(selectedPawn.NetworkObjectId, enemy.NetworkObjectId, cell.Coordinates);
                     }
                 }
@@ -232,6 +253,15 @@ namespace AlperKocasalih.Chess.Grid
                 {
                     if (Core.PawnActionExecutor.Instance != null)
                     {
+                        int cardIndex = -1;
+                        if (activeCardData != null && DeckManager.Instance != null)
+                        {
+                            cardIndex = DeckManager.Instance.GetCardIndex(activeCardData);
+                        }
+                        if (cardIndex >= 0)
+                        {
+                            Core.PawnActionExecutor.Instance.ApplyCardEffectServerRpc(selectedPawn.NetworkObjectId, cardIndex);
+                        }
                         Core.PawnActionExecutor.Instance.ExecuteMoveServerRpc(selectedPawn.NetworkObjectId, cell.Coordinates);
                     }
                 }
@@ -310,17 +340,17 @@ namespace AlperKocasalih.Chess.Grid
         {
             ClearCellHighlights();
             Vector2Int currentCoords = pawn.OccupiedCell.Coordinates;
-            List<Vector2Int> offsets = activePattern.GetValidOffsets(currentCoords.x);
+            
+            if (activePattern == null) return;
+            List<Vector2Int> offsets = activePattern.GetValidOffsets(currentCoords, pawn.PlayerID == 2);
+
+            if (offsets == null || offsets.Count == 0) return;
 
             Vector3Int startCube = HexGridMath.OffsetToCube(currentCoords);
 
             foreach (var offset in offsets)
             {
                 Vector2Int finalOffset = offset;
-                if (pawn.PlayerID == 2)
-                {
-                    finalOffset = HexGridMath.GetMirroredOffset(offset, currentCoords.x);
-                }
 
                 Vector2Int targetCoords = currentCoords + finalOffset;
                 

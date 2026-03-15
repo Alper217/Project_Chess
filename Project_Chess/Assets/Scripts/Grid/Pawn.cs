@@ -170,6 +170,26 @@ namespace AlperKocasalih.Chess.Grid
             currentHealth.Value += bonusHealth;
         }
 
+        public void ApplyCardEffectServer(int bonusHealth, int bonusDamage)
+        {
+            if (!IsServer) return;
+
+            if (bonusHealth != 0)
+            {
+                maxHealth.Value += bonusHealth;
+                currentHealth.Value += bonusHealth;
+                if (currentHealth.Value > maxHealth.Value)
+                {
+                    currentHealth.Value = maxHealth.Value;
+                }
+            }
+
+            if (bonusDamage != 0)
+            {
+                damage.Value += bonusDamage;
+            }
+        }
+
      
         #endregion
     }

@@ -15,4 +15,9 @@ MonoBehaviour:
   cardName: Card_A
   cardSprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
   pattern: {fileID: 11400000, guid: 1430dad23950a99439d9fed19599b806, type: 2}
+  healthToAdd: 5
+  damageToAdd: 5
+  pawnClass: 1
+  isObstacleCard: 0
+  obstaclePattern: {fileID: 11400000, guid: b45bf2a6d6e0bff49bd33909148ee9be, type: 2}
   description: 

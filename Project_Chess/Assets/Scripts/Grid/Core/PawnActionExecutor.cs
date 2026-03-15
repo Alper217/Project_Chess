@@ -84,7 +84,7 @@ namespace AlperKocasalih.Chess.Grid.Core
                     Debug.LogWarning("PawnActionExecutor: Friendly fire attempt blocked on server.");
                     return;
                 }
-                
+
                 int loserID = defender.PlayerID;
                 
                 // Destroy defender
@@ -99,6 +99,33 @@ namespace AlperKocasalih.Chess.Grid.Core
                     GameManager.Instance.CheckWinCondition(loserID);
                 }
             }
+        }
+
+        [ServerRpc(RequireOwnership = false)]
+        public void ApplyCardEffectServerRpc(ulong pawnNetworkID, int cardIndex)
+        {
+            NetworkObject pawnObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[pawnNetworkID];
+            if (pawnObj == null) return;
+
+            Pawn pawn = pawnObj.GetComponent<Pawn>();
+            ApplyCardEffectIfApplicable(pawn, cardIndex);
+        }
+
+        private void ApplyCardEffectIfApplicable(Pawn pawn, int cardIndex)
+        {
+            if (!IsServer) return;
+            if (pawn == null) return;
+            if (cardIndex < 0) return;
+            if (DeckManager.Instance == null) return;
+
+            CardData card = DeckManager.Instance.GetCardByIndex(cardIndex);
+            if (card == null) return;
+            if (pawn.PawnType == null) return;
+
+            if (pawn.PawnType.synergyGroup != card.pawnClass) return;
+            if (card.healthToAdd == 0 && card.damageToAdd == 0) return;
+
+            pawn.ApplyCardEffectServer(card.healthToAdd, card.damageToAdd);
         }
     }
 }

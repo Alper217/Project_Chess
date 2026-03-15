@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using AlperKocasalih.Chess.Grid.Utils;
 
 namespace AlperKocasalih.Chess.Grid
 {
@@ -7,7 +8,9 @@ namespace AlperKocasalih.Chess.Grid
     public class ObstaclePattern : ScriptableObject
     {
         public string patternName;
-        
+        [Header("Identity")]
+        public string cardName;
+        public Sprite cardSprite;
         // 7x7 grid representation (flat array for Unity serialization)
         // True means the target hex is an obstacle
         [HideInInspector]
@@ -39,6 +42,31 @@ namespace AlperKocasalih.Chess.Grid
                 }
             }
             return activeOffsets;
+        }
+
+        /// <summary>
+        /// Converts the pattern into movement offsets in world coordinates,
+        /// accounting for odd-q layout and optional 180-degree rotation.
+        /// </summary>
+        public List<Vector2Int> GetMovementOffsets(Vector2Int centerWorldCoords, bool rotate180)
+        {
+            List<Vector2Int> localOffsets = GetObstacleOffsets(centerWorldCoords.x);
+            List<Vector2Int> worldCoords = HexGridMath.GenerateAccurateWorldOffsetsFromPattern(
+                centerWorldCoords,
+                localOffsets,
+                rotate180
+            );
+
+            List<Vector2Int> movementOffsets = new List<Vector2Int>(worldCoords.Count);
+            foreach (var worldCoord in worldCoords)
+            {
+                Vector2Int offset = worldCoord - centerWorldCoords;
+                if (offset != Vector2Int.zero)
+                {
+                    movementOffsets.Add(offset);
+                }
+            }
+            return movementOffsets;
         }
     }
 }
