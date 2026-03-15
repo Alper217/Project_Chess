@@ -633,7 +633,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PawnSelectionUI
   pawnTypeIndex: 6
-  pawnName: Commander
+  pawnName: Ninja
   pawnDescription: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   highlightOutline: {fileID: 255717180}
 --- !u!114 &187423245
@@ -4626,7 +4626,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PawnSelectionUI
   pawnTypeIndex: 7
-  pawnName: Commander
+  pawnName: Cheriff
   pawnDescription: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
   highlightOutline: {fileID: 1077663221}
 --- !u!114 &1135526371
