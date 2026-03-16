@@ -53,6 +53,8 @@ public class PawnSelectionUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (pawnIcon != null)
         {
             pawnIcon.color = orgColor;
+            Debug.Log("PawnSelectionUI: ResetItem() called");
+            Debug.Log($"IndexNumber: {pawnTypeIndex}");
             pawnIcon.raycastTarget = true;
         }
         SetSelected(false);
