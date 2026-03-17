@@ -5,21 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3d9e23b9-49f8-4e62-afbc-c164cc147016" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_MovementA.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_MovementA.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_MovementB.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_MovementB.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_ObstacleA.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_ObstacleA.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementA.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementA.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementB.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementB.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/SampleObstacle.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/SampleObstacle.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/SampleObstacle.asset.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/SampleObstacle.asset.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/CardData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/CardData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/MovementPattern.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/MovementPattern.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/ObstaclePattern.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/ObstaclePattern.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PlayerInputController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PlayerInputController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Multiplayer/NetworkBootstrap.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Multiplayer/NetworkBootstrap.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DrawSkipButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DrawSkipButton.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -30,15 +18,22 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/CardData.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/DeckManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/DraftManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/DrawSkipButton.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/HandCard.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/MovementPattern.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/ObstaclePattern.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/PawnPlacementManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/PlayerInputController.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/TooltipManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/TurnManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Multiplayer/NetworkBootstrap.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.ugui@f250afc9b68d/Editor/TMP/TMP_BaseEditorPanel.cs" root0="SKIP_HIGHLIGHTING" />
   </component>
   <component name="McpProjectServerCommands">
@@ -128,6 +123,7 @@
       <workItem from="1773225436151" duration="6124000" />
       <workItem from="1773476968750" duration="421000" />
       <workItem from="1773568745798" duration="7172000" />
+      <workItem from="1773743870686" duration="1158000" />
     </task>
     <servers />
   </component>

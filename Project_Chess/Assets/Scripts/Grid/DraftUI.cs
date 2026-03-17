@@ -178,7 +178,15 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (keepButton != null) keepButton.interactable = !usedActions.Contains(DraftAction.Keep);
             if (giveButton != null) giveButton.interactable = !usedActions.Contains(DraftAction.Give);
-            if (burnButton != null) burnButton.interactable = !usedActions.Contains(DraftAction.Burn);
+            if (burnButton != null)
+            {
+                bool burnAllowed = !usedActions.Contains(DraftAction.Burn);
+                if (DraftManager.Instance != null && !DraftManager.Instance.IsBurnAllowed)
+                {
+                    burnAllowed = false;
+                }
+                burnButton.interactable = burnAllowed;
+            }
         }
 
         #endregion

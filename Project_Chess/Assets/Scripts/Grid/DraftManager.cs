@@ -32,6 +32,9 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, ReadOnly] private List<CardData> p1PendingIncoming = new List<CardData>();
         [SerializeField, ReadOnly] private List<CardData> p2PendingIncoming = new List<CardData>();
 
+        [Header("Early Round Restrictions")]
+        [SerializeField, Min(0)] private int blockDrawAndBurnForRounds = 2;
+
         private List<CardData> currentChoices = new List<CardData>();
         private HashSet<DraftAction> usedActionsThisRound = new HashSet<DraftAction>();
         
@@ -156,6 +159,11 @@ namespace AlperKocasalih.Chess.Grid
             if (pendingOverflowBurnCount > 0)
             {
                 Debug.LogWarning("DraftManager: Resolve overflow burn before continuing.");
+                return;
+            }
+            if (action == DraftAction.Burn && isActionDraftActive && IsEarlyRoundLocked())
+            {
+                Debug.LogWarning("DraftManager: Burn is disabled for the first rounds.");
                 return;
             }
             if (usedActionsThisRound.Contains(action))
@@ -330,6 +338,8 @@ namespace AlperKocasalih.Chess.Grid
         public bool IsDraftingActive => isDraftingActive;
         public bool IsOverflowBurnPending => pendingOverflowBurnCount > 0;
         public int DraftingPlayerID => draftingPlayerID;
+        public bool IsDrawAllowed => !IsEarlyRoundLocked();
+        public bool IsBurnAllowed => !isActionDraftActive || !IsEarlyRoundLocked();
 
         public List<CardData> GetCurrentChoices()
         {
@@ -376,6 +386,11 @@ namespace AlperKocasalih.Chess.Grid
             if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.ActionPhase) return;
             if (TurnManager.Instance == null || DeckManager.Instance == null) return;
             if (isDraftingActive) return;
+            if (IsEarlyRoundLocked())
+            {
+                Debug.LogWarning("DraftManager: Draw is disabled for the first rounds.");
+                return;
+            }
 
             int playerID = GetPlayerIdFromClientId(serverRpcParams.Receive.SenderClientId);
             if (TurnManager.Instance.ActivePlayerID != playerID) return;
@@ -399,6 +414,15 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (NetworkManager.Singleton == null) return 1;
             return clientId == NetworkManager.ServerClientId ? 1 : 2;
+        }
+
+        private bool IsEarlyRoundLocked()
+        {
+            if (blockDrawAndBurnForRounds <= 0) return false;
+            if (TurnManager.Instance == null) return false;
+
+            int currentRound = (TurnManager.Instance.TurnCount + 1) / 2;
+            return currentRound <= blockDrawAndBurnForRounds;
         }
 
         private void RequestOverflowBurn(int playerID)

@@ -77,7 +77,8 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             bool isMyTurn = TurnManager.Instance != null && TurnManager.Instance.ActivePlayerID == localPlayerID;
-            drawSkipButton.interactable = isActionPhase && isMyTurn && !isDrafting;
+            bool isDrawAllowed = DraftManager.Instance == null || DraftManager.Instance.IsDrawAllowed;
+            drawSkipButton.interactable = isActionPhase && isMyTurn && !isDrafting && isDrawAllowed;
         }
 
         private void HandleTurnChanged(int _)
