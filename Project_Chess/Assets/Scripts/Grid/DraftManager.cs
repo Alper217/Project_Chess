@@ -216,7 +216,7 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void HandleChoiceServerRpc(int cardIndex, DraftAction action)
         {
             HandleChoice(cardIndex, action);
@@ -379,8 +379,8 @@ namespace AlperKocasalih.Chess.Grid
             return playerID == 1 ? p1PendingIncoming : p2PendingIncoming;
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void DrawOneAndSkipTurnServerRpc(ServerRpcParams serverRpcParams = default)
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void DrawOneAndSkipTurnServerRpc(RpcParams rpcParams = default)
         {
             if (!IsServer) return;
             if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.ActionPhase) return;
@@ -392,7 +392,7 @@ namespace AlperKocasalih.Chess.Grid
                 return;
             }
 
-            int playerID = GetPlayerIdFromClientId(serverRpcParams.Receive.SenderClientId);
+            int playerID = GetPlayerIdFromClientId(rpcParams.Receive.SenderClientId);
             if (TurnManager.Instance.ActivePlayerID != playerID) return;
 
             int currentTurn = TurnManager.Instance.TurnCount;
@@ -438,7 +438,7 @@ namespace AlperKocasalih.Chess.Grid
             NotifyOverflowBurnRequestedClientRpc(playerID, pendingOverflowBurnCount);
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void BurnOverflowCardAtIndexServerRpc(int playerID, int handIndex)
         {
             if (!IsServer) return;
@@ -527,7 +527,7 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         private void RemoveCardFromHandServerRpc(int playerID, int cardIndex)
         {
             CardData card = DeckManager.Instance.GetCardByIndex(cardIndex);

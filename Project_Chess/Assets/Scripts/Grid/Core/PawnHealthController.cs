@@ -60,7 +60,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         }
     }
 
-    [ServerRpc(RequireOwnership = false)]
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
     private void TakeDamageServerRpc(int damageAmount)
     {
         if (!IsServer) return;

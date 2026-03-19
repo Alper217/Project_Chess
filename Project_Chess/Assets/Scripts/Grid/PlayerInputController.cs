@@ -136,7 +136,7 @@ namespace AlperKocasalih.Chess.Grid
                 currentState = SelectionState.CardSelected;
                 int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
 
-                foreach (var pObj in GameObject.FindObjectsOfType<Pawn>())
+                foreach (var pObj in GameObject.FindObjectsByType<Pawn>(FindObjectsSortMode.None))
                 {
                     if (pObj.PlayerID != localPlayerID) continue;
                     
@@ -159,7 +159,7 @@ namespace AlperKocasalih.Chess.Grid
 
             int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
 
-            foreach (var pObj in GameObject.FindObjectsOfType<Pawn>())
+            foreach (var pObj in GameObject.FindObjectsByType<Pawn>(FindObjectsSortMode.None))
             {
                 if (pObj.PlayerID != localPlayerID) continue;
                 
@@ -409,7 +409,7 @@ namespace AlperKocasalih.Chess.Grid
 
         private Pawn FindPawnOnCell(HexCell cell)
         {
-            Pawn[] allPawns = GameObject.FindObjectsOfType<Pawn>();
+            Pawn[] allPawns = GameObject.FindObjectsByType<Pawn>(FindObjectsSortMode.None);
             foreach (var p in allPawns)
             {
                 if (p.OccupiedCell == cell) return p;

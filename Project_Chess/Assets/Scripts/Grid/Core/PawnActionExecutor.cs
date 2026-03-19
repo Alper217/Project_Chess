@@ -26,7 +26,7 @@ namespace AlperKocasalih.Chess.Grid.Core
             gridLookup = lookup;
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void ExecuteMoveServerRpc(ulong pawnNetworkID, Vector2Int targetCoords)
         {
             NetworkObject pawnObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[pawnNetworkID];
@@ -67,7 +67,7 @@ namespace AlperKocasalih.Chess.Grid.Core
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void ExecuteCombatServerRpc(ulong attackerID, ulong defenderID, Vector2Int targetCoords)
         {
             NetworkObject attackerObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[attackerID];
@@ -101,7 +101,7 @@ namespace AlperKocasalih.Chess.Grid.Core
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void ApplyCardEffectServerRpc(ulong pawnNetworkID, int cardIndex)
         {
             NetworkObject pawnObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[pawnNetworkID];

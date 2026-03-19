@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &370988766121966672
+--- !u!1001 &1502621624293718979
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -8,94 +8,99 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalScale.x
       value: 92.43987
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalScale.y
       value: 88.59397
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalScale.z
       value: 80
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 434.7136
+      value: 432.91
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -54.633247
+      value: -53.8
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.7071068
+      value: 0.5000001
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalRotation.x
-      value: -0.000000026692545
+      value: -0.5
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.70710677
+      value: -0.5
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.000000026692543
+      value: -0.4999999
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: -8679921383154817045, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: -8679921383154817045, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 919132149155446097, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - target: {fileID: 919132149155446097, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       propertyPath: m_Name
-      value: Pawn_A_Horseman
+      value: Pawn_B_Commander
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6395158291349081507}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+      addedObject: {fileID: 4300073015503815903}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 8138061854260184022}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
+      addedObject: {fileID: 8340486370310186705}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5087033671203317710}
-  m_SourcePrefab: {fileID: 100100000, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
---- !u!1 &713659465979724033 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
-  m_PrefabInstance: {fileID: 370988766121966672}
+      addedObject: {fileID: 2364298345684220907}
+  m_SourcePrefab: {fileID: 100100000, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
+--- !u!23 &224045036822226759 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
+  m_PrefabInstance: {fileID: 1502621624293718979}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &6395158291349081507
+--- !u!1 &1736994957993297554 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: 1d71139b7a6c5db478470059f5f801ab, type: 3}
+  m_PrefabInstance: {fileID: 1502621624293718979}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4300073015503815903
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 713659465979724033}
+  m_GameObject: {fileID: 1736994957993297554}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 3857545775
+  GlobalObjectIdHash: 248672176
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -108,20 +113,20 @@ MonoBehaviour:
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &8138061854260184022
+--- !u!114 &8340486370310186705
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 713659465979724033}
+  m_GameObject: {fileID: 1736994957993297554}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a2f757b8ac984e4681e4238be532594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.Pawn
   ShowTopMostFoldoutHeaderGroup: 1
-  pawnType: {fileID: 11400000, guid: 2f5adbc4549d4d04a909943245096088, type: 2}
+  pawnType: {fileID: 11400000, guid: 1770ee354df864c44b36d1c69e1b7791, type: 2}
   currentCell: {fileID: 0}
   maxHealth:
     m_InternalValue: 0
@@ -129,26 +134,21 @@ MonoBehaviour:
     m_InternalValue: 100
   damage:
     m_InternalValue: 0
-  meshRenderer: {fileID: 1362217876156489940}
+  meshRenderer: {fileID: 224045036822226759}
   highlightMaterialIndex: 0
   hasSynergy:
     m_InternalValue: 0
---- !u!114 &5087033671203317710
+--- !u!114 &2364298345684220907
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 713659465979724033}
+  m_GameObject: {fileID: 1736994957993297554}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c1dbaa5955f979743ae9a8c150e66383, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PawnHealthController
   ShowTopMostFoldoutHeaderGroup: 1
-  pawn: {fileID: 713659465979724033}
---- !u!23 &1362217876156489940 stripped
-MeshRenderer:
-  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: bdcadb984d1e9d04aa6c157e3595f65b, type: 3}
-  m_PrefabInstance: {fileID: 370988766121966672}
-  m_PrefabAsset: {fileID: 0}
+  pawn: {fileID: 1736994957993297554}

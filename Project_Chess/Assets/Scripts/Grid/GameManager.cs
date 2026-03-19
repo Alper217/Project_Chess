@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 using Unity.Netcode;
+using TMPro;
+using AlperKocasalih.Chess.Multiplayer;
 
 namespace AlperKocasalih.Chess.Grid
 {
@@ -21,6 +23,7 @@ namespace AlperKocasalih.Chess.Grid
 
         [Header("Game State")]
         [SerializeField, ReadOnly] private NetworkVariable<GameState> currentState = new NetworkVariable<GameState>(GameState.Setup, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        [SerializeField] private TextMeshProUGUI gameCode;
 
         [Header("Restart Readiness")]
         [SerializeField, ReadOnly] private NetworkVariable<bool> hostWantsRestart = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -72,6 +75,9 @@ namespace AlperKocasalih.Chess.Grid
             {
                 ChangeState(GameState.Setup);
             }
+            string code = NetworkBootstrap.JoinCode;
+            if (gameCode != null) gameCode.text = $"Game Code : {code}";
+            
         }
 
         #endregion
@@ -137,7 +143,7 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (!IsServer) return;
 
-            Pawn[] allPawns = GameObject.FindObjectsOfType<Pawn>();
+            Pawn[] allPawns = GameObject.FindObjectsByType<Pawn>(FindObjectsSortMode.None);
             bool hasPawnsLeft = false;
             foreach (var p in allPawns)
             {
@@ -164,10 +170,10 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void RequestRestartServerRpc(ServerRpcParams serverRpcParams = default)
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void RequestRestartServerRpc(RpcParams rpcParams = default)
         {
-            ulong clientId = serverRpcParams.Receive.SenderClientId;
+            ulong clientId = rpcParams.Receive.SenderClientId;
             if (clientId == NetworkManager.ServerClientId)
             {
                 hostWantsRestart.Value = true;
@@ -203,7 +209,7 @@ namespace AlperKocasalih.Chess.Grid
         private void RestartGameClientRpc()
         {
             // 1. Clear Pawns
-            Pawn[] allPawns = FindObjectsOfType<Pawn>();
+            Pawn[] allPawns = FindObjectsByType<Pawn>(FindObjectsSortMode.None);
             foreach (var pawn in allPawns)
             {
                 if (pawn.OccupiedCell != null)
