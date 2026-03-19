@@ -47,7 +47,7 @@ namespace AlperKocasalih.Chess.Grid.Core
             gridLookup = lookup;
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void ExecuteObstaclePlacementServerRpc(Vector2Int[] worldCoords)
         {
             int currentTurn = TurnManager.Instance != null ? TurnManager.Instance.TurnCount : 1;

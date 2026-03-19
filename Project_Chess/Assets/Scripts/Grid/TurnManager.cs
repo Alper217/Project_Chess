@@ -136,7 +136,7 @@ namespace AlperKocasalih.Chess.Grid
             Debug.Log($"TurnManager: Player {activePlayerID.Value}'s turn.");
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         private void NextTurnServerRpc()
         {
             NextTurn();

@@ -75,7 +75,7 @@ public class SynergyManager : NetworkBehaviour
     private List<Pawn> GetAllActivePawnsOfPlayer(int playerID)
     {
         List<Pawn> result = new List<Pawn>();
-        Pawn[] allPawns = FindObjectsOfType<Pawn>();
+        Pawn[] allPawns = FindObjectsByType<Pawn>(FindObjectsSortMode.None);
 
         foreach (Pawn pawn in allPawns)
         {

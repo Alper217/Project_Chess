@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1001 &7480666048473969546
+--- !u!1001 &471002658784060308
 PrefabInstance:
   m_ObjectHideFlags: 0
   serializedVersion: 2
@@ -10,27 +10,27 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
       propertyPath: m_LocalScale.x
-      value: 92.43987
+      value: 82.62541
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
       propertyPath: m_LocalScale.y
-      value: 88.59397
+      value: 79.187836
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
       propertyPath: m_LocalScale.z
-      value: 80
+      value: 75.71087
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -292.58234
+      value: 432.91
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -691.2737
+      value: -57.87
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
       propertyPath: m_LocalRotation.w
@@ -70,68 +70,51 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 5364679611832030631}
+      addedObject: {fileID: 7842208875114544124}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 2998864406886734259}
+      addedObject: {fileID: 5174293487086459248}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 7021686910802426362}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 5055135879260013315}
+      addedObject: {fileID: 5300043859562203865}
   m_SourcePrefab: {fileID: 100100000, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
---- !u!1 &7715163084612996827 stripped
+--- !u!1 &740912223192063685 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
-  m_PrefabInstance: {fileID: 7480666048473969546}
+  m_PrefabInstance: {fileID: 471002658784060308}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5364679611832030631
+--- !u!114 &7842208875114544124
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7715163084612996827}
+  m_GameObject: {fileID: 740912223192063685}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1499708533
+  GlobalObjectIdHash: 968982144
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 0
+  SceneMigrationSynchronization: 1
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
   SyncOwnerTransformWhenParented: 1
   AllowOwnerToParent: 0
---- !u!114 &2998864406886734259
+--- !u!114 &5174293487086459248
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7715163084612996827}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c1dbaa5955f979743ae9a8c150e66383, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PawnHealthController
-  ShowTopMostFoldoutHeaderGroup: 1
-  pawn: {fileID: 7715163084612996827}
---- !u!114 &7021686910802426362
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7715163084612996827}
+  m_GameObject: {fileID: 740912223192063685}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2a2f757b8ac984e4681e4238be532594, type: 3}
@@ -146,34 +129,26 @@ MonoBehaviour:
     m_InternalValue: 100
   damage:
     m_InternalValue: 0
-  meshRenderer: {fileID: 8075305437991218958}
+  meshRenderer: {fileID: 1245460586091003664}
   highlightMaterialIndex: 0
   hasSynergy:
     m_InternalValue: 0
---- !u!64 &5055135879260013315
-MeshCollider:
+--- !u!114 &5300043859562203865
+MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7715163084612996827}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
+  m_GameObject: {fileID: 740912223192063685}
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 261500406688899528, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
---- !u!23 &8075305437991218958 stripped
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1dbaa5955f979743ae9a8c150e66383, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PawnHealthController
+  ShowTopMostFoldoutHeaderGroup: 1
+  pawn: {fileID: 740912223192063685}
+--- !u!23 &1245460586091003664 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: d24cacab1dfb696458e2402a6e010472, type: 3}
-  m_PrefabInstance: {fileID: 7480666048473969546}
+  m_PrefabInstance: {fileID: 471002658784060308}
   m_PrefabAsset: {fileID: 0}

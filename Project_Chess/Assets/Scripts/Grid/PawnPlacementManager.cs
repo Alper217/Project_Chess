@@ -178,7 +178,7 @@ namespace AlperKocasalih.Chess.Grid
             SpawnPawnOnServer(cell, selectedPawnIndex, localPlayerID);
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         private void TryPlacePawnServerRpc(Vector2Int coordinates, int pawnIndex, int playerID)
         {
             HexCell cell = GetCellByCoords(coordinates);
@@ -421,7 +421,7 @@ namespace AlperKocasalih.Chess.Grid
         private Pawn FindPawnOnCell(HexCell cell)
         {
             // Fallback to find pawn if not easily accessible
-            Pawn[] allPawns = FindObjectsOfType<Pawn>();
+            Pawn[] allPawns = FindObjectsByType<Pawn>(FindObjectsSortMode.None);
             foreach (var p in allPawns)
             {
                 if (p.OccupiedCell == cell) return p;
@@ -439,7 +439,7 @@ namespace AlperKocasalih.Chess.Grid
             ConfirmPlayerPlacementServerRpc(localPlayerID);
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void ConfirmPlayerPlacementServerRpc(int playerID)
         {
             ConfirmPlayerPlacement(playerID);

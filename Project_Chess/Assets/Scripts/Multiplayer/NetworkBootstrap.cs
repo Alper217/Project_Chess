@@ -20,6 +20,7 @@ namespace AlperKocasalih.Chess.Multiplayer
         [SerializeField] private TMP_InputField codeInputField; // Artık IP değil, Relay Kodu girişi
         [SerializeField] private TextMeshProUGUI relayCodeText; // Host olduğumuzda kodu göstereceğimiz text
         [SerializeField] private string gameSceneName = "GameScene";
+        public static string JoinCode { get; private set; }
 
         private async void Start()
         {
@@ -50,12 +51,12 @@ namespace AlperKocasalih.Chess.Multiplayer
             try
             {
                 Allocation allocation = await RelayService.Instance.CreateAllocationAsync(1);
-                string joinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-                Debug.Log($"Relay Host Created. Join Code: {joinCode}");
+                JoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
+                Debug.Log($"Relay Host Created. Join Code: {JoinCode}");
                 
                 if (relayCodeText != null)
                 {
-                    relayCodeText.text = $"Room Code: {joinCode}";
+                    relayCodeText.text = $"Room Code: {JoinCode}";
                     relayCodeText.gameObject.SetActive(true);
                 }
 
