@@ -122,6 +122,14 @@ namespace AlperKocasalih.Chess.Grid
                 handCard.Setup(hand[i]);
                 handCard.SetHandIndex(i);
                 
+                int localPlayerID = 1;
+                if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+                {
+                    localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                }
+                bool isLocked = DraftManager.Instance != null && DraftManager.Instance.IsBurnLocked(localPlayerID, i);
+                handCard.SetBurnLockedUI(isBurnSelectionActive && isLocked);
+                
                 // Calculate position on arc
                 float angle = startAngle + (i * angleStep);
                 float x = Mathf.Sin(angle * Mathf.Deg2Rad) * radius;
@@ -157,6 +165,15 @@ namespace AlperKocasalih.Chess.Grid
             {
                 Debug.Log($"HandUI: Choose {pendingBurnCount} card(s) to burn.");
             }
+
+            for (int i = 0; i < spawnedCards.Count; i++)
+            {
+                if (spawnedCards[i] != null)
+                {
+                    bool isLocked = DraftManager.Instance != null && DraftManager.Instance.IsBurnLocked(localPlayerID, i);
+                    spawnedCards[i].SetBurnLockedUI(isBurnSelectionActive && isLocked);
+                }
+            }
         }
 
         private void TryBurnSelectedCard(HandCard card)
@@ -169,6 +186,13 @@ namespace AlperKocasalih.Chess.Grid
 
             if (DraftManager.Instance != null)
             {
+                if (DraftManager.Instance.IsBurnLocked(localPlayerID, card.HandIndex))
+                {
+                    Debug.LogWarning("HandUI: Cannot burn this card, it is locked!");
+                    card.transform.DOShakePosition(0.2f, 10f, 20, 90f, false, true);
+                    return;
+                }
+
                 DraftManager.Instance.BurnOverflowCardAtIndexServerRpc(localPlayerID, card.HandIndex);
                 isBurnSelectionActive = false; // will be re-enabled if more burns are required
             }

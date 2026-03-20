@@ -14,6 +14,7 @@ namespace AlperKocasalih.Chess.Grid
 
         [Header("State")]
         [SerializeField, ReadOnly] private int draftingPlayerID = 1;
+        [SerializeField, ReadOnly] private int startingDraftPlayerID = 1;
         [SerializeField, ReadOnly] private int roundCount = 1;
         [SerializeField, ReadOnly] private bool isDraftingActive = false;
         [SerializeField, ReadOnly] private bool isActionDraftActive = false;
@@ -81,6 +82,7 @@ namespace AlperKocasalih.Chess.Grid
             overflowNotificationDeferred = false;
             roundCount = 1;
             draftingPlayerID = TurnManager.Instance.ActivePlayerID;
+            startingDraftPlayerID = draftingPlayerID;
             
             p1Hand.Clear();
             p2Hand.Clear();
@@ -226,14 +228,14 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         public void HandleChoiceServerRpc(int cardIndex, DraftAction action)
         {
             HandleChoice(cardIndex, action);
         }
 
         [ClientRpc]
-        private void NotifyHandUpdatedClientRpc(int playerID, int cardIndex, bool isAdd, int handIndexToRemove)
+        private void NotifyHandUpdatedClientRpc(int playerID, int cardIndex, bool isAdd, int handIndexToRemove, int lockUntilRound)
         {
             Debug.Log($"[CLIENT RPC ULAŞTI] Hedef PlayerID: {playerID} | isAdd: {isAdd} | Gelen Kart Index: {cardIndex}");
             CardData card = DeckManager.Instance.GetCardByIndex(cardIndex);
@@ -244,11 +246,13 @@ namespace AlperKocasalih.Chess.Grid
                 return; 
             }
             List<CardData> hand = playerID == 1 ? p1Hand : p2Hand;
+            List<int> burnLocks = GetBurnLockList(playerID);
 
             if (isAdd && !NetworkManager.Singleton.IsServer) 
             {
                 hand.Add(card);
-                Debug.Log($"[CLIENT LİSTE GÜNCELLEMESİ] {card.cardName} ele eklendi. Eldeki toplam kart: {hand.Count}");
+                burnLocks.Add(lockUntilRound);
+                Debug.Log($"[CLIENT LİSTE GÜNCELLEMESİ] {card.cardName} ele eklendi. Eldeki toplam kart: {hand.Count}, lock: {lockUntilRound}");
             }
             else if (!isAdd && !NetworkManager.Singleton.IsServer)
             {
@@ -256,11 +260,17 @@ namespace AlperKocasalih.Chess.Grid
                 if (handIndexToRemove >= 0 && handIndexToRemove < hand.Count)
                 {
                     hand.RemoveAt(handIndexToRemove);
+                    burnLocks.RemoveAt(handIndexToRemove);
                     Debug.Log($"[CLIENT LİSTE GÜNCELLEMESİ] {handIndexToRemove}. sıradaki kart elden silindi.");
                 }
                 else
                 {
-                    hand.Remove(card); // Güvenlik ağı
+                    int index = hand.IndexOf(card);
+                    if (index >= 0)
+                    {
+                        hand.RemoveAt(index);
+                        burnLocks.RemoveAt(index);
+                    }
                 }
             }
 
@@ -299,10 +309,10 @@ namespace AlperKocasalih.Chess.Grid
                 return;
             }
 
-            // Turn order: 1 -> 2 -> 1 -> 2 -> 1 -> 2 (3 rounds each)
-            if (draftingPlayerID == 1)
+            // Turn order alternates between starting player and the other player (3 rounds each)
+            if (draftingPlayerID == startingDraftPlayerID)
             {
-                draftingPlayerID = 2;
+                draftingPlayerID = (startingDraftPlayerID == 1) ? 2 : 1;
                 StartDraftRound();
             }
             else
@@ -310,7 +320,7 @@ namespace AlperKocasalih.Chess.Grid
                 if (roundCount < 3)
                 {
                     roundCount++;
-                    draftingPlayerID = 1;
+                    draftingPlayerID = startingDraftPlayerID;
                     StartDraftRound();
                 }
                 else
@@ -412,10 +422,12 @@ namespace AlperKocasalih.Chess.Grid
             hand.Add(card);
             
             bool isFromOpponent = (playerID != draftingPlayerID);
+            int lockRound = 0;
 
             if (isFromOpponent)
             {
-                burnLocks.Add(GetBurnLockUntilRound());
+                lockRound = GetBurnLockUntilRound();
+                burnLocks.Add(lockRound);
             }
             else
             {
@@ -424,7 +436,7 @@ namespace AlperKocasalih.Chess.Grid
             int cardIndexToSend = DeckManager.Instance.GetCardIndex(card);
             Debug.Log($"[SERVER] Kart Eklendi: {card.cardName}. Player {playerID}'ye RPC gönderiliyor. Gönderilen Index: {cardIndexToSend}");
 
-            NotifyHandUpdatedClientRpc(playerID, DeckManager.Instance.GetCardIndex(card), true, -1);
+            NotifyHandUpdatedClientRpc(playerID, DeckManager.Instance.GetCardIndex(card), true, -1, lockRound);
         }
 
         private List<CardData> GetPendingIncoming(int playerID)
@@ -449,7 +461,7 @@ namespace AlperKocasalih.Chess.Grid
             return GetCurrentRound() + burnLockRounds;
         }
 
-        private bool IsBurnLocked(int playerID, int handIndex)
+        public bool IsBurnLocked(int playerID, int handIndex)
         {
             if (burnLockRounds <= 0) return false;
             List<int> burnLocks = GetBurnLockList(playerID);
@@ -458,8 +470,8 @@ namespace AlperKocasalih.Chess.Grid
             return currentRound < burnLocks[handIndex];
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void DrawOneAndSkipTurnServerRpc(ServerRpcParams serverRpcParams = default)
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void DrawOneAndSkipTurnServerRpc(RpcParams rpcParams = default)
         {
             if (!IsServer) return;
             if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.ActionPhase) return;
@@ -471,7 +483,7 @@ namespace AlperKocasalih.Chess.Grid
                 return;
             }
 
-            int playerID = GetPlayerIdFromClientId(serverRpcParams.Receive.SenderClientId);
+            int playerID = GetPlayerIdFromClientId(rpcParams.Receive.SenderClientId);
             if (TurnManager.Instance.ActivePlayerID != playerID) return;
 
             int currentTurn = TurnManager.Instance.TurnCount;
@@ -523,8 +535,8 @@ namespace AlperKocasalih.Chess.Grid
             NotifyOverflowBurnRequestedClientRpc(playerID, pendingOverflowBurnCount);
         }
 
-        [ServerRpc(RequireOwnership = false)]
-        public void BurnOverflowCardAtIndexServerRpc(int playerID, int handIndex,ServerRpcParams serverRpcParams = default)
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void BurnOverflowCardAtIndexServerRpc(int playerID, int handIndex,RpcParams rpcParams = default)
         {
             if (!IsServer) return;
             if (pendingOverflowBurnCount <= 0 || pendingOverflowBurnPlayerID != playerID) return;
@@ -535,11 +547,11 @@ namespace AlperKocasalih.Chess.Grid
             {Debug.LogWarning("DraftManager: Selected card is temporarily locked from burning.");
             
                 // YENİ: Sadece tıklayan oyuncuya "Bu kart kilitli!" uyarısı gönder
-                ClientRpcParams rpcParams = new ClientRpcParams
+                ClientRpcParams clientRpcParams = new ClientRpcParams
                 {
-                    Send = new ClientRpcSendParams { TargetClientIds = new[] { serverRpcParams.Receive.SenderClientId } }
+                    Send = new ClientRpcSendParams { TargetClientIds = new[] { rpcParams.Receive.SenderClientId } }
                 };
-                NotifyCardLockedClientRpc(playerID, rpcParams);
+                NotifyCardLockedClientRpc(playerID, clientRpcParams);
             
                 NotifyOverflowBurnRequestedClientRpc(playerID, pendingOverflowBurnCount);
                 return;
@@ -548,7 +560,7 @@ namespace AlperKocasalih.Chess.Grid
             CardData burned = hand[handIndex];
             hand.RemoveAt(handIndex);
             GetBurnLockList(playerID).RemoveAt(handIndex);
-            NotifyHandUpdatedClientRpc(playerID, DeckManager.Instance.GetCardIndex(burned), false, handIndex);
+            NotifyHandUpdatedClientRpc(playerID, DeckManager.Instance.GetCardIndex(burned), false, handIndex, 0);
 
             ResolveOverflowAndApplyPending(playerID);
         }
@@ -630,7 +642,7 @@ namespace AlperKocasalih.Chess.Grid
                 {
                     hand.RemoveAt(index);
                     GetBurnLockList(playerID).RemoveAt(index);
-                    NotifyHandUpdatedClientRpc(playerID, DeckManager.Instance.GetCardIndex(card), false, index);
+                    NotifyHandUpdatedClientRpc(playerID, DeckManager.Instance.GetCardIndex(card), false, index, 0);
                     Debug.Log($"DraftManager: Removed {card.cardName} from Player {playerID}'s hand.");
 
                     // If both hands are empty, go back to drafting phase
@@ -650,7 +662,7 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
-        [ServerRpc(RequireOwnership = false)]
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
         private void RemoveCardFromHandServerRpc(int playerID, int cardIndex)
         {
             CardData card = DeckManager.Instance.GetCardByIndex(cardIndex);
@@ -662,6 +674,7 @@ namespace AlperKocasalih.Chess.Grid
             isDraftingActive = false;
             isActionDraftActive = false;
             skipTurnOnActionDraftComplete = false;
+            startingDraftPlayerID = 1;
             p1Hand.Clear();
             p2Hand.Clear();
             currentChoices.Clear();
