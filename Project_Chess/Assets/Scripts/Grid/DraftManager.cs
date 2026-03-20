@@ -291,14 +291,38 @@ namespace AlperKocasalih.Chess.Grid
 
         private void EndCurrentDraftTurn()
         {
-            if (pendingOverflowBurnCount > 0)
-            {
-                if (overflowNotificationDeferred)
-                {
-                    NotifyOverflowBurnRequestedClientRpc(pendingOverflowBurnPlayerID, pendingOverflowBurnCount);
-                    overflowNotificationDeferred = false;
-                }
+            int p1Overflow = (p1Hand.Count + p1PendingIncoming.Count) - maxHandSize;
+            int p2Overflow = (p2Hand.Count + p2PendingIncoming.Count) - maxHandSize;
 
+            if (p1Overflow > 0 || p2Overflow > 0)
+            {
+                int firstToBurn = draftingPlayerID;
+                int secondToBurn = draftingPlayerID == 1 ? 2 : 1;
+
+                if (firstToBurn == 1 && p1Overflow > 0)
+                {
+                    pendingOverflowBurnPlayerID = 1;
+                    pendingOverflowBurnCount = p1Overflow;
+                }
+                else if (firstToBurn == 2 && p2Overflow > 0)
+                {
+                    pendingOverflowBurnPlayerID = 2;
+                    pendingOverflowBurnCount = p2Overflow;
+                }
+                else if (secondToBurn == 1 && p1Overflow > 0)
+                {
+                    pendingOverflowBurnPlayerID = 1;
+                    pendingOverflowBurnCount = p1Overflow;
+                }
+                else if (secondToBurn == 2 && p2Overflow > 0)
+                {
+                    pendingOverflowBurnPlayerID = 2;
+                    pendingOverflowBurnCount = p2Overflow;
+                }
+                
+                // Daima sunucu üzerinden ilgili oyuncuya RPC gönderilir
+                NotifyOverflowBurnRequestedClientRpc(pendingOverflowBurnPlayerID, pendingOverflowBurnCount);
+                overflowNotificationDeferred = false;
                 pendingAdvanceAfterBurn = true;
                 return;
             }
@@ -523,15 +547,16 @@ namespace AlperKocasalih.Chess.Grid
             int overflow = (hand.Count + pending.Count) - maxHandSize;
             if (overflow <= 0) return;
 
-            pendingOverflowBurnPlayerID = playerID;
-            pendingOverflowBurnCount = overflow;
-            
+            // Wait until full draft resolution to decide who burns first to avoid overwriting inappropriately.
             if (isDraftingActive && currentChoices.Count > 0)
             {
                 overflowNotificationDeferred = true;
                 return;
             }
 
+            // If we are here, we are requesting a burn MID-play (not during 3-choice draft)
+            pendingOverflowBurnPlayerID = playerID;
+            pendingOverflowBurnCount = overflow;
             NotifyOverflowBurnRequestedClientRpc(playerID, pendingOverflowBurnCount);
         }
 
@@ -604,11 +629,20 @@ namespace AlperKocasalih.Chess.Grid
 
             ApplyPendingIncoming(playerID);
 
-            // If the other player has pending overflow, request it now.
+            // Now check if the OTHER player needs to burn
             int otherPlayerID = playerID == 1 ? 2 : 1;
-            if (GetPendingIncoming(otherPlayerID).Count > 0)
+            int otherOverflow = 0;
+            if (maxHandSize > 0)
             {
-                RequestOverflowBurn(otherPlayerID);
+                List<CardData> otherHand = GetHand(otherPlayerID);
+                List<CardData> otherPending = GetPendingIncoming(otherPlayerID);
+                otherOverflow = (otherHand.Count + otherPending.Count) - maxHandSize;
+            }
+            if (otherOverflow > 0)
+            {
+                pendingOverflowBurnPlayerID = otherPlayerID;
+                pendingOverflowBurnCount = otherOverflow;
+                NotifyOverflowBurnRequestedClientRpc(otherPlayerID, otherOverflow);
                 return;
             }
 
