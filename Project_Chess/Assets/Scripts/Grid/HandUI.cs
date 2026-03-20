@@ -61,7 +61,7 @@ namespace AlperKocasalih.Chess.Grid
                 localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
             }
 
-            // Only update the hand UI if the updated hand belongs to the local player
+            Debug.Log($"[HandUI TETİKLENDİ] Yenileme İstenen ID: {playerID} | Benim ID: {localPlayerID}");
             if (playerID == localPlayerID)
             {
                 RefreshHand(hand);

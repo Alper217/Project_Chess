@@ -178,15 +178,7 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (keepButton != null) keepButton.interactable = !usedActions.Contains(DraftAction.Keep);
             if (giveButton != null) giveButton.interactable = !usedActions.Contains(DraftAction.Give);
-            if (burnButton != null)
-            {
-                bool burnAllowed = !usedActions.Contains(DraftAction.Burn);
-                if (DraftManager.Instance != null && !DraftManager.Instance.IsBurnAllowed)
-                {
-                    burnAllowed = false;
-                }
-                burnButton.interactable = burnAllowed;
-            }
+            if (burnButton != null) burnButton.interactable = !usedActions.Contains(DraftAction.Burn);
         }
 
         #endregion
@@ -228,8 +220,17 @@ namespace AlperKocasalih.Chess.Grid
             if (DraftManager.Instance == null) return;
             if (!DraftManager.Instance.IsDraftingActive) return;
 
-            List<CardData> choices = DraftManager.Instance.GetCurrentChoices();
-            UpdateDraftUI(DraftManager.Instance.DraftingPlayerID, choices);
+            int localPlayerID = 1;
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            }
+
+            if (DraftManager.Instance.DraftingPlayerID == localPlayerID)
+            {
+                List<CardData> choices = DraftManager.Instance.GetCurrentChoices();
+                UpdateDraftUI(DraftManager.Instance.DraftingPlayerID, choices);
+            }
         }
     }
 }
