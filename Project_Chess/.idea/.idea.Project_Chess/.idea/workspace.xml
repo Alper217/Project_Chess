@@ -6,10 +6,16 @@
   <component name="ChangeListManager">
     <list default="true" id="3d9e23b9-49f8-4e62-afbc-c164cc147016" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DrawSkipButton.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DrawSkipButton.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/HandUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/HandUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_MovementA.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_MovementA.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_MovementB.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_MovementB.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementA.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementA.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementB.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementB.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/CardData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/CardData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PlayerInputController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PlayerInputController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/SynergyManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/SynergyManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/SynergyRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/SynergyRule.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,6 +74,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -128,6 +135,12 @@
       <workItem from="1773743870686" duration="1158000" />
       <workItem from="1773934147918" duration="137000" />
       <workItem from="1773983829789" duration="4194000" />
+      <workItem from="1774086681885" duration="1750000" />
+      <workItem from="1774088461422" duration="1020000" />
+      <workItem from="1774089503117" duration="1969000" />
+      <workItem from="1774091825373" duration="300000" />
+      <workItem from="1774092158317" duration="53000" />
+      <workItem from="1774092253449" duration="37000" />
     </task>
     <servers />
   </component>
@@ -137,7 +150,6 @@
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="true" />
   <component name="UnityProjectDiscoverer">
-    <option name="hasUnityReference" value="true" />
     <option name="unityProject" value="true" />
     <option name="unityProjectFolder" value="true" />
   </component>

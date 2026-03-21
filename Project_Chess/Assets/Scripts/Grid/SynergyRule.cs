@@ -6,7 +6,7 @@ public class SynergyRule : ScriptableObject
 {
     public string synergyName;
     [Tooltip("Required Class")]
-    public SynergyGroup[]  requiredGroups;
+    public Type[]  requiredGroups;
     
     [Header("Synergy")]
     public int bonusHealth;

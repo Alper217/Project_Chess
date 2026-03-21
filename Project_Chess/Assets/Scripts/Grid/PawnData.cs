@@ -1,6 +1,7 @@
 using UnityEngine;
-public enum SynergyGroup
+public enum Type
 {
+    None,
     Archer,
     Cannon,
     Knight,
@@ -14,8 +15,7 @@ public enum SynergyGroup
 [CreateAssetMenu(fileName = "PawnSO", menuName = "Scriptable Objects/PawnSO")]
 public class PawnData: ScriptableObject
 {
-    public SynergyGroup synergyGroup;
-    
+    public Type type;
     
     [Header("Pawn Data")]
     public string pawnName;

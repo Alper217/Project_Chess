@@ -122,7 +122,7 @@ namespace AlperKocasalih.Chess.Grid.Core
             if (card == null) return;
             if (pawn.PawnType == null) return;
 
-            if (pawn.PawnType.synergyGroup != card.pawnClass) return;
+            if (pawn.PawnType.type != card.pawnClass) return;
             if (card.healthToAdd == 0 && card.damageToAdd == 0) return;
 
             pawn.ApplyCardEffectServer(card.healthToAdd, card.damageToAdd);

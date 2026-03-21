@@ -143,9 +143,10 @@ namespace AlperKocasalih.Chess.Grid
                     SetPawnLayer(pObj.gameObject, "Outline_Selectable");
                     highlightedPawns.Add(pObj);
                 }
-
+                
                 Debug.Log($"PlayerInputController: Card '{card.cardName}' selected. Select a pawn.");
             }
+            
         }
 
         public void SelectMovementPattern(MovementPattern pattern)
@@ -165,7 +166,9 @@ namespace AlperKocasalih.Chess.Grid
                 
                 SetPawnLayer(pObj.gameObject, "Outline_Selectable");
                 highlightedPawns.Add(pObj);
+               
             }
+            
         }
 
         private void HandleSelection()
@@ -218,7 +221,16 @@ namespace AlperKocasalih.Chess.Grid
                 
                 ClearPawnHighlights();
                 SetPawnLayer(selectedPawn.gameObject, "Outline");
-                
+
+                MovementPattern resolvedPattern = ResolveMovementPatternForPawn(selectedPawn);
+                if (resolvedPattern == null)
+                {
+                    Debug.LogWarning("PlayerInputController: No MovementPattern resolved for selected pawn.");
+                    CancelSelection();
+                    return;
+                }
+                activePattern = resolvedPattern;
+
                 ShowValidMoves(selectedPawn);
             }
         }
@@ -402,6 +414,20 @@ namespace AlperKocasalih.Chess.Grid
                     }
                 }
             }
+        }
+
+        private MovementPattern ResolveMovementPatternForPawn(Pawn pawn)
+        {
+            if (activeCardData == null) return activePattern;
+            if (activeCardData.isObstacleCard) return null;
+
+            if (pawn == null || pawn.PawnType == null)
+            {
+                return activeCardData.pattern;
+            }
+
+            bool isMatch = pawn.PawnType.type == activeCardData.pawnClass;
+            return isMatch ? activeCardData.pattern : activeCardData.mismatchPattern;
         }
         
         // Network Actions moved to PawnActionExecutor

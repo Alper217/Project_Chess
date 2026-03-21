@@ -18,6 +18,7 @@ MonoBehaviour:
   healthToAdd: 5
   damageToAdd: 5
   pawnClass: 0
+  mismatchPattern: {fileID: 11400000, guid: f89b8aecbb9d59a4d830f85ac7019303, type: 2}
   isObstacleCard: 0
   obstaclePattern: {fileID: 11400000, guid: 8d276098ca9681e4bbd731dd0dbdc3e8, type: 2}
   description: 

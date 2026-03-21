@@ -21,13 +21,13 @@ public class SynergyManager : NetworkBehaviour
 
         List<Pawn> playerPawns = GetAllActivePawnsOfPlayer(playerID);
 
-        Dictionary<SynergyGroup, int> activeGroupCounts = new Dictionary<SynergyGroup, int>();
+        Dictionary<Type, int> activeGroupCounts = new Dictionary<Type, int>();
         
         foreach (Pawn p in playerPawns)
         {
             if (p.PawnType != null)
             {
-                SynergyGroup sg = p.PawnType.synergyGroup;
+                Type sg = p.PawnType.type;
 
                 if (activeGroupCounts.ContainsKey(sg))
                     activeGroupCounts[sg]++;
@@ -39,8 +39,8 @@ public class SynergyManager : NetworkBehaviour
 
         foreach (SynergyRule rule in synergyRules)
         {
-            Dictionary<SynergyGroup, int> requiredCounts = new Dictionary<SynergyGroup, int>();
-            foreach (SynergyGroup req in rule.requiredGroups)
+            Dictionary<Type, int> requiredCounts = new Dictionary<Type, int>();
+            foreach (Type req in rule.requiredGroups)
             {
                 if (requiredCounts.ContainsKey(req)) requiredCounts[req]++;
                 else requiredCounts[req] = 1;
@@ -50,7 +50,7 @@ public class SynergyManager : NetworkBehaviour
 
             foreach (var kvp in requiredCounts)
             {
-                SynergyGroup reqGroup = kvp.Key;
+                Type reqGroup = kvp.Key;
                 int reqAmount = kvp.Value;
 
                 if (!activeGroupCounts.ContainsKey(reqGroup) || activeGroupCounts[reqGroup] < reqAmount)
@@ -63,7 +63,7 @@ public class SynergyManager : NetworkBehaviour
             {
                 foreach (Pawn p in playerPawns)
                 {
-                    if (System.Array.Exists(rule.requiredGroups, g => g == p.PawnType.synergyGroup))
+                    if (System.Array.Exists(rule.requiredGroups, g => g == p.PawnType.type))
                     {
                         p.ApplyBuffsServer(rule.bonusHealth, rule.bonusDamage);
                     }

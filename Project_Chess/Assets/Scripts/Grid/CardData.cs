@@ -14,11 +14,15 @@ namespace AlperKocasalih.Chess.Grid
 
         [Header("Effect")]
         public MovementPattern pattern;
+        
 
         public int healthToAdd;
         public int damageToAdd;
         [Tooltip("Class")]
-        public SynergyGroup pawnClass;
+        public Type pawnClass;
+        
+        [Header("Type Mismatch")]
+        public MovementPattern mismatchPattern;
         
         [Header("Obstacle Settings")]
         [Tooltip("If true, playing this card places an obstacle instead of moving a pawn.")]
