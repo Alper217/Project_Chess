@@ -2037,7 +2037,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 17.3231, y: 202.3}
+  m_AnchoredPosition: {x: -21, y: 202.3}
   m_SizeDelta: {x: 409.0312, y: 69.2395}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &445695432
@@ -4411,6 +4411,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.DraftManager
   ShowTopMostFoldoutHeaderGroup: 1
   draftingPlayerID: 1
+  startingDraftPlayerID: 1
   roundCount: 1
   isDraftingActive: 0
   isActionDraftActive: 0
@@ -4424,7 +4425,12 @@ MonoBehaviour:
   pendingOverflowBurnCount: 0
   p1PendingIncoming: []
   p2PendingIncoming: []
-  blockDrawAndBurnForRounds: 2
+  blockDrawForRounds: 2
+  burnLockRounds: 2
+  p1BurnLockUntilRound: 
+  p2BurnLockUntilRound: 
+  pendingAdvanceAfterBurn: 0
+  overflowNotificationDeferred: 0
 --- !u!114 &1073880202
 MonoBehaviour:
   m_ObjectHideFlags: 0

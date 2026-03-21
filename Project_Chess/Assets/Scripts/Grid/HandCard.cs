@@ -64,6 +64,14 @@ namespace AlperKocasalih.Chess.Grid
             handIndex = index;
         }
 
+        public void SetBurnLockedUI(bool isLocked)
+        {
+            if (cardImage != null)
+            {
+                cardImage.color = isLocked ? new Color(1f, 0.4f, 0.4f, 1f) : Color.white;
+            }
+        }
+
         #endregion
 
         #region Interaction
