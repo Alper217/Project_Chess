@@ -16,7 +16,7 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private PawnData pawnType;
         [SerializeField, ReadOnly] private HexCell currentCell;
         public NetworkVariable<int> maxHealth = new NetworkVariable<int>();
-        public NetworkVariable<int> currentHealth = new NetworkVariable<int>(100, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        public NetworkVariable<int> currentHealth = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<int> damage = new NetworkVariable<int>();
         
         [Header("Sync Data")]

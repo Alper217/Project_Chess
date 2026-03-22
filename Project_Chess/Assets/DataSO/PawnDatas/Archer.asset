@@ -12,7 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2f6ecffe9b6b034a953b287a923a755, type: 3}
   m_Name: Archer
   m_EditorClassIdentifier: Assembly-CSharp::PawnData
+  type: 1
   pawnName: 
   damage: 0
   maxHealth: 0
-  synergyGroup: 0
+  currentHealth: 0
+  attackPattern: {fileID: 11400000, guid: c0a09e01a6fcb0c4b8c40bea6c6ea79b, type: 2}

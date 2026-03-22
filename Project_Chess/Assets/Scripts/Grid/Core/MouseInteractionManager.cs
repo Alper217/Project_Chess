@@ -1,8 +1,10 @@
+using System;
 using UnityEngine;
 
 public class MouseInteractionManager : MonoBehaviour
 {
     private IHoverable currentHoveredObject;
+    [SerializeField] private LayerMask hoverLayer = ~0;
 
     void Update()
     {
@@ -12,10 +14,17 @@ public class MouseInteractionManager : MonoBehaviour
         if (Input.GetKey(KeyCode.Tab))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            if (Physics.Raycast(ray, out RaycastHit hit))
+            RaycastHit[] hits = Physics.RaycastAll(ray, 100f, hoverLayer);
+            if (hits != null && hits.Length > 0)
             {
-                IHoverable hoverable = hit.collider.GetComponent<IHoverable>();
-                
+                Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+                IHoverable hoverable = null;
+                foreach (var h in hits)
+                {
+                    hoverable = h.collider.GetComponentInParent<IHoverable>();
+                    if (hoverable != null) break;
+                }
+
                 if (hoverable != currentHoveredObject)
                 {
                     if (currentHoveredObject != null) currentHoveredObject.OnHoverExit();

@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using AlperKocasalih.Chess.Grid;
+using AlperKocasalih.Chess.Grid.Utils;
 using UnityEngine;
 using Unity.Netcode;
 
@@ -8,6 +10,9 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     private Pawn _pawn;
     public GameObject pawn;
     private bool isHovered = false;
+    [SerializeField] private Color attackHighlightColor = Color.blue;
+    private readonly List<HexCell> highlightedCells = new List<HexCell>();
+    private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
 
     private void Awake()
     {
@@ -38,17 +43,23 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     // Fare piyonun üstüne gelince
     public void OnHoverEnter()
     {
+        if (_pawn == null) return;
         isHovered = true;
         if (HealthUIManager.Instance != null)
             HealthUIManager.Instance.ShowHealthBar(transform, _pawn.currentHealth.Value, _pawn.maxHealth.Value);
+        
+        ShowAttackRange();
     }
 
     // Fare piyondan çıkınca
     public void OnHoverExit()
     {
+        if (_pawn == null) return;
         isHovered = false;
         if (HealthUIManager.Instance != null)
             HealthUIManager.Instance.HideHealthBar();
+        
+        ClearAttackRange();
     }
 
     void Update()
@@ -71,6 +82,89 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         {
             Die();
         }
+    }
+    
+    private void ShowAttackRange()
+    {
+        if (_pawn == null || _pawn.PawnType == null) return;
+        MovementPattern pattern = _pawn.PawnType.attackPattern;
+        if (pattern == null) return;
+        if (_pawn.OccupiedCell == null) return;
+        if (!EnsureGridLookup()) return;
+
+        ClearAttackRange();
+
+        Vector2Int currentPos = _pawn.OccupiedCell.Coordinates;
+        List<Vector2Int> offsets = pattern.GetValidOffsets(currentPos, _pawn.PlayerID == 2);
+        if (offsets == null || offsets.Count == 0) return;
+
+        Vector3Int startCube = HexGridMath.OffsetToCube(currentPos);
+
+        foreach (var offset in offsets)
+        {
+            Vector2Int targetCoords = currentPos + offset;
+
+            bool isBlocked = false;
+            Vector3Int targetCube = HexGridMath.OffsetToCube(targetCoords);
+            int dist = HexGridMath.CubeDistance(startCube, targetCube);
+
+            for (int i = 1; i <= dist; i++)
+            {
+                Vector3 cubeFloat = HexGridMath.CubeLerp(startCube, targetCube, 1f / dist * i);
+                Vector3Int cubePoint = HexGridMath.CubeRound(cubeFloat);
+                Vector2Int pathCoord = HexGridMath.CubeToOffset(cubePoint);
+
+                if (gridLookup.TryGetValue(pathCoord, out HexCell pathCell))
+                {
+                    if (pathCell.IsObstacle)
+                    {
+                        isBlocked = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    isBlocked = true;
+                    break;
+                }
+            }
+
+            if (isBlocked) continue;
+
+            if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
+            {
+                highlightedCells.Add(targetCell);
+                targetCell.Highlight(attackHighlightColor);
+            }
+        }
+    }
+
+    private void ClearAttackRange()
+    {
+        foreach (var cell in highlightedCells)
+        {
+            if (cell != null) cell.ResetHighlight();
+        }
+        highlightedCells.Clear();
+    }
+
+    private bool EnsureGridLookup()
+    {
+        if (gridLookup != null && gridLookup.Count > 0) return true;
+        if (GridGenerator.Instance == null) return false;
+
+        gridLookup.Clear();
+        foreach (var hex in GridGenerator.Instance.SpawnedHexes)
+        {
+            if (hex == null) continue;
+            HexCell cell = hex.GetComponent<HexCell>();
+            if (cell != null)
+            {
+                gridLookup[cell.Coordinates] = cell;
+            }
+        }
+
+        return gridLookup.Count > 0;
     }
 
     private void Die()

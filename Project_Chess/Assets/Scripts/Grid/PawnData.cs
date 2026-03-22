@@ -1,3 +1,4 @@
+using AlperKocasalih.Chess.Grid;
 using UnityEngine;
 public enum Type
 {
@@ -22,4 +23,8 @@ public class PawnData: ScriptableObject
     public int damage;
     public int maxHealth;
     public int currentHealth;
+
+    [Header("Attack Pattern")] 
+    public MovementPattern attackPattern;
+
 }

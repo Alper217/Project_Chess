@@ -6,16 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="3d9e23b9-49f8-4e62-afbc-c164cc147016" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_MovementA.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_MovementA.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_MovementB.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_MovementB.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementA.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementA.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementB.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementB.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/CardData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/CardData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Archer.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Archer.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Archer.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Archer.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/MouseInteractionManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/MouseInteractionManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PlayerInputController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PlayerInputController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/SynergyManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/SynergyManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/SynergyRule.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/SynergyRule.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -141,6 +138,7 @@
       <workItem from="1774091825373" duration="300000" />
       <workItem from="1774092158317" duration="53000" />
       <workItem from="1774092253449" duration="37000" />
+      <workItem from="1774172837484" duration="2361000" />
     </task>
     <servers />
   </component>
@@ -150,6 +148,7 @@
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="true" />
   <component name="UnityProjectDiscoverer">
+    <option name="hasUnityReference" value="true" />
     <option name="unityProject" value="true" />
     <option name="unityProjectFolder" value="true" />
   </component>
