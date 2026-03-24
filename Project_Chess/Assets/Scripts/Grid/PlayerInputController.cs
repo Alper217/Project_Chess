@@ -385,7 +385,7 @@ namespace AlperKocasalih.Chess.Grid
                     {
                         if (occupant.PlayerID != pawn.PlayerID)
                         {
-                            HighlightCell(targetCell, combatHighlightColor);
+                            AddClickableCell(targetCell);
                         }
                     }
                     else
@@ -416,7 +416,7 @@ namespace AlperKocasalih.Chess.Grid
                     Pawn occupant = FindPawnOnCell(targetCell);
                     if (occupant != null && occupant.PlayerID != pawn.PlayerID)
                     {
-                        HighlightCell(targetCell, combatHighlightColor);
+                        AddClickableCell(targetCell);
                     }
                 }
             }
@@ -457,6 +457,15 @@ namespace AlperKocasalih.Chess.Grid
                 highlightedCells.Add(cell);
             }
             cell.Highlight(color);
+        }
+
+        private void AddClickableCell(HexCell cell)
+        {
+            if (cell == null) return;
+            if (!highlightedCells.Contains(cell))
+            {
+                highlightedCells.Add(cell);
+            }
         }
 
         private MovementPattern ResolveMovementPatternForPawn(Pawn pawn)

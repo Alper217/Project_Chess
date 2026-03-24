@@ -64,7 +64,7 @@ namespace AlperKocasalih.Chess.Grid.Editor
                         // Offset odd columns downwards
                         if (x % 2 != 0)
                         {
-                            yPos += ySpacing * 0.5f;
+                            yPos -= ySpacing * 0.5f;
                         }
 
                         Rect hexRect = new Rect(xPos, yPos, HEX_SIZE, HEX_SIZE);

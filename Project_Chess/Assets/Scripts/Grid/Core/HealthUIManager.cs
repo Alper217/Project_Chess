@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class HealthUIManager : MonoBehaviour
 {
@@ -9,13 +10,20 @@ public class HealthUIManager : MonoBehaviour
     public Slider healthSlider;
     [Tooltip("Kameradan bakıldığında can barlığının ne kadar yukarıda duracağını ayarlar.")]
     public float heightOffsetMultiplier = 2f; 
+    public TextMeshProUGUI healthText; // Optional: Assign in inspector, or auto-found in Awake
     private Transform currentTarget;
 
     private void Awake() 
     {
         Instance = this;
         if (healthCanvas != null)
+        {
             healthCanvas.SetActive(false); // Başlangıçta gizli başlasın
+            if (healthText == null)
+            {
+                healthText = healthCanvas.GetComponentInChildren<TextMeshProUGUI>(true);
+            }
+        }
     }
 
     public void ShowHealthBar(Transform target, int current, int max)
@@ -25,6 +33,11 @@ public class HealthUIManager : MonoBehaviour
         {
             healthSlider.maxValue = max;
             healthSlider.value = current;
+        }
+        
+        if (healthText != null)
+        {
+            healthText.text = $"{current} / {max}";
         }
         if (healthCanvas != null)
         {
@@ -47,8 +60,18 @@ public class HealthUIManager : MonoBehaviour
 
     private void UpdateHealthCanvasPosition()
     {
+        // Eğer takip edilen piyon (hedef) yok edildiyse UI'ı hemen gizle
+        if (currentTarget == null)
+        {
+            if (healthCanvas != null && healthCanvas.activeSelf)
+            {
+                HideHealthBar();
+            }
+            return;
+        }
+
         // Piyonun kafasını takip etme ve kameraya dönük kalma işlemi
-        if (currentTarget != null && healthCanvas != null && healthCanvas.activeSelf)
+        if (healthCanvas != null && healthCanvas.activeSelf)
         {
             Camera mainCam = Camera.main;
             if (mainCam != null)

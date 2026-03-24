@@ -41,7 +41,6 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, ReadOnly] private List<int> p1BurnLockUntilRound = new List<int>();
         [SerializeField, ReadOnly] private List<int> p2BurnLockUntilRound = new List<int>();
         [SerializeField, ReadOnly] private bool pendingAdvanceAfterBurn = false;
-        [SerializeField, ReadOnly] private bool overflowNotificationDeferred = false;
 
         private List<CardData> currentChoices = new List<CardData>();
         private HashSet<DraftAction> usedActionsThisRound = new HashSet<DraftAction>();
@@ -79,7 +78,6 @@ namespace AlperKocasalih.Chess.Grid
             pendingOverflowBurnPlayerID = 0;
             pendingOverflowBurnCount = 0;
             pendingAdvanceAfterBurn = false;
-            overflowNotificationDeferred = false;
             roundCount = 1;
             draftingPlayerID = TurnManager.Instance.ActivePlayerID;
             startingDraftPlayerID = draftingPlayerID;
@@ -322,7 +320,6 @@ namespace AlperKocasalih.Chess.Grid
                 
                 // Daima sunucu üzerinden ilgili oyuncuya RPC gönderilir
                 NotifyOverflowBurnRequestedClientRpc(pendingOverflowBurnPlayerID, pendingOverflowBurnCount);
-                overflowNotificationDeferred = false;
                 pendingAdvanceAfterBurn = true;
                 return;
             }
@@ -550,7 +547,6 @@ namespace AlperKocasalih.Chess.Grid
             // Wait until full draft resolution to decide who burns first to avoid overwriting inappropriately.
             if (isDraftingActive && currentChoices.Count > 0)
             {
-                overflowNotificationDeferred = true;
                 return;
             }
 
@@ -718,7 +714,6 @@ namespace AlperKocasalih.Chess.Grid
             pendingOverflowBurnPlayerID = 0;
             pendingOverflowBurnCount = 0;
             pendingAdvanceAfterBurn = false;
-            overflowNotificationDeferred = false;
             p1PendingIncoming.Clear();
             p2PendingIncoming.Clear();
             p1BurnLockUntilRound.Clear();

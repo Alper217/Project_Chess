@@ -34,7 +34,10 @@ public class MouseInteractionManager : MonoBehaviour
             }
             else if (currentHoveredObject != null)
             {
-                currentHoveredObject.OnHoverExit();
+                if (currentHoveredObject is MonoBehaviour mono && mono != null)
+                {
+                    currentHoveredObject.OnHoverExit();
+                }
                 currentHoveredObject = null;
             }
         }
@@ -43,7 +46,10 @@ public class MouseInteractionManager : MonoBehaviour
             // TAB tuşu bırakıldığında (veya basılı değilse) eğer ekranda açık kalmış bir UI varsa kapat.
             if (currentHoveredObject != null)
             {
-                currentHoveredObject.OnHoverExit();
+                if (currentHoveredObject is MonoBehaviour mono && mono != null)
+                {
+                    currentHoveredObject.OnHoverExit();
+                }
                 currentHoveredObject = null;
             }
         }
