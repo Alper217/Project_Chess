@@ -28,7 +28,19 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     public override void OnNetworkDespawn()
     {
         base.OnNetworkDespawn();
-        _pawn.currentHealth.OnValueChanged -= OnHealthChanged;
+        if (_pawn != null)
+            _pawn.currentHealth.OnValueChanged -= OnHealthChanged;
+        
+        ClearAttackRange();
+        if (isHovered && HealthUIManager.Instance != null)
+        {
+            HealthUIManager.Instance.HideHealthBar();
+        }
+    }
+
+    private void OnDestroy()
+    {
+        ClearAttackRange();
     }
 
     private void OnHealthChanged(int previousValue, int newValue)
