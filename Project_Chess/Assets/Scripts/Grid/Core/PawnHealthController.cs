@@ -67,12 +67,11 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         // Örnek hasar alma kodu (Yalnızca piyonun üzerine gelindiğinde ve sol tıklandığında test için hasar al)
         if (Input.GetMouseButtonDown(0) && isHovered)
         {
-            TakeDamageServerRpc(_pawn.damage.Value);
+            TakeDamageServer(_pawn.damage.Value);
         }
     }
-
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    private void TakeDamageServerRpc(int damageAmount)
+    
+    public void TakeDamageServer(int damageAmount)
     {
         if (!IsServer) return;
 
@@ -86,8 +85,8 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     
     private void ShowAttackRange()
     {
-        if (_pawn == null || _pawn.PawnType == null) return;
-        MovementPattern pattern = _pawn.PawnType.attackPattern;
+        if (_pawn == null || _pawn.PawnData == null) return;
+        MovementPattern pattern = _pawn.PawnData.attackPattern;
         if (pattern == null) return;
         if (_pawn.OccupiedCell == null) return;
         if (!EnsureGridLookup()) return;

@@ -13,7 +13,7 @@ namespace AlperKocasalih.Chess.Grid
         #region Fields
 
         [Header("Pawn Data")]
-        [SerializeField] private PawnData pawnType;
+        [SerializeField] private PawnData pawnData;
         [SerializeField, ReadOnly] private HexCell currentCell;
         public NetworkVariable<int> maxHealth = new NetworkVariable<int>();
         public NetworkVariable<int> currentHealth = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -34,7 +34,7 @@ namespace AlperKocasalih.Chess.Grid
 
         #region Properties
 
-        public PawnData PawnType => pawnType;
+        public PawnData PawnData => pawnData;
         public HexCell OccupiedCell => currentCell;
         public int PlayerID { get => netPlayerID.Value; set { if (IsServer) netPlayerID.Value = value; } }
         public int TypeIndex { get => netTypeIndex.Value; set { if (IsServer) netTypeIndex.Value = value; } }
@@ -55,9 +55,9 @@ namespace AlperKocasalih.Chess.Grid
             }
             if (IsServer)
             {
-                maxHealth.Value = pawnType.maxHealth;
-                damage.Value = pawnType.damage;
-                currentHealth.Value = pawnType.currentHealth;
+                maxHealth.Value = pawnData.maxHealth;
+                damage.Value = pawnData.damage;
+                currentHealth.Value = pawnData.currentHealth;
                 currentHealth.Value = maxHealth.Value;
             }
 
@@ -151,8 +151,8 @@ namespace AlperKocasalih.Chess.Grid
         {
             if(!IsServer) return;
             hasSynergy.Value = false;
-            maxHealth.Value = pawnType.maxHealth;
-            damage.Value = pawnType.damage;
+            maxHealth.Value = pawnData.maxHealth;
+            damage.Value = pawnData.damage;
 
             if (currentHealth.Value > maxHealth.Value)
             {

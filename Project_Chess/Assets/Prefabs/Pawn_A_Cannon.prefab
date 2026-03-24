@@ -81,6 +81,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d0b62176440acca4d8aa8944588dd62e, type: 3}
       insertIndex: -1
       addedObject: {fileID: 3235681357996013961}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d0b62176440acca4d8aa8944588dd62e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6643246433336281158}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d0b62176440acca4d8aa8944588dd62e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -7302079880081114978}
   m_SourcePrefab: {fileID: 100100000, guid: d0b62176440acca4d8aa8944588dd62e, type: 3}
 --- !u!1 &4766898906427391955 stripped
 GameObject:
@@ -99,7 +105,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2646828809
+  GlobalObjectIdHash: 3794223412
   InScenePlacedSourceGlobalObjectIdHash: 0
   DeferredDespawnTick: 0
   Ownership: 1
@@ -125,12 +131,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.Pawn
   ShowTopMostFoldoutHeaderGroup: 1
-  pawnType: {fileID: 11400000, guid: dcaf0cd661207424988b345fa2155251, type: 2}
+  pawnData: {fileID: 11400000, guid: dcaf0cd661207424988b345fa2155251, type: 2}
   currentCell: {fileID: 0}
   maxHealth:
     m_InternalValue: 0
   currentHealth:
-    m_InternalValue: 100
+    m_InternalValue: 0
   damage:
     m_InternalValue: 0
   meshRenderer: {fileID: 6424263083226750470}
@@ -151,6 +157,44 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PawnHealthController
   ShowTopMostFoldoutHeaderGroup: 1
   pawn: {fileID: 4766898906427391955}
+  attackHighlightColor: {r: 0, g: 0, b: 1, a: 1}
+--- !u!114 &6643246433336281158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4766898906427391955}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 609a1c535f8962a419e69e5e9801145a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttackHandler
+  ShowTopMostFoldoutHeaderGroup: 1
+  currentCooldown:
+    m_InternalValue: 0
+--- !u!64 &-7302079880081114978
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4766898906427391955}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 282665186597767424, guid: d0b62176440acca4d8aa8944588dd62e, type: 3}
 --- !u!23 &6424263083226750470 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: d0b62176440acca4d8aa8944588dd62e, type: 3}

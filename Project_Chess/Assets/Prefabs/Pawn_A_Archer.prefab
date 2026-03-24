@@ -84,6 +84,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6940579c99c79a94ea2b55e5a515306e, type: 3}
       insertIndex: -1
       addedObject: {fileID: -7390910781723124800}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 6940579c99c79a94ea2b55e5a515306e, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5652515606542804381}
   m_SourcePrefab: {fileID: 100100000, guid: 6940579c99c79a94ea2b55e5a515306e, type: 3}
 --- !u!1 &175890167728597889 stripped
 GameObject:
@@ -128,12 +131,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.Pawn
   ShowTopMostFoldoutHeaderGroup: 1
-  pawnType: {fileID: 11400000, guid: 94a340785c9894843b024a16412618a5, type: 2}
+  pawnData: {fileID: 11400000, guid: 94a340785c9894843b024a16412618a5, type: 2}
   currentCell: {fileID: 0}
   maxHealth:
     m_InternalValue: 0
   currentHealth:
-    m_InternalValue: 100
+    m_InternalValue: 0
   damage:
     m_InternalValue: 0
   meshRenderer: {fileID: 1832999531564616276}
@@ -177,6 +180,21 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: -2563013813576986068, guid: 6940579c99c79a94ea2b55e5a515306e, type: 3}
+--- !u!114 &5652515606542804381
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 175890167728597889}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 609a1c535f8962a419e69e5e9801145a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttackHandler
+  ShowTopMostFoldoutHeaderGroup: 1
+  currentCooldown:
+    m_InternalValue: 0
 --- !u!23 &1832999531564616276 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 6940579c99c79a94ea2b55e5a515306e, type: 3}

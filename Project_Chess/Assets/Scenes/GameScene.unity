@@ -2980,8 +2980,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SynergyManager
   ShowTopMostFoldoutHeaderGroup: 1
-  synergyRules:
-  - {fileID: 11400000, guid: ab257f8e53c5a86448217c72111e7090, type: 2}
+  synergyRules: []
 --- !u!4 &706128110
 Transform:
   m_ObjectHideFlags: 0

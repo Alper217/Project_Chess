@@ -29,8 +29,8 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, ReadOnly] private CardData activeCardData;
         [SerializeField, ReadOnly] private Pawn selectedPawn;
 
-        private List<HexCell> highlightedCells = new List<HexCell>();
-        private List<Pawn> highlightedPawns = new List<Pawn>();
+        private readonly List<HexCell> highlightedCells = new List<HexCell>();
+        private readonly List<Pawn> highlightedPawns = new List<Pawn>();
         private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
 
         public bool IsActive => currentState != SelectionState.None;
@@ -247,6 +247,12 @@ namespace AlperKocasalih.Chess.Grid
                         Debug.LogWarning("PlayerInputController: Friendly pawn selected as target. Move ignored.");
                         return;
                     }
+                    AttackHandler attackHandler = selectedPawn != null ? selectedPawn.GetComponent<AttackHandler>() : null;
+                    if (attackHandler != null && !attackHandler.CanAttack())
+                    {
+                        Debug.Log("PlayerInputController: Attack on cooldown. Action ignored.");
+                        return;
+                    }
                     if (Core.PawnActionExecutor.Instance != null)
                     {
                         int cardIndex = -1;
@@ -258,6 +264,7 @@ namespace AlperKocasalih.Chess.Grid
                         {
                             Core.PawnActionExecutor.Instance.ApplyCardEffectServerRpc(selectedPawn.NetworkObjectId, cardIndex);
                         }
+
                         Core.PawnActionExecutor.Instance.ExecuteCombatServerRpc(selectedPawn.NetworkObjectId, enemy.NetworkObjectId, cell.Coordinates);
                     }
                 }
@@ -360,41 +367,16 @@ namespace AlperKocasalih.Chess.Grid
 
             Vector3Int startCube = HexGridMath.OffsetToCube(currentCoords);
 
+            HighlightMovementTargets(pawn, currentCoords, startCube, offsets);
+            HighlightAttackTargets(pawn, currentCoords, startCube);
+        }
+
+        private void HighlightMovementTargets(Pawn pawn, Vector2Int currentCoords, Vector3Int startCube, List<Vector2Int> offsets)
+        {
             foreach (var offset in offsets)
             {
-                Vector2Int finalOffset = offset;
-
-                Vector2Int targetCoords = currentCoords + finalOffset;
-                
-                // --- LINE OF SIGHT CHECK ---
-                bool isBlocked = false;
-                Vector3Int targetCube = HexGridMath.OffsetToCube(targetCoords);
-                int dist = HexGridMath.CubeDistance(startCube, targetCube);
-                
-                for (int i = 1; i <= dist; i++)
-                {
-                    // LERP to find all hexes exactly on the line
-                    Vector3 cubeFloat = HexGridMath.CubeLerp(startCube, targetCube, 1f / dist * i);
-                    Vector3Int cubePoint = HexGridMath.CubeRound(cubeFloat);
-                    Vector2Int pathCoord = HexGridMath.CubeToOffset(cubePoint);
-                    
-                    if (gridLookup.TryGetValue(pathCoord, out HexCell pathCell))
-                    {
-                        if (pathCell.IsObstacle)
-                        {
-                            isBlocked = true;
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        isBlocked = true; // Path goes out of bounds
-                        break;
-                    }
-                }
-                
-                if (isBlocked) continue; // Skip to next target option
-                // --------------------------
+                Vector2Int targetCoords = currentCoords + offset;
+                if (IsPathBlocked(startCube, targetCoords)) continue;
 
                 if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
                 {
@@ -403,17 +385,78 @@ namespace AlperKocasalih.Chess.Grid
                     {
                         if (occupant.PlayerID != pawn.PlayerID)
                         {
-                            highlightedCells.Add(targetCell);
-                            targetCell.Highlight(combatHighlightColor);
+                            HighlightCell(targetCell, combatHighlightColor);
                         }
                     }
                     else
                     {
-                        highlightedCells.Add(targetCell);
-                        targetCell.Highlight(moveHighlightColor);
+                        HighlightCell(targetCell, moveHighlightColor);
                     }
                 }
             }
+        }
+
+        private void HighlightAttackTargets(Pawn pawn, Vector2Int currentCoords, Vector3Int startCube)
+        {
+            if (pawn == null || pawn.PawnData == null) return;
+
+            MovementPattern attackPattern = pawn.PawnData.attackPattern;
+            if (attackPattern == null) return;
+
+            List<Vector2Int> attackOffsets = attackPattern.GetValidOffsets(currentCoords, pawn.PlayerID == 2);
+            if (attackOffsets == null || attackOffsets.Count == 0) return;
+
+            foreach (var offset in attackOffsets)
+            {
+                Vector2Int targetCoords = currentCoords + offset;
+                if (IsPathBlocked(startCube, targetCoords)) continue;
+
+                if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
+                {
+                    Pawn occupant = FindPawnOnCell(targetCell);
+                    if (occupant != null && occupant.PlayerID != pawn.PlayerID)
+                    {
+                        HighlightCell(targetCell, combatHighlightColor);
+                    }
+                }
+            }
+        }
+
+        private bool IsPathBlocked(Vector3Int startCube, Vector2Int targetCoords)
+        {
+            Vector3Int targetCube = HexGridMath.OffsetToCube(targetCoords);
+            int dist = HexGridMath.CubeDistance(startCube, targetCube);
+
+            for (int i = 1; i <= dist; i++)
+            {
+                Vector3 cubeFloat = HexGridMath.CubeLerp(startCube, targetCube, 1f / dist * i);
+                Vector3Int cubePoint = HexGridMath.CubeRound(cubeFloat);
+                Vector2Int pathCoord = HexGridMath.CubeToOffset(cubePoint);
+
+                if (gridLookup.TryGetValue(pathCoord, out HexCell pathCell))
+                {
+                    if (pathCell.IsObstacle)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private void HighlightCell(HexCell cell, Color color)
+        {
+            if (cell == null) return;
+            if (!highlightedCells.Contains(cell))
+            {
+                highlightedCells.Add(cell);
+            }
+            cell.Highlight(color);
         }
 
         private MovementPattern ResolveMovementPatternForPawn(Pawn pawn)
@@ -421,12 +464,12 @@ namespace AlperKocasalih.Chess.Grid
             if (activeCardData == null) return activePattern;
             if (activeCardData.isObstacleCard) return null;
 
-            if (pawn == null || pawn.PawnType == null)
+            if (pawn == null || pawn.PawnData == null)
             {
                 return activeCardData.pattern;
             }
 
-            bool isMatch = pawn.PawnType.type == activeCardData.pawnClass;
+            bool isMatch = pawn.PawnData.type == activeCardData.pawnClass;
             return isMatch ? activeCardData.pattern : activeCardData.mismatchPattern;
         }
         

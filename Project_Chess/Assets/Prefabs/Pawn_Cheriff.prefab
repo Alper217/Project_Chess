@@ -77,6 +77,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 91a800660b8cd52498c8184507a8756a, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2256819625384752199}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 91a800660b8cd52498c8184507a8756a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8506686717226348608}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 91a800660b8cd52498c8184507a8756a, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 8165749115678589190}
   m_SourcePrefab: {fileID: 100100000, guid: 91a800660b8cd52498c8184507a8756a, type: 3}
 --- !u!1 &2400306031831673477 stripped
 GameObject:
@@ -121,12 +127,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.Pawn
   ShowTopMostFoldoutHeaderGroup: 1
-  pawnType: {fileID: 11400000, guid: 8df1ab86ad9228546bf49956885cfe30, type: 2}
+  pawnData: {fileID: 11400000, guid: 8df1ab86ad9228546bf49956885cfe30, type: 2}
   currentCell: {fileID: 0}
   maxHealth:
     m_InternalValue: 0
   currentHealth:
-    m_InternalValue: 100
+    m_InternalValue: 0
   damage:
     m_InternalValue: 0
   meshRenderer: {fileID: 4201689052067547984}
@@ -147,6 +153,44 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PawnHealthController
   ShowTopMostFoldoutHeaderGroup: 1
   pawn: {fileID: 2400306031831673477}
+  attackHighlightColor: {r: 0, g: 0, b: 1, a: 1}
+--- !u!114 &8506686717226348608
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2400306031831673477}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 609a1c535f8962a419e69e5e9801145a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AttackHandler
+  ShowTopMostFoldoutHeaderGroup: 1
+  currentCooldown:
+    m_InternalValue: 0
+--- !u!64 &8165749115678589190
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2400306031831673477}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 3173064091474949090, guid: 91a800660b8cd52498c8184507a8756a, type: 3}
 --- !u!23 &4201689052067547984 stripped
 MeshRenderer:
   m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: 91a800660b8cd52498c8184507a8756a, type: 3}

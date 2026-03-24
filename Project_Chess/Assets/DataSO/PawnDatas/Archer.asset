@@ -14,7 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PawnData
   type: 1
   pawnName: 
-  damage: 0
-  maxHealth: 0
-  currentHealth: 0
+  damage: 10
+  maxHealth: 100
+  currentHealth: 100
   attackPattern: {fileID: 11400000, guid: c0a09e01a6fcb0c4b8c40bea6c6ea79b, type: 2}
+  attackCooldown: 0
+  isAoE: 0
+  AoERadius: 0
+  AoEDamageFallOff: 0

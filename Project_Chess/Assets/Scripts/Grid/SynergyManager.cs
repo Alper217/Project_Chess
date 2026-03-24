@@ -25,9 +25,9 @@ public class SynergyManager : NetworkBehaviour
         
         foreach (Pawn p in playerPawns)
         {
-            if (p.PawnType != null)
+            if (p.PawnData != null)
             {
-                Type sg = p.PawnType.type;
+                Type sg = p.PawnData.type;
 
                 if (activeGroupCounts.ContainsKey(sg))
                     activeGroupCounts[sg]++;
@@ -63,7 +63,7 @@ public class SynergyManager : NetworkBehaviour
             {
                 foreach (Pawn p in playerPawns)
                 {
-                    if (System.Array.Exists(rule.requiredGroups, g => g == p.PawnType.type))
+                    if (System.Array.Exists(rule.requiredGroups, g => g == p.PawnData.type))
                     {
                         p.ApplyBuffsServer(rule.bonusHealth, rule.bonusDamage);
                     }

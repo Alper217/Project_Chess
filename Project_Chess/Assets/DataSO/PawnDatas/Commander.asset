@@ -12,7 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2f6ecffe9b6b034a953b287a923a755, type: 3}
   m_Name: Commander
   m_EditorClassIdentifier: Assembly-CSharp::PawnData
+  type: 6
   pawnName: 
   damage: 0
   maxHealth: 0
-  synergyGroup: 5
+  currentHealth: 0
+  attackPattern: {fileID: 0}
+  attackCooldown: 0
+  isAoE: 0
+  AoERadius: 0
+  AoEDamageFallOff: 0

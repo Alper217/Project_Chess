@@ -27,4 +27,9 @@ public class PawnData: ScriptableObject
     [Header("Attack Pattern")] 
     public MovementPattern attackPattern;
 
+    public int attackCooldown;
+    public bool isAoE;
+    public int AoERadius;
+    public int AoEDamageFallOff;
+
 }

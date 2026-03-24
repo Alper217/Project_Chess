@@ -12,8 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2f6ecffe9b6b034a953b287a923a755, type: 3}
   m_Name: Knight
   m_EditorClassIdentifier: Assembly-CSharp::PawnData
-  synergyGroup: 2
+  type: 3
   pawnName: 
   damage: 10
   maxHealth: 10
   currentHealth: 10
+  attackPattern: {fileID: 0}
+  attackCooldown: 0
+  isAoE: 0
+  AoERadius: 0
+  AoEDamageFallOff: 0
