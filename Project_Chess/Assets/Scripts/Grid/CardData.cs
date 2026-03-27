@@ -16,8 +16,13 @@ namespace AlperKocasalih.Chess.Grid
         public MovementPattern pattern;
         
 
-        public int healthToAdd;
-        public int damageToAdd;
+        public int healthToAdd; // Legacy, kept for compatibility
+        public int damageToAdd; // Legacy, kept for compatibility
+
+        [Header("Dynamic Effects (Runtime)")]
+        [Tooltip("These buffs are generated and injected dynamically at runtime by the DeckManager.")]
+        public System.Collections.Generic.List<BuffData> runtimeBuffs = new System.Collections.Generic.List<BuffData>();
+
         [Tooltip("Class")]
         public Type pawnClass;
         
@@ -32,5 +37,23 @@ namespace AlperKocasalih.Chess.Grid
 
         [TextArea(2, 5)]
         public string description;
+
+        /// <summary>
+        /// Gets a formatted string of the applied runtime buffs to display on the UI.
+        /// </summary>
+        public string GetBuffsText()
+        {
+            if (runtimeBuffs == null || runtimeBuffs.Count == 0) return "";
+            string desc = "";
+            foreach (var buff in runtimeBuffs)
+            {
+                if (buff == null) continue;
+                string sign = buff.amount > 0 ? "+" : "";
+                string percent = buff.isPercentage ? "%" : "";
+                string color = buff.isPositiveEffect ? "#4CAF50" : "#FF5252"; // Green for buff, Red for debuff
+                desc += $"\n<color={color}><size=80%>[{sign}{buff.amount}{percent} {buff.effectType}]</size></color>";
+            }
+            return desc;
+        }
     }
 }

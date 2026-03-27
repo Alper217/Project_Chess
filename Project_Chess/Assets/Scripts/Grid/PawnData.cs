@@ -17,6 +17,7 @@ public enum Type
 public class PawnData: ScriptableObject
 {
     public Type type;
+    public PawnGroup pawnGroup;
     
     [Header("Pawn Data")]
     public string pawnName;

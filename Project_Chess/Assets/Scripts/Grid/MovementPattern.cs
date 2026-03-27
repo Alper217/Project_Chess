@@ -43,11 +43,17 @@ namespace AlperKocasalih.Chess.Grid
 
         /// <summary>
         /// Converts the pattern into movement offsets in world coordinates,
-        /// using the pawn as the center and accounting for odd-q layout and optional 180-degree rotation.
+        /// using the pawn as the center and accounting for odd-q layout, rotation, and range modifiers.
         /// </summary>
-        public List<Vector2Int> GetValidOffsets(Vector2Int centerWorldCoords, bool rotate180)
+        public List<Vector2Int> GetValidOffsets(Vector2Int centerWorldCoords, bool rotate180, int rangeModifier = 0)
         {
             List<Vector2Int> localOffsets = GetPatternOffsets();
+
+            if (rangeModifier != 0)
+            {
+                localOffsets = ApplyRangeModifier(localOffsets, rangeModifier);
+            }
+
             List<Vector2Int> worldCoords = HexGridMath.GenerateAccurateWorldOffsetsFromPattern(
                 centerWorldCoords,
                 localOffsets,
@@ -64,6 +70,97 @@ namespace AlperKocasalih.Chess.Grid
                 }
             }
             return movementOffsets;
+        }
+
+        private List<Vector2Int> ApplyRangeModifier(List<Vector2Int> localOffsets, int rangeModifier)
+        {
+            List<Vector2Int> modifiedOffsets = new List<Vector2Int>(localOffsets);
+            Vector3Int localCenterCube = HexGridMath.OffsetToCube(new Vector2Int(3, 3));
+
+            Dictionary<Vector3, int> maxDistPerDir = new Dictionary<Vector3, int>();
+            Dictionary<Vector3, Vector3Int> tipDiffPerDir = new Dictionary<Vector3, Vector3Int>();
+
+            // Convert to cube diffs and find tips
+            List<Vector3Int> allDiffs = new List<Vector3Int>();
+            foreach (var loc in localOffsets)
+            {
+                Vector2Int absLoc = new Vector2Int(3 + loc.x, 3 + loc.y);
+                Vector3Int diff = HexGridMath.OffsetToCube(absLoc) - localCenterCube;
+                allDiffs.Add(diff);
+
+                if (diff == Vector3Int.zero) continue;
+
+                int dist = Mathf.Max(Mathf.Abs(diff.x), Mathf.Abs(diff.y), Mathf.Abs(diff.z));
+                Vector3 dir = new Vector3((float)diff.x / dist, (float)diff.y / dist, (float)diff.z / dist);
+                
+                // Discretize to avoid float issues
+                dir = new Vector3(Mathf.Round(dir.x * 100f) / 100f, Mathf.Round(dir.y * 100f) / 100f, Mathf.Round(dir.z * 100f) / 100f);
+
+                if (!maxDistPerDir.ContainsKey(dir) || dist > maxDistPerDir[dir])
+                {
+                    maxDistPerDir[dir] = dist;
+                    tipDiffPerDir[dir] = diff;
+                }
+            }
+
+            if (rangeModifier > 0)
+            {
+                // Expand
+                foreach (var kvp in tipDiffPerDir)
+                {
+                    Vector3 dir = kvp.Key;
+                    int currentMaxDist = maxDistPerDir[dir];
+
+                    for (int i = 1; i <= rangeModifier; i++)
+                    {
+                        int newDist = currentMaxDist + i;
+                        Vector3Int newDiff = new Vector3Int(
+                            Mathf.RoundToInt(dir.x * newDist),
+                            Mathf.RoundToInt(dir.y * newDist),
+                            Mathf.RoundToInt(dir.z * newDist)
+                        );
+                        
+                        Vector3Int newLocalCube = localCenterCube + newDiff;
+                        Vector2Int newAbsLoc = HexGridMath.CubeToOffset(newLocalCube);
+                        Vector2Int newLocalOffset = new Vector2Int(newAbsLoc.x - 3, newAbsLoc.y - 3);
+                        
+                        if (!modifiedOffsets.Contains(newLocalOffset))
+                        {
+                            modifiedOffsets.Add(newLocalOffset);
+                        }
+                    }
+                }
+            }
+            else if (rangeModifier < 0)
+            {
+                // Shrink: Remove points that are at distance > maxDist - |rangeModifier|
+                int shrinkAmount = -rangeModifier;
+                modifiedOffsets.Clear();
+
+                foreach (var loc in localOffsets)
+                {
+                    Vector2Int absLoc = new Vector2Int(3 + loc.x, 3 + loc.y);
+                    Vector3Int diff = HexGridMath.OffsetToCube(absLoc) - localCenterCube;
+                    
+                    if (diff == Vector3Int.zero) 
+                    {
+                        modifiedOffsets.Add(loc);
+                        continue;
+                    }
+
+                    int dist = Mathf.Max(Mathf.Abs(diff.x), Mathf.Abs(diff.y), Mathf.Abs(diff.z));
+                    Vector3 dir = new Vector3((float)diff.x / dist, (float)diff.y / dist, (float)diff.z / dist);
+                    dir = new Vector3(Mathf.Round(dir.x * 100f) / 100f, Mathf.Round(dir.y * 100f) / 100f, Mathf.Round(dir.z * 100f) / 100f);
+
+                    int maxDistForThisDir = maxDistPerDir.ContainsKey(dir) ? maxDistPerDir[dir] : dist;
+                    if (dist <= maxDistForThisDir - shrinkAmount || dist == 0)
+                    {
+                        modifiedOffsets.Add(loc);
+                    }
+                }
+            }
+
+            return modifiedOffsets;
         }
     }
 }

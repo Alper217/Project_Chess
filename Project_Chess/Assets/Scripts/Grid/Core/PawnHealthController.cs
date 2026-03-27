@@ -38,8 +38,9 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         }
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
+        base.OnDestroy();
         ClearAttackRange();
     }
 

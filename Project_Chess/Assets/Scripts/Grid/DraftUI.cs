@@ -112,7 +112,7 @@ namespace AlperKocasalih.Chess.Grid
                     if (i >= cardSlots.Length) break;
 
                     cardSlots[i].SetActive(true);
-                    if (cardNameTexts.Length > i) cardNameTexts[i].text = cards[i].cardName;
+                    if (cardNameTexts.Length > i) cardNameTexts[i].text = cards[i].cardName + cards[i].GetBuffsText();
                     if (cardImages.Length > i) cardImages[i].sprite = cards[i].cardSprite;
                     
                     // Add simple animation

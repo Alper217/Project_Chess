@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Cheriff
   m_EditorClassIdentifier: Assembly-CSharp::PawnData
   type: 8
-  pawnName: 
-  damage: 0
-  maxHealth: 0
-  currentHealth: 0
+  pawnGroup: 2
+  pawnName: Cheriff
+  damage: 30
+  maxHealth: 30
+  currentHealth: 30
   attackPattern: {fileID: 0}
   attackCooldown: 0
   isAoE: 0

@@ -229,7 +229,12 @@ namespace AlperKocasalih.Chess.Grid
             if (DraftManager.Instance != null) DraftManager.Instance.ResetManager();
 
             // 3. Reset Deck
-            if (DeckManager.Instance != null) DeckManager.Instance.InitializeDeck();
+            if (IsServer && DeckManager.Instance != null && DraftManager.Instance != null)
+            {
+                int newSeed = UnityEngine.Random.Range(1000, 999999);
+                DraftManager.Instance.deckSeed.Value = newSeed;
+                DeckManager.Instance.InitializeDeckWithSeed(newSeed);
+            }
 
             // 4. Return to Setup
             if (IsServer) ChangeState(GameState.Setup);

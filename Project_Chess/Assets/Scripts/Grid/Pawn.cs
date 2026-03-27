@@ -24,6 +24,9 @@ namespace AlperKocasalih.Chess.Grid
         private NetworkVariable<int> netTypeIndex = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         private NetworkVariable<Vector2Int> netCellCoords = new NetworkVariable<Vector2Int>(new Vector2Int(-999, -999), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
+        [Header("Active Buffs (Server-Side)")]
+        public System.Collections.Generic.List<ServerActiveBuff> activeBuffs = new System.Collections.Generic.List<ServerActiveBuff>();
+
         [Header("Visuals")]
         [SerializeField] private MeshRenderer meshRenderer;
         [SerializeField, Min(0)] private int highlightMaterialIndex = 0;
@@ -60,12 +63,27 @@ namespace AlperKocasalih.Chess.Grid
                 currentHealth.Value = pawnData.currentHealth;
                 currentHealth.Value = maxHealth.Value;
             }
-
+            if (TurnManager.Instance != null && IsServer)
+            {
+                TurnManager.Instance.OnTurnChanged += OnTurnChanged;
+            }
         }
 
         public override void OnNetworkDespawn()
         {
             netCellCoords.OnValueChanged -= OnCellCoordsChanged;
+            if (TurnManager.Instance != null && IsServer)
+            {
+                TurnManager.Instance.OnTurnChanged -= OnTurnChanged;
+            }
+        }
+
+        private void OnTurnChanged(int activePlayerID)
+        {
+            if (activePlayerID == PlayerID)
+            {
+                TickBuffsServer();
+            }
         }
 
         private void OnCellCoordsChanged(Vector2Int previousValue, Vector2Int newValue)
@@ -158,6 +176,7 @@ namespace AlperKocasalih.Chess.Grid
             {
                 currentHealth.Value = maxHealth.Value;
             }
+            activeBuffs.Clear();
         }
 
         public void ApplyBuffsServer(int bonusHealth, int bonusDamage)
@@ -190,6 +209,187 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        public void ApplyRuntimeBuffsServer(System.Collections.Generic.List<BuffData> buffs)
+        {
+            if (!IsServer) return;
+            if (buffs == null) return;
+
+            bool immuneToDebuffs = HasDebuffImmunity();
+            bool isAmplified = HasDebuffAmplifier();
+
+            foreach (var buff in buffs)
+            {
+                if (buff == null) continue;
+
+                if (immuneToDebuffs && !buff.isPositiveEffect)
+                {
+                    Debug.Log($"Debuff {buff.effectType} blocked due to Immunity!");
+                    continue;
+                }
+
+                if (buff.durationTurns == 0)
+                {
+                    // Instant effects
+                    float multiplier = (!buff.isPositiveEffect && isAmplified) ? 2f : 1f;
+
+                    if (buff.effectType == EffectType.CurrentHealth)
+                    {
+                        int change = buff.isPercentage ? Mathf.RoundToInt(currentHealth.Value * (buff.amount / 100f)) : (int)buff.amount;
+                        change = Mathf.RoundToInt(change * multiplier);
+                        currentHealth.Value += change;
+                        if (currentHealth.Value > maxHealth.Value) currentHealth.Value = maxHealth.Value;
+                    }
+                    else if (buff.effectType == EffectType.MaxHealth)
+                    {
+                        int change = buff.isPercentage ? Mathf.RoundToInt(maxHealth.Value * (buff.amount / 100f)) : (int)buff.amount;
+                        change = Mathf.RoundToInt(change * multiplier);
+                        maxHealth.Value += change;
+                        currentHealth.Value += change;
+                        if (currentHealth.Value > maxHealth.Value) currentHealth.Value = maxHealth.Value;
+                    }
+                }
+                else
+                {
+                    activeBuffs.Add(new ServerActiveBuff(buff));
+                }
+            }
+        }
+
+        public void TickBuffsServer()
+        {
+            if (!IsServer) return;
+            
+            for (int i = activeBuffs.Count - 1; i >= 0; i--)
+            {
+                activeBuffs[i].remainingTurns--;
+                if (activeBuffs[i].remainingTurns <= 0)
+                {
+                    activeBuffs.RemoveAt(i);
+                }
+            }
+        }
+
+        #region Buff Helper Methods
+
+        public bool HasDebuffAmplifier()
+        {
+            foreach (var buff in activeBuffs)
+            {
+                if (buff.buffData.effectType == EffectType.DebuffAmplifier) return true;
+            }
+            return false;
+        }
+
+        public float GetOutgoingDamageMultiplier()
+        {
+            float multiplier = 1f;
+            bool isAmplified = HasDebuffAmplifier();
+            foreach (var buff in activeBuffs)
+            {
+                if (buff.buffData.effectType == EffectType.OutgoingDamageModifier)
+                {
+                    float val = buff.buffData.isPercentage ? buff.buffData.amount / 100f : buff.buffData.amount;
+                    if (!buff.buffData.isPositiveEffect && isAmplified) val *= 2f;
+                    multiplier += val;
+                }
+            }
+            return Mathf.Max(0f, multiplier);
+        }
+
+        public float GetIncomingDamageMultiplier()
+        {
+            float multiplier = 1f;
+            bool isAmplified = HasDebuffAmplifier();
+            foreach (var buff in activeBuffs)
+            {
+                if (buff.buffData.effectType == EffectType.IncomingDamageModifier)
+                {
+                    // Remember: For IncomingDamageModifier, decreasing incoming damage is a Buff (isPositiveEffect = true, negative amount)
+                    // So increasing incoming damage is a Debuff (isPositiveEffect = false, positive amount).
+                    float val = buff.buffData.isPercentage ? buff.buffData.amount / 100f : buff.buffData.amount;
+                    if (!buff.buffData.isPositiveEffect && isAmplified) val *= 2f;
+                    multiplier += val;
+                }
+            }
+            return Mathf.Max(0f, multiplier);
+        }
+
+        public float GetLifestealPercentage()
+        {
+            float lifesteal = 0f;
+            foreach (var buff in activeBuffs)
+            {
+                if (buff.buffData.effectType == EffectType.Lifesteal)
+                {
+                    float val = buff.buffData.isPercentage ? buff.buffData.amount / 100f : buff.buffData.amount;
+                    lifesteal += val;
+                }
+            }
+            return lifesteal;
+        }
+
+        public float GetRecoilPercentage()
+        {
+            float recoil = 0f;
+            foreach (var buff in activeBuffs)
+            {
+                if (buff.buffData.effectType == EffectType.Recoil)
+                {
+                    float val = buff.buffData.isPercentage ? buff.buffData.amount / 100f : buff.buffData.amount;
+                    recoil += val;
+                }
+            }
+            return recoil;
+        }
+
+        public bool ConsumeDamageBlock()
+        {
+            for (int i = 0; i < activeBuffs.Count; i++)
+            {
+                if (activeBuffs[i].buffData.effectType == EffectType.DamageBlock)
+                {
+                    activeBuffs.RemoveAt(i);
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool HasStun()
+        {
+            foreach (var buff in activeBuffs)
+            {
+                if (buff.buffData.effectType == EffectType.Stun) return true;
+            }
+            return false;
+        }
+
+        public int GetMovementRangeModifier()
+        {
+            int modifier = 0;
+            bool isAmplified = HasDebuffAmplifier();
+            foreach (var buff in activeBuffs)
+            {
+                if (buff.buffData.effectType == EffectType.MovementRangeModifier)
+                {
+                    float val = buff.buffData.amount;
+                    if (!buff.buffData.isPositiveEffect && isAmplified) val *= 2f;
+                    modifier += (int)val;
+                }
+            }
+            return modifier;
+        }
+
+        public bool HasDebuffImmunity()
+        {
+            foreach (var buff in activeBuffs)
+            {
+                if (buff.buffData.effectType == EffectType.DebuffImmunity) return true;
+            }
+            return false;
+        }
+
+        #endregion
      
         #endregion
     }

@@ -130,9 +130,16 @@ namespace AlperKocasalih.Chess.Grid.Core
             if (pawn.PawnData == null) return;
 
             if (pawn.PawnData.type != card.pawnClass) return;
-            if (card.healthToAdd == 0 && card.damageToAdd == 0) return;
 
-            pawn.ApplyCardEffectServer(card.healthToAdd, card.damageToAdd);
+            if (card.healthToAdd != 0 || card.damageToAdd != 0)
+            {
+                pawn.ApplyCardEffectServer(card.healthToAdd, card.damageToAdd);
+            }
+
+            if (card.runtimeBuffs != null && card.runtimeBuffs.Count > 0)
+            {
+                pawn.ApplyRuntimeBuffsServer(card.runtimeBuffs);
+            }
         }
     }
 }

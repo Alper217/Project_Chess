@@ -39,7 +39,7 @@ public class AttackHandler : NetworkBehaviour
         }
     }
     
-    public bool CanAttack() => currentCooldown.Value <= 0;
+    public bool CanAttack() => currentCooldown.Value <= 0 && !pawn.HasStun();
 
     public void ExecuteAttack(Vector2Int targetPos, Dictionary<Vector2Int, HexCell> gridLookup)
     {
@@ -51,7 +51,7 @@ public class AttackHandler : NetworkBehaviour
         }
         else
         {
-           ApplySingleDamage(targetPos, gridLookup, pawn.PawnData.damage);
+           ApplySingleDamage(targetPos, gridLookup, pawn.damage.Value);
         }
 
         currentCooldown.Value = pawn.PawnData.attackCooldown;
@@ -64,10 +64,43 @@ public class AttackHandler : NetworkBehaviour
             Pawn targetPawn = FindPawnOnCell(targetCell);
             if (targetPawn != null && targetPawn.PlayerID != pawn.PlayerID)
             {
+                if (targetPawn.ConsumeDamageBlock())
+                {
+                    Debug.Log("Damage Blocked by Shield/Echo!");
+                    return;
+                }
+
+                float outMultiplier = pawn.GetOutgoingDamageMultiplier();
+                float inMultiplier = targetPawn.GetIncomingDamageMultiplier();
+                int finalDamage = Mathf.RoundToInt(damageAmount * outMultiplier * inMultiplier);
+
                 var healthController = targetPawn.GetComponent<PawnHealthController>();
                 if (healthController != null)
                 {
-                    healthController.TakeDamageServer(damageAmount);
+                    healthController.TakeDamageServer(finalDamage);
+
+                    // Lifesteal
+                    float lifestealPct = pawn.GetLifestealPercentage();
+                    if (lifestealPct > 0)
+                    {
+                        int heal = Mathf.FloorToInt(finalDamage * lifestealPct);
+                        if (heal > 0)
+                        {
+                            pawn.currentHealth.Value = Mathf.Min(pawn.currentHealth.Value + heal, pawn.maxHealth.Value);
+                        }
+                    }
+
+                    // Recoil
+                    float recoilPct = pawn.GetRecoilPercentage();
+                    if (recoilPct > 0)
+                    {
+                        int recoilDmg = Mathf.FloorToInt(finalDamage * recoilPct);
+                        if (recoilDmg > 0)
+                        {
+                            var myHealth = pawn.GetComponent<PawnHealthController>();
+                            if (myHealth != null) myHealth.TakeDamageServer(recoilDmg);
+                        }
+                    }
                 }
             }
         }

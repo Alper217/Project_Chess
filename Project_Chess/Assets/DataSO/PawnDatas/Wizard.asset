@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Wizard
   m_EditorClassIdentifier: Assembly-CSharp::PawnData
   type: 9
-  pawnName: 
-  damage: 0
-  maxHealth: 0
-  currentHealth: 0
+  pawnGroup: 5
+  pawnName: Wizard
+  damage: 15
+  maxHealth: 60
+  currentHealth: 60
   attackPattern: {fileID: 0}
   attackCooldown: 0
   isAoE: 0

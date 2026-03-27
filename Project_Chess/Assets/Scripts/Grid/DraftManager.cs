@@ -56,6 +56,8 @@ namespace AlperKocasalih.Chess.Grid
         public event Action OnDraftFinished;
         public event Action<int, int> OnOverflowBurnRequested; // playerID, burnCount
 
+        public NetworkVariable<int> deckSeed = new NetworkVariable<int>(0);
+
         #endregion
 
         #region Unity Methods
@@ -64,6 +66,34 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
+        }
+
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+
+            if (IsServer)
+            {
+                deckSeed.Value = UnityEngine.Random.Range(1000, 999999);
+                if (DeckManager.Instance != null)
+                {
+                    DeckManager.Instance.InitializeDeckWithSeed(deckSeed.Value);
+                }
+            }
+
+            deckSeed.OnValueChanged += (oldValue, newValue) => 
+            {
+                if (!IsServer && newValue != 0 && DeckManager.Instance != null)
+                {
+                    DeckManager.Instance.InitializeDeckWithSeed(newValue);
+                }
+            };
+            
+            // Catch late joins or quick spawns perfectly
+            if (!IsServer && deckSeed.Value != 0 && DeckManager.Instance != null)
+            {
+                DeckManager.Instance.InitializeDeckWithSeed(deckSeed.Value);
+            }
         }
 
         #endregion

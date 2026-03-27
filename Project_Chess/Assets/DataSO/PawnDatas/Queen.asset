@@ -13,10 +13,11 @@ MonoBehaviour:
   m_Name: Queen
   m_EditorClassIdentifier: Assembly-CSharp::PawnData
   type: 4
-  pawnName: 
-  damage: 0
-  maxHealth: 0
-  currentHealth: 0
+  pawnGroup: 4
+  pawnName: Queen
+  damage: 5
+  maxHealth: 90
+  currentHealth: 90
   attackPattern: {fileID: 0}
   attackCooldown: 0
   isAoE: 0

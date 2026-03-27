@@ -27,6 +27,7 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, ReadOnly] private SelectionState currentState = SelectionState.None;
         [SerializeField, ReadOnly] private MovementPattern activePattern;
         [SerializeField, ReadOnly] private CardData activeCardData;
+        [SerializeField, ReadOnly] private int activeCardRemainingUses = 1;
         [SerializeField, ReadOnly] private Pawn selectedPawn;
 
         private readonly List<HexCell> highlightedCells = new List<HexCell>();
@@ -113,6 +114,18 @@ namespace AlperKocasalih.Chess.Grid
             CancelSelection();
             activeCardData = card;
             activePattern = card.pattern;
+            
+            activeCardRemainingUses = 1;
+            if (card.runtimeBuffs != null)
+            {
+                foreach(var buff in card.runtimeBuffs)
+                {
+                    if (buff != null && buff.effectType == EffectType.DoubleUse)
+                    {
+                        activeCardRemainingUses = 2; // Or buff.amount if we want variable uses
+                    }
+                }
+            }
 
             if (card.isObstacleCard)
             {
@@ -216,6 +229,12 @@ namespace AlperKocasalih.Chess.Grid
 
                 if (pawn.PlayerID != localPlayerID) return;
 
+                if (pawn.HasStun())
+                {
+                    Debug.Log("Pawn is stunned and cannot move or attack!");
+                    return;
+                }
+
                 selectedPawn = pawn;
                 currentState = SelectionState.PawnSelected;
                 
@@ -285,20 +304,52 @@ namespace AlperKocasalih.Chess.Grid
                     }
                 }
                 
-                // Discard the played card locally (and sync via DraftManager)
-                if (activeCardData != null && DraftManager.Instance != null)
+                // Manage Card Uses
+                if (activeCardData != null)
                 {
-                    int localPlayerID = 1;
-                    if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+                    activeCardRemainingUses--;
+                    if (activeCardRemainingUses <= 0)
                     {
-                        localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                        if (DraftManager.Instance != null)
+                        {
+                            int localPlayerID = 1;
+                            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+                            {
+                                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                            }
+                            DraftManager.Instance.RemoveCardFromHand(localPlayerID, activeCardData);
+                        }
+                        
+                        ClearCellHighlights();
+                        CancelSelection();
                     }
-                    DraftManager.Instance.RemoveCardFromHand(localPlayerID, activeCardData);
+                    else
+                    {
+                        // Double Use: Reset pawn selection to allow selecting another pawn
+                        Debug.Log("Tanrının Eli aktif: Kart halen elde, başka bir birim seçin.");
+                        
+                        int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                        SetPawnLayer(selectedPawn.gameObject, "Default");
+                        
+                        selectedPawn = null;
+                        currentState = SelectionState.CardSelected;
+                        ClearCellHighlights();
+                        
+                        foreach (var pObj in GameObject.FindObjectsByType<Pawn>(FindObjectsSortMode.None))
+                        {
+                            if (pObj.PlayerID == localPlayerID)
+                            {
+                                SetPawnLayer(pObj.gameObject, "Outline_Selectable");
+                                highlightedPawns.Add(pObj);
+                            }
+                        }
+                    }
                 }
-
-                // Clear locally immediately for responsiveness
-                ClearCellHighlights();
-                CancelSelection();
+                else
+                {
+                    ClearCellHighlights();
+                    CancelSelection();
+                }
             }
             else
             {
@@ -361,7 +412,9 @@ namespace AlperKocasalih.Chess.Grid
             Vector2Int currentCoords = pawn.OccupiedCell.Coordinates;
             
             if (activePattern == null) return;
-            List<Vector2Int> offsets = activePattern.GetValidOffsets(currentCoords, pawn.PlayerID == 2);
+            
+            int rangeMod = pawn.GetMovementRangeModifier();
+            List<Vector2Int> offsets = activePattern.GetValidOffsets(currentCoords, pawn.PlayerID == 2, rangeMod);
 
             if (offsets == null || offsets.Count == 0) return;
 

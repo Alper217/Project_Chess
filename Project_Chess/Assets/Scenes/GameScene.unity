@@ -3734,15 +3734,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -4082,7 +4082,31 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ec2c6cd505f8a05458ad7e9712f25409, type: 2}
   - {fileID: 11400000, guid: 4444fe951717a0442ac82f74cced862b, type: 2}
   initialDeckSize: 100
+  allPawnDatas:
+  - {fileID: 11400000, guid: 94a340785c9894843b024a16412618a5, type: 2}
+  - {fileID: 11400000, guid: dcaf0cd661207424988b345fa2155251, type: 2}
+  - {fileID: 11400000, guid: 8df1ab86ad9228546bf49956885cfe30, type: 2}
+  - {fileID: 11400000, guid: 1770ee354df864c44b36d1c69e1b7791, type: 2}
+  - {fileID: 11400000, guid: 2f5adbc4549d4d04a909943245096088, type: 2}
+  - {fileID: 11400000, guid: 5cdfb4c163de9cf4098dfc78df80369d, type: 2}
+  - {fileID: 11400000, guid: 3bd2f9515f1993942a500c2f24eb3ec6, type: 2}
+  - {fileID: 11400000, guid: 64c68eb6a2fc5f04b8d82c265eca28c3, type: 2}
+  - {fileID: 11400000, guid: ad30aa40c4abf0c448e562846a8f8375, type: 2}
+  allBuffPools:
+  - {fileID: 11400000, guid: 1724681bf9a3ab64e866727b57d603be, type: 2}
+  - {fileID: 11400000, guid: a9b3f202b4cd77e4b9a2182fe20f9f4b, type: 2}
+  - {fileID: 11400000, guid: 357320ebe0e480a4e96f8912825bddfe, type: 2}
+  - {fileID: 11400000, guid: 91f4f27a2ac969742862b7fd11a1137a, type: 2}
+  - {fileID: 11400000, guid: 2da4e0fa80463c54c9dcfa41b4604653, type: 2}
+  allDebuffs:
+  - {fileID: 11400000, guid: 66f85c28edd29e94087a29f1ea4fe6ef, type: 2}
+  - {fileID: 11400000, guid: f2154165050801f4d8fd25b898b95c8e, type: 2}
+  - {fileID: 11400000, guid: 188aeac4e5cb0e447a1c81ae9efb814b, type: 2}
+  - {fileID: 11400000, guid: b7e17f032439b84408cf492335135b97, type: 2}
+  - {fileID: 11400000, guid: df5d68f9cab8eb542814c8aa2ffed8b6, type: 2}
+  - {fileID: 11400000, guid: 96eba9bac015fed489d3389dfcb7ba07, type: 2}
   deck: []
+  masterRuntimeCardList: []
 --- !u!114 &1073880200
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4146,6 +4170,8 @@ MonoBehaviour:
   p1BurnLockUntilRound: 
   p2BurnLockUntilRound: 
   pendingAdvanceAfterBurn: 0
+  deckSeed:
+    m_InternalValue: 0
 --- !u!114 &1073880202
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6548,6 +6574,7 @@ MonoBehaviour:
   currentState: 0
   activePattern: {fileID: 0}
   activeCardData: {fileID: 0}
+  activeCardRemainingUses: 1
   selectedPawn: {fileID: 0}
 --- !u!1 &1930345817
 GameObject:
@@ -6772,8 +6799,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 10, y: -92}
-  m_SizeDelta: {x: 200, y: 50}
+  m_AnchoredPosition: {x: 3.7009, y: -92}
+  m_SizeDelta: {x: 300.7847, y: 50}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2013007728
 CanvasRenderer:
@@ -6830,15 +6857,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
@@ -7099,15 +7126,15 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 24
+  m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 1
-  m_VerticalAlignment: 256
+  m_HorizontalAlignment: 2
+  m_VerticalAlignment: 512
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0

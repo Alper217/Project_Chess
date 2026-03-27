@@ -47,7 +47,7 @@ namespace AlperKocasalih.Chess.Grid
         public void Setup(CardData data)
         {
             this.cardData = data;
-            if (cardNameText != null) cardNameText.text = data.cardName;
+            if (cardNameText != null) cardNameText.text = data.cardName + data.GetBuffsText();
             if (cardImage != null) cardImage.sprite = data.cardSprite;
             if (descriptionText != null) descriptionText.text = data.description;
         }
