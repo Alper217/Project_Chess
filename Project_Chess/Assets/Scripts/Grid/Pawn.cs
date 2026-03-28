@@ -15,9 +15,9 @@ namespace AlperKocasalih.Chess.Grid
         [Header("Pawn Data")]
         [SerializeField] private PawnData pawnData;
         [SerializeField, ReadOnly] private HexCell currentCell;
-        public NetworkVariable<int> maxHealth = new NetworkVariable<int>();
+        public NetworkVariable<int> maxHealth = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         public NetworkVariable<int> currentHealth = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        public NetworkVariable<int> damage = new NetworkVariable<int>();
+        public NetworkVariable<int> damage = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         
         [Header("Sync Data")]
         private NetworkVariable<int> netPlayerID = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -32,6 +32,11 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, Min(0)] private int highlightMaterialIndex = 0;
         private Material[] originalMaterials;
         private bool isInitialized = false;
+        [SerializeField] private bool debugBuffs = true;
+        [Header("Debug (Runtime)")]
+        [SerializeField, ReadOnly] private int debugMaxHealth;
+        [SerializeField, ReadOnly] private int debugCurrentHealth;
+        [SerializeField, ReadOnly] private int debugDamage;
 
         #endregion
 
@@ -51,6 +56,9 @@ namespace AlperKocasalih.Chess.Grid
             if (meshRenderer == null) meshRenderer = GetComponent<MeshRenderer>();
 
             netCellCoords.OnValueChanged += OnCellCoordsChanged;
+            maxHealth.OnValueChanged += OnStatsChanged;
+            currentHealth.OnValueChanged += OnStatsChanged;
+            damage.OnValueChanged += OnStatsChanged;
             // If we are a client joining late, or just receiving the spawn AFTER data is set:
             if (netCellCoords.Value.x != -999)
             {
@@ -67,11 +75,15 @@ namespace AlperKocasalih.Chess.Grid
             {
                 TurnManager.Instance.OnTurnChanged += OnTurnChanged;
             }
+            UpdateDebugStats();
         }
 
         public override void OnNetworkDespawn()
         {
             netCellCoords.OnValueChanged -= OnCellCoordsChanged;
+            maxHealth.OnValueChanged -= OnStatsChanged;
+            currentHealth.OnValueChanged -= OnStatsChanged;
+            damage.OnValueChanged -= OnStatsChanged;
             if (TurnManager.Instance != null && IsServer)
             {
                 TurnManager.Instance.OnTurnChanged -= OnTurnChanged;
@@ -92,6 +104,18 @@ namespace AlperKocasalih.Chess.Grid
             {
                 AttachToGridLocally(newValue);
             }
+        }
+
+        private void OnStatsChanged(int previousValue, int newValue)
+        {
+            UpdateDebugStats();
+        }
+
+        private void UpdateDebugStats()
+        {
+            debugMaxHealth = maxHealth.Value;
+            debugCurrentHealth = currentHealth.Value;
+            debugDamage = damage.Value;
         }
         
         
@@ -168,6 +192,11 @@ namespace AlperKocasalih.Chess.Grid
         public void ResetSynergyServer()
         {
             if(!IsServer) return;
+            if (debugBuffs)
+            {
+                string pawnName = pawnData != null ? pawnData.pawnName : name;
+                Debug.Log($"Pawn: ResetSynergyServer '{pawnName}' pre max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
+            }
             hasSynergy.Value = false;
             maxHealth.Value = pawnData.maxHealth;
             damage.Value = pawnData.damage;
@@ -177,16 +206,31 @@ namespace AlperKocasalih.Chess.Grid
                 currentHealth.Value = maxHealth.Value;
             }
             activeBuffs.Clear();
+            if (debugBuffs)
+            {
+                string pawnName = pawnData != null ? pawnData.pawnName : name;
+                Debug.Log($"Pawn: ResetSynergyServer '{pawnName}' post max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
+            }
         }
 
         public void ApplyBuffsServer(int bonusHealth, int bonusDamage)
         {
             if (!IsServer) return;
+            if (debugBuffs)
+            {
+                string pawnName = pawnData != null ? pawnData.pawnName : name;
+                Debug.Log($"Pawn: ApplyBuffsServer '{pawnName}' bonusH={bonusHealth} bonusD={bonusDamage} pre max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
+            }
             hasSynergy.Value = true;
             
             maxHealth.Value += bonusHealth;
             damage.Value += bonusDamage;
             currentHealth.Value += bonusHealth;
+            if (debugBuffs)
+            {
+                string pawnName = pawnData != null ? pawnData.pawnName : name;
+                Debug.Log($"Pawn: ApplyBuffsServer '{pawnName}' post max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
+            }
         }
 
         public void ApplyCardEffectServer(int bonusHealth, int bonusDamage)

@@ -8,6 +8,7 @@ public class SynergyManager : NetworkBehaviour
     public static SynergyManager instance;
     [Tooltip("Synergies")]
     public SynergyRule[] synergyRules;
+    [SerializeField] private bool debugSynergy = true;
 
     private void Awake()
     {
@@ -18,8 +19,16 @@ public class SynergyManager : NetworkBehaviour
    public void EvaluateSynergiesOnServer(int playerID)
     {
         if (!IsServer) return;
+        if (debugSynergy)
+        {
+            Debug.Log($"SynergyManager: EvaluateSynergiesOnServer playerID={playerID}");
+        }
 
         List<Pawn> playerPawns = GetAllActivePawnsOfPlayer(playerID);
+        if (debugSynergy)
+        {
+            Debug.Log($"SynergyManager: player pawns count={playerPawns.Count}");
+        }
 
         Dictionary<Type, int> activeGroupCounts = new Dictionary<Type, int>();
         

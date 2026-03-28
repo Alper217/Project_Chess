@@ -78,29 +78,15 @@ public class AttackHandler : NetworkBehaviour
                 if (healthController != null)
                 {
                     healthController.TakeDamageServer(finalDamage);
+                }
+            }
 
-                    // Lifesteal
-                    float lifestealPct = pawn.GetLifestealPercentage();
-                    if (lifestealPct > 0)
-                    {
-                        int heal = Mathf.FloorToInt(finalDamage * lifestealPct);
-                        if (heal > 0)
-                        {
-                            pawn.currentHealth.Value = Mathf.Min(pawn.currentHealth.Value + heal, pawn.maxHealth.Value);
-                        }
-                    }
-
-                    // Recoil
-                    float recoilPct = pawn.GetRecoilPercentage();
-                    if (recoilPct > 0)
-                    {
-                        int recoilDmg = Mathf.FloorToInt(finalDamage * recoilPct);
-                        if (recoilDmg > 0)
-                        {
-                            var myHealth = pawn.GetComponent<PawnHealthController>();
-                            if (myHealth != null) myHealth.TakeDamageServer(recoilDmg);
-                        }
-                    }
+            if (pawn.PawnData.isHealer)
+            {
+                if (targetPawn.PlayerID == pawn.PlayerID)
+                {
+                    PawnHealthController healthController = targetPawn.GetComponent<PawnHealthController>();
+                    healthController.HealServer(pawn.PawnData.healAmount);
                 }
             }
         }
@@ -108,7 +94,7 @@ public class AttackHandler : NetworkBehaviour
 
     private void ApplyAreaDamage(Vector2Int centerPos, int radius,  Dictionary<Vector2Int, HexCell> gridLookup)
     {
-        Dictionary<Vector2Int, int> areaTiles = GetHexesWithDistance(centerPos, radius);
+        Dictionary<Vector2Int, int> areaTiles = HexGridMath.GetHexesWithDistance(centerPos, radius);
         
         foreach (var tile in areaTiles)
         {
@@ -124,27 +110,7 @@ public class AttackHandler : NetworkBehaviour
         }
     }
 
-    private Dictionary<Vector2Int, int> GetHexesWithDistance(Vector2Int centerOffset, int radius)
-    {
-        Dictionary<Vector2Int, int> results = new Dictionary<Vector2Int, int>();
-        Vector3Int centerCube = HexGridMath.OffsetToCube(centerOffset);
-
-        for (int i = -radius; i <= radius; i++)
-        {
-            for (int k = Mathf.Max(-radius, -i - radius); k <= Mathf.Min(radius, -i + radius); k++)
-            {
-                int s = -i - k;
-                Vector3Int offsetCube = new Vector3Int(i, k, s);
-                Vector3Int targetCube = centerCube + offsetCube;
-                
-                int distance = (Mathf.Abs(i)+ Mathf.Abs(k) + Mathf.Abs(s)) / 2;
-                
-                results.Add(HexGridMath.CubeToOffset(targetCube), distance);
-            }
-        }
-        return results;
-    }
-
+    
     private Pawn FindPawnOnCell(HexCell cell)
     {
         Pawn[] allPawns = FindObjectsByType<Pawn>(FindObjectsSortMode.None);

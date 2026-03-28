@@ -23,3 +23,9 @@ MonoBehaviour:
   isAoE: 0
   AoERadius: 0
   AoEDamageFallOff: 0
+  hasAura: 0
+  auraRadius: 2
+  damageBuff: 0
+  healthbuff: 0
+  isHealer: 1
+  healAmount: 10

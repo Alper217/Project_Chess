@@ -95,6 +95,21 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             Die();
         }
     }
+    public void HealServer(int amount)
+    {
+        if (!IsServer) return;
+
+        _pawn.currentHealth.Value += amount;
+
+        // Canın, maksimum canı (maxHealth) geçmesini engelle
+        if (_pawn.currentHealth.Value > _pawn.maxHealth.Value)
+        {
+            _pawn.currentHealth.Value = _pawn.maxHealth.Value;
+        }
+    
+        Debug.Log($"{_pawn.PawnData.pawnName} iyileştirildi. Yeni can: {_pawn.currentHealth.Value}");
+    }
+    
     
     private void ShowAttackRange()
     {

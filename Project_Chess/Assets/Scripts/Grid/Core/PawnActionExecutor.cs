@@ -79,9 +79,14 @@ namespace AlperKocasalih.Chess.Grid.Core
                 Pawn defender = defenderObj.GetComponent<Pawn>();
                 if (attacker == null || defender == null) return;
                 
-                if (attacker.PlayerID == defender.PlayerID)
+                if (attacker.PlayerID == defender.PlayerID && !attacker.PawnData.isHealer)
                 {
                     Debug.LogWarning("PawnActionExecutor: Friendly fire attempt blocked on server.");
+                    return;
+                }
+                if (attacker.PlayerID != defender.PlayerID && attacker.PawnData.isHealer)
+                {
+                    Debug.LogWarning("Şifacılar düşman birimlerini iyileştiremez!");
                     return;
                 }
 

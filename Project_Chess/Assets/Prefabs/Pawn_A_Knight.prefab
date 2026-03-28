@@ -144,6 +144,7 @@ MonoBehaviour:
     m_InternalValue: 0
   damage:
     m_InternalValue: 0
+  activeBuffs: []
   meshRenderer: {fileID: 1056673944915614935}
   highlightMaterialIndex: 0
   hasSynergy:

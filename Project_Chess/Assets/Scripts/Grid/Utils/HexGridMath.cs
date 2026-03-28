@@ -34,6 +34,26 @@ namespace AlperKocasalih.Chess.Grid.Utils
 
             return worldCoords;
         }
+        public static Dictionary<Vector2Int, int> GetHexesWithDistance(Vector2Int centerOffset, int radius)
+        {
+            Dictionary<Vector2Int, int> results = new Dictionary<Vector2Int, int>();
+            Vector3Int centerCube = OffsetToCube(centerOffset);
+
+            for (int q = -radius; q <= radius; q++)
+            {
+                for (int r = Mathf.Max(-radius, -q - radius); r <= Mathf.Min(radius, -q + radius); r++)
+                {
+                    int s = -q - r;
+                    Vector3Int targetCube = centerCube + new Vector3Int(q, r, s);
+            
+                    // Merkezden uzaklık formülü
+                    int distance = (Mathf.Abs(q) + Mathf.Abs(r) + Mathf.Abs(s)) / 2;
+
+                    results.Add(CubeToOffset(targetCube), distance);
+                }
+            }
+            return results;
+        }
 
         public static Vector3Int OffsetToCube(Vector2Int hex)
         {

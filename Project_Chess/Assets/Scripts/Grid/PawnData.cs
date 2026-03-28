@@ -29,8 +29,20 @@ public class PawnData: ScriptableObject
     public MovementPattern attackPattern;
 
     public int attackCooldown;
+    [Header("AOE Effects")]
     public bool isAoE;
     public int AoERadius;
     public int AoEDamageFallOff;
+    
+    [Header("Aura Settings")]
+    public bool hasAura;
+    public int auraRadius = 2;
+    public int damageBuff;
+    public int healthbuff;
+
+    [Header("Heal Effects")] 
+    public bool isHealer;
+    public int healAmount;
+
 
 }

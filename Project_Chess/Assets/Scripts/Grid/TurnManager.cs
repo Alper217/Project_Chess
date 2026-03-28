@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using TMPro;
@@ -124,6 +125,7 @@ namespace AlperKocasalih.Chess.Grid
 
         public void NextTurn()
         {
+            Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
             if (!IsServer)
             {
                 NextTurnServerRpc();
@@ -132,7 +134,7 @@ namespace AlperKocasalih.Chess.Grid
 
             activePlayerID.Value = activePlayerID.Value == 1 ? 2 : 1;
             turnCount.Value++;
-            
+            AuraManager.instance.RefreshAuraServer(gridLookup);
             Debug.Log($"TurnManager: Player {activePlayerID.Value}'s turn.");
         }
 

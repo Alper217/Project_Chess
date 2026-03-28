@@ -25,6 +25,7 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private float animationDuration = 0.5f;
         [SerializeField] private Vector3 pawnVisualOffset = new Vector3(0, 0.5f, 0);
         [SerializeField] private int maxPawns = 5;
+        [SerializeField] private bool debugAuraRefresh = true;
 
         private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
         private HashSet<int> p1SpawnedTypes = new HashSet<int>(); // P1: r 0-2
@@ -234,6 +235,7 @@ namespace AlperKocasalih.Chess.Grid
                         NetworkObject existingNetObj = existingPawn.GetComponent<NetworkObject>();
                         if (existingNetObj != null && existingNetObj.IsSpawned) existingNetObj.Despawn();
                         else Destroy(existingPawn.gameObject);
+                        RefreshAuraServerIfAvailable();
                         NotifyPawnPickedUpClientRpc(typeIndexToReset, 1 , new ClientRpcParams());
                         Debug.Log($"PawnPlacementManager: Player 1 picked up pawn type {existingPawn.TypeIndex}.");
                         return;
@@ -246,6 +248,7 @@ namespace AlperKocasalih.Chess.Grid
                         NetworkObject existingNetObj = existingPawn.GetComponent<NetworkObject>();
                         if (existingNetObj != null && existingNetObj.IsSpawned) existingNetObj.Despawn();
                         else Destroy(existingPawn.gameObject);
+                        RefreshAuraServerIfAvailable();
                         NotifyPawnPickedUpClientRpc(typeIndexToReset, 2 , new ClientRpcParams());
                         Debug.Log($"PawnPlacementManager: Player 2 picked up pawn type {existingPawn.TypeIndex}.");
                         return;
@@ -345,6 +348,7 @@ namespace AlperKocasalih.Chess.Grid
 
             StartCoroutine(AnimatePawnDrop(pawnObj, targetPos));
             
+            RefreshAuraServerIfAvailable();
             NotifyPlacementSuccessClientRpc(pawnIndex, isP1Region? 1 : 2, clientRpcParams);
             SynergyManager.instance.EvaluateSynergiesOnServer(isP1Region ? 1 : 2);
             string successMsg = $"PawnPlacementManager: Successfully placed pawn type {pawnIndex} for Player {(isP1Region ? "1" : "2")}.";
@@ -427,6 +431,31 @@ namespace AlperKocasalih.Chess.Grid
                 if (p.OccupiedCell == cell) return p;
             }
             return null;
+        }
+
+        private void RefreshAuraServerIfAvailable()
+        {
+            if (!IsServer) return;
+            if (AuraManager.instance == null)
+            {
+                AuraManager[] found = FindObjectsByType<AuraManager>(FindObjectsSortMode.None);
+                if (found.Length > 0)
+                {
+                    AuraManager.instance = found[0];
+                    if (debugAuraRefresh) Debug.LogWarning("PawnPlacementManager: AuraManager.instance was null; assigned from scene search.");
+                }
+                else
+                {
+                    if (debugAuraRefresh) Debug.LogWarning("PawnPlacementManager: AuraManager.instance is null and none found in scene; skipping aura refresh.");
+                    return;
+                }
+            }
+            if (debugAuraRefresh)
+            {
+                int lookupCount = gridLookup == null ? -1 : gridLookup.Count;
+                Debug.Log($"PawnPlacementManager: RefreshAuraServer called. lookupCount={lookupCount}");
+            }
+            AuraManager.instance.RefreshAuraServer(gridLookup);
         }
 
         public void ConfirmLocalPlayerPlacement()
