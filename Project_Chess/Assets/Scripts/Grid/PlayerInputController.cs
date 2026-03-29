@@ -426,13 +426,16 @@ namespace AlperKocasalih.Chess.Grid
 
         private void HighlightMovementTargets(Pawn pawn, Vector2Int currentCoords, Vector3Int startCube, List<Vector2Int> offsets)
         {
+            bool ignoresObstacles = pawn.PawnData.type == Type.Ninja;
             foreach (var offset in offsets)
             {
                 Vector2Int targetCoords = currentCoords + offset;
-                if (IsPathBlocked(startCube, targetCoords)) continue;
+                if (!ignoresObstacles && IsPathBlocked(startCube, targetCoords)) continue;
 
                 if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
                 {
+                    if (!ignoresObstacles && targetCell.IsObstacle) continue;
+                    
                     Pawn occupant = FindPawnOnCell(targetCell);
                     if (occupant != null)
                     {
