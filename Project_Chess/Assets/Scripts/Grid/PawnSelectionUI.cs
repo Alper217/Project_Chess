@@ -50,6 +50,7 @@ public class PawnSelectionUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
     public void ResetItem()
     {
         isPlaced = false;
+        SetSelected(false);
         if (pawnIcon != null)
         {
             pawnIcon.color = orgColor;
@@ -57,7 +58,6 @@ public class PawnSelectionUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
             Debug.Log($"IndexNumber: {pawnTypeIndex}");
             pawnIcon.raycastTarget = true;
         }
-        SetSelected(false);
     }
 
 

@@ -9,6 +9,7 @@ namespace AlperKocasalih.Chess.UI
     {
         [SerializeField] private GameObject setupPanel;
         [SerializeField] private Button confirmButton;
+        private bool localConfirmed = false;
 
         private void Start()
         {
@@ -20,6 +21,11 @@ namespace AlperKocasalih.Chess.UI
             if (confirmButton != null)
             {
                 confirmButton.onClick.AddListener(OnConfirmClicked);
+            }
+
+            if (PawnPlacementManager.Instance != null)
+            {
+                PawnPlacementManager.Instance.OnLocalPlacementChanged += UpdateConfirmInteractable;
             }
 
             // Initialization state check
@@ -40,19 +46,21 @@ namespace AlperKocasalih.Chess.UI
             {
                 GameManager.Instance.OnStateChanged -= HandleStateChanged;
             }
+            if (PawnPlacementManager.Instance != null)
+            {
+                PawnPlacementManager.Instance.OnLocalPlacementChanged -= UpdateConfirmInteractable;
+            }
         }
 
         private void HandleStateChanged(GameState newState)
         {
+            bool isSetup = newState == GameState.Setup;
             if (setupPanel != null)
             {
-                setupPanel.SetActive(newState == GameState.Setup);
+                setupPanel.SetActive(isSetup);
             }
-
-            if (confirmButton != null)
-            {
-                confirmButton.interactable = (newState == GameState.Setup);
-            }
+            if (!isSetup) localConfirmed = false;
+            UpdateConfirmInteractable();
         }
 
         private void OnConfirmClicked()
@@ -61,8 +69,36 @@ namespace AlperKocasalih.Chess.UI
             {
                 PawnPlacementManager.Instance.ConfirmLocalPlayerPlacement();
                 // Disable after confirm to prevent double-submit until next Setup state.
-                if (confirmButton != null) confirmButton.interactable = false;
+                localConfirmed = true;
+                UpdateConfirmInteractable();
             }
+        }
+
+        private void UpdateConfirmInteractable()
+        {
+            if (confirmButton == null) return;
+            if (GameManager.Instance == null)
+            {
+                confirmButton.interactable = false;
+                return;
+            }
+
+            bool isSetup = GameManager.Instance.CurrentState == GameState.Setup;
+            if (!isSetup || localConfirmed)
+            {
+                confirmButton.interactable = false;
+                return;
+            }
+
+            if (PawnPlacementManager.Instance == null)
+            {
+                confirmButton.interactable = false;
+                return;
+            }
+
+            int required = PawnPlacementManager.Instance.GetRequiredPlacementCount();
+            int placed = PawnPlacementManager.Instance.GetLocalPlacedCount();
+            confirmButton.interactable = required > 0 && placed >= required;
         }
     }
 }

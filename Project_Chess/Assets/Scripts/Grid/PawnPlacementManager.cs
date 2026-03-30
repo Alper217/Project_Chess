@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -34,9 +35,11 @@ namespace AlperKocasalih.Chess.Grid
         private bool p1Confirmed = false;
         private bool p2Confirmed = false;
 
+        public event Action OnLocalPlacementChanged;
+
         #endregion
 
-        private int GetPlacementCap()
+        public int GetPlacementCap()
         {
             int prefabCount = pawnPrefabs != null ? pawnPrefabs.Length : 0;
             return Mathf.Clamp(maxPawns, 0, prefabCount);
@@ -367,6 +370,7 @@ namespace AlperKocasalih.Chess.Grid
                     currentSelectedPawn.MarkAsPlaced();
                     currentSelectedPawn = null;
                 }
+                NotifyLocalPlacementChanged();
             }
         }
 
@@ -381,9 +385,11 @@ namespace AlperKocasalih.Chess.Grid
                     if (pawn.pawnTypeIndex == pickedPawnIndex)
                     {
                         pawn.ResetItem();
+                        selectedPawnIndex = -1;
                         break;
                     }
                 }
+                NotifyLocalPlacementChanged();
             }
         }
 
@@ -420,6 +426,28 @@ namespace AlperKocasalih.Chess.Grid
                 Vector3 targetPos = pawn.OccupiedCell.transform.position + pawnVisualOffset;
                 StartCoroutine(AnimatePawnDrop(pawn.gameObject, targetPos));
             }
+        }
+
+        public int GetLocalPlacedCount()
+        {
+            if (allPawnUIItems == null) return 0;
+
+            int count = 0;
+            foreach (var pawn in allPawnUIItems)
+            {
+                if (pawn != null && pawn.isPlaced) count++;
+            }
+            return count;
+        }
+
+        public int GetRequiredPlacementCount()
+        {
+            return GetPlacementCap();
+        }
+
+        private void NotifyLocalPlacementChanged()
+        {
+            OnLocalPlacementChanged?.Invoke();
         }
 
         private Pawn FindPawnOnCell(HexCell cell)
@@ -483,6 +511,7 @@ namespace AlperKocasalih.Chess.Grid
                 if (p1SpawnedTypes.Count == placementCap)
                 {
                     p1Confirmed = true;
+                    
                     Debug.Log("PawnPlacementManager: Player 1 confirmed placement.");
                 }
                 else Debug.LogWarning($"PawnPlacementManager: Player 1 must place {placementCap} pawns first!");
@@ -544,6 +573,7 @@ namespace AlperKocasalih.Chess.Grid
             p1Confirmed = false;
             p2Confirmed = false;
             Debug.Log("PawnPlacementManager: Placement tracking reset.");
+            NotifyLocalPlacementChanged();
         }
 
         private IEnumerator AnimatePawnDrop(GameObject pawn, Vector3 targetPos)
