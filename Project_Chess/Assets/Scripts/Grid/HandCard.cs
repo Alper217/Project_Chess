@@ -17,8 +17,7 @@ namespace AlperKocasalih.Chess.Grid
 
         [Header("UI References")]
         [SerializeField] private TextMeshProUGUI cardNameText;
-        [SerializeField] private Image cardImage;
-        [SerializeField] private TextMeshProUGUI descriptionText;
+        [SerializeField] private Image cardImage; // The ONLY background image (the full design)
 
         [Header("Animation Settings")]
         [SerializeField] private float hoverScale = 1.1f;
@@ -48,8 +47,8 @@ namespace AlperKocasalih.Chess.Grid
         {
             this.cardData = data;
             if (cardNameText != null) cardNameText.text = data.cardName + data.GetBuffsText();
-            if (cardImage != null) cardImage.sprite = data.cardSprite;
-            if (descriptionText != null) descriptionText.text = data.description;
+            if (cardImage != null && data.cardDesign != null) cardImage.sprite = data.cardDesign;
+            else if (cardImage != null) cardImage.sprite = data.cardSprite; // Fallback
         }
 
         public void SetOriginalState(Vector3 pos, int siblingIndex)

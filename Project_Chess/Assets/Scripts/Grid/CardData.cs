@@ -11,6 +11,7 @@ namespace AlperKocasalih.Chess.Grid
         [Header("Identity")]
         public string cardName;
         public Sprite cardSprite;
+        public Sprite cardDesign; // NEW: The full design/background of the card
 
         [Header("Effect")]
         public MovementPattern pattern;

@@ -17,7 +17,7 @@ namespace AlperKocasalih.Chess.Grid
         [Header("Card Slots")]
         [SerializeField] private GameObject[] cardSlots; // Should have 3
         [SerializeField] private TextMeshProUGUI[] cardNameTexts;
-        [SerializeField] private Image[] cardImages;
+        [SerializeField] private Image[] cardImages; // The ONLY background image (the full design)
 
         [Header("Choice Buttons Parent")]
         [SerializeField] private GameObject choicePanel;
@@ -113,7 +113,8 @@ namespace AlperKocasalih.Chess.Grid
 
                     cardSlots[i].SetActive(true);
                     if (cardNameTexts.Length > i) cardNameTexts[i].text = cards[i].cardName + cards[i].GetBuffsText();
-                    if (cardImages.Length > i) cardImages[i].sprite = cards[i].cardSprite;
+                    if (cardImages.Length > i && cards[i].cardDesign != null) cardImages[i].sprite = cards[i].cardDesign;
+                    else if (cardImages.Length > i) cardImages[i].sprite = cards[i].cardSprite; // Fallback
                     
                     // Add simple animation
                     cardSlots[i].transform.DOPunchScale(Vector3.one * 0.1f, 0.2f);
