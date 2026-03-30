@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: 
   effectType: 6
+  effectDescription: "Verilen hasar\u0131n %15'i kadar can yeniler"
   amount: 15
   isPercentage: 1
   durationTurns: 1

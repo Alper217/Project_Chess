@@ -50,8 +50,12 @@ namespace AlperKocasalih.Chess.Grid
                 if (buff == null) continue;
                 string sign = buff.amount > 0 ? "+" : "";
                 string percent = buff.isPercentage ? "%" : "";
-                string color = buff.isPositiveEffect ? "#4CAF50" : "#FF5252"; // Green for buff, Red for debuff
-                desc += $"\n<color={color}><size=80%>[{sign}{buff.amount}{percent} {buff.effectType}]</size></color>";
+                string color = buff.isPositiveEffect ? "#0b6d0eff" : "#c90000ff"; // Green for buff, Red for debuff
+                
+                // Use description if available, else fallback to enum name
+                string displayName = !string.IsNullOrEmpty(buff.effectDescription) ? buff.effectDescription : buff.effectType.ToString();
+                
+                desc += $"\n<color={color}><size=80%>{displayName}</size></color>";
             }
             return desc;
         }

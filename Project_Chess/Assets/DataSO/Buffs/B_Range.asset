@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: 
   effectType: 5
+  effectDescription: "Bu tur yap\u0131lan hareketin menzilini +1 kare art\u0131r\u0131r."
   amount: 1
   isPercentage: 0
   durationTurns: 1

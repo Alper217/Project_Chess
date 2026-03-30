@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: 
   effectType: 12
+  effectDescription: "Piyonun sahip oldu\u011Fu debufflar 2x olarak uygulan\u0131r."
   amount: 0
   isPercentage: 0
   durationTurns: 2

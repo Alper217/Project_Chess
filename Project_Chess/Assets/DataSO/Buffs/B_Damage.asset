@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: Balyoz
   effectType: 3
+  effectDescription: '%15 kadar ek hasar vurur.'
   amount: 15
   isPercentage: 1
   durationTurns: 1
