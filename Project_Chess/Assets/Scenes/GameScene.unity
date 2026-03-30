@@ -4029,16 +4029,16 @@ MonoBehaviour:
   turnStatusText: {fileID: 375826801}
   cardSlots:
   - {fileID: 1100248327}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 2097446477}
+  - {fileID: 1861086036}
   cardNameTexts:
   - {fileID: 2013007729}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 2066035408}
+  - {fileID: 499350661}
   cardImages:
   - {fileID: 439394637}
-  - {fileID: 0}
-  - {fileID: 0}
+  - {fileID: 843366236}
+  - {fileID: 1408457601}
   choicePanel: {fileID: 636543106}
   keepButton: {fileID: 1038200613}
   giveButton: {fileID: 206381434}
