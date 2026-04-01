@@ -13,7 +13,8 @@ MonoBehaviour:
   m_Name: Card_MovementE
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.CardData
   cardName: Horseman
-  cardSprite: {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  cardSprite: {fileID: 0}
+  cardDesign: {fileID: 21300000, guid: cc3c3d1c1aa55f74b9e77104dd7cec35, type: 3}
   pattern: {fileID: 11400000, guid: 3e48cef3f79fdc14fb7563874f809249, type: 2}
   healthToAdd: 5
   damageToAdd: 5
