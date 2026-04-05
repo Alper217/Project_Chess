@@ -30,6 +30,8 @@ namespace AlperKocasalih.Chess.Grid
         [Header("Visuals")]
         [SerializeField] private MeshRenderer meshRenderer;
         [SerializeField, Min(0)] private int highlightMaterialIndex = 0;
+        [SerializeField] private Color player1Color = Color.white;
+        [SerializeField] private Color player2Color = Color.black;
         private Material[] originalMaterials;
         private bool isInitialized = false;
         [SerializeField] private bool debugBuffs = true;
@@ -56,6 +58,7 @@ namespace AlperKocasalih.Chess.Grid
             if (meshRenderer == null) meshRenderer = GetComponent<MeshRenderer>();
 
             netCellCoords.OnValueChanged += OnCellCoordsChanged;
+            netPlayerID.OnValueChanged += OnPlayerIdChanged;
             maxHealth.OnValueChanged += OnStatsChanged;
             currentHealth.OnValueChanged += OnStatsChanged;
             damage.OnValueChanged += OnStatsChanged;
@@ -71,6 +74,7 @@ namespace AlperKocasalih.Chess.Grid
                 currentHealth.Value = pawnData.currentHealth;
                 currentHealth.Value = maxHealth.Value;
             }
+            ApplyPlayerVisuals(netPlayerID.Value);
             if (TurnManager.Instance != null && IsServer)
             {
                 TurnManager.Instance.OnTurnChanged += OnTurnChanged;
@@ -81,6 +85,7 @@ namespace AlperKocasalih.Chess.Grid
         public override void OnNetworkDespawn()
         {
             netCellCoords.OnValueChanged -= OnCellCoordsChanged;
+            netPlayerID.OnValueChanged -= OnPlayerIdChanged;
             maxHealth.OnValueChanged -= OnStatsChanged;
             currentHealth.OnValueChanged -= OnStatsChanged;
             damage.OnValueChanged -= OnStatsChanged;
@@ -109,6 +114,11 @@ namespace AlperKocasalih.Chess.Grid
         private void OnStatsChanged(int previousValue, int newValue)
         {
             UpdateDebugStats();
+        }
+
+        private void OnPlayerIdChanged(int previousValue, int newValue)
+        {
+            ApplyPlayerVisuals(newValue);
         }
 
         private void UpdateDebugStats()
@@ -187,6 +197,27 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (meshRenderer == null || originalMaterials == null || originalMaterials.Length == 0) return;
             meshRenderer.materials = originalMaterials;
+        }
+
+        private void ApplyPlayerVisuals(int playerId)
+        {
+            if (meshRenderer == null) return;
+            if (playerId != 1 && playerId != 2) return;
+
+            Color targetColor = playerId == 2 ? player2Color : player1Color;
+            Material[] mats = meshRenderer.materials;
+            if (mats == null || mats.Length == 0) return;
+
+            for (int i = 0; i < mats.Length; i++)
+            {
+                Material mat = mats[i];
+                if (mat == null) continue;
+                if (mat.HasProperty("_BaseColor")) mat.SetColor("_BaseColor", targetColor);
+                if (mat.HasProperty("_Color")) mat.color = targetColor;
+            }
+
+            meshRenderer.materials = mats;
+            originalMaterials = mats;
         }
 
         public void ResetSynergyServer()

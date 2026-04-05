@@ -15,6 +15,9 @@ namespace AlperKocasalih.Chess.Grid
         [Header("Pawn Placement Settings")] 
         private PawnSelectionUI currentSelectedPawn;
         [SerializeField] private PawnSelectionUI[] allPawnUIItems;
+
+        [Header("UI")]
+        [SerializeField] private GameObject pawnSelectionPanel;
  
         [Header("Prefabs")]
         [SerializeField] private GameObject[] pawnPrefabs;
@@ -58,6 +61,19 @@ namespace AlperKocasalih.Chess.Grid
         private void Start()
         {
             InitializeGridLookup();
+            ApplyPlacementUIState(GameManager.Instance != null ? GameManager.Instance.CurrentState : GameState.Setup);
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnStateChanged += HandleGameStateChanged;
+            }
+        }
+
+        private void OnDisable()
+        {
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnStateChanged -= HandleGameStateChanged;
+            }
         }
 
         public override void OnNetworkSpawn()
@@ -545,6 +561,17 @@ namespace AlperKocasalih.Chess.Grid
                 SynergyManager.instance.EvaluateSynergiesOnServer(2);
                 GameManager.Instance.ChangeState(GameState.RollDice);
             }
+        }
+
+        private void HandleGameStateChanged(GameState newState)
+        {
+            ApplyPlacementUIState(newState);
+        }
+
+        private void ApplyPlacementUIState(GameState newState)
+        {
+            if (pawnSelectionPanel == null) return;
+            pawnSelectionPanel.SetActive(newState == GameState.Setup);
         }
 
         [ContextMenu("Finish Setup")]
