@@ -579,6 +579,12 @@ namespace AlperKocasalih.Chess.Grid
             {
                 child.gameObject.layer = layerIndex;
             }
+
+            // Yeni silüet outline sistemini tetikle
+            if (layerName == "Outline" || layerName == "Outline_Selectable")
+                OutlineController.Register(pawnObj);
+            else
+                OutlineController.Unregister(pawnObj);
         }
 
         #endregion
