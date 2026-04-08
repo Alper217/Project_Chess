@@ -131,13 +131,13 @@ namespace AlperKocasalih.Chess.Grid
             if (selectedBuff != null)
             {
                 cardInstance.runtimeBuffs.Add(selectedBuff);
-                Debug.Log($"Card '{cardInstance.cardName}' -> BUFF: {selectedBuff.buffName} ({selectedBuff.effectType})");
+                Debug.Log($"BUFF: {selectedBuff.buffName} ({selectedBuff.effectType})");
             }
 
             if (selectedDebuff != null)
             {
                 cardInstance.runtimeBuffs.Add(selectedDebuff);
-                Debug.Log($"Card '{cardInstance.cardName}' -> DEBUFF: {selectedDebuff.buffName} ({selectedDebuff.effectType})");
+                Debug.Log($"DEBUFF: {selectedDebuff.buffName} ({selectedDebuff.effectType})");
             }
         }
 

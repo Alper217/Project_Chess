@@ -56,7 +56,8 @@ namespace AlperKocasalih.Chess.Grid
                 // Use description if available, else fallback to enum name
                 string displayName = !string.IsNullOrEmpty(buff.effectDescription) ? buff.effectDescription : buff.effectType.ToString();
                 
-                desc += $"\n<color={color}><size=80%>{displayName}</size></color>";
+                if (desc != "") desc += "\n";
+                desc += $"<color={color}><size=80%>{displayName}</size></color>";
             }
             return desc;
         }

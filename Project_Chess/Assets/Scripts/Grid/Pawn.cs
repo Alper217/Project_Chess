@@ -225,8 +225,7 @@ namespace AlperKocasalih.Chess.Grid
             if(!IsServer) return;
             if (debugBuffs)
             {
-                string pawnName = pawnData != null ? pawnData.pawnName : name;
-                Debug.Log($"Pawn: ResetSynergyServer '{pawnName}' pre max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
+                Debug.Log($"Pawn: ResetSynergyServer pre max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
             }
             hasSynergy.Value = false;
             maxHealth.Value = pawnData.maxHealth;
@@ -239,8 +238,7 @@ namespace AlperKocasalih.Chess.Grid
             activeBuffs.Clear();
             if (debugBuffs)
             {
-                string pawnName = pawnData != null ? pawnData.pawnName : name;
-                Debug.Log($"Pawn: ResetSynergyServer '{pawnName}' post max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
+                Debug.Log($"Pawn: ResetSynergyServer post max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
             }
         }
 
@@ -249,8 +247,7 @@ namespace AlperKocasalih.Chess.Grid
             if (!IsServer) return;
             if (debugBuffs)
             {
-                string pawnName = pawnData != null ? pawnData.pawnName : name;
-                Debug.Log($"Pawn: ApplyBuffsServer '{pawnName}' bonusH={bonusHealth} bonusD={bonusDamage} pre max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
+                Debug.Log($"Pawn: ApplyBuffsServer bonusH={bonusHealth} bonusD={bonusDamage} pre max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
             }
             hasSynergy.Value = true;
             
@@ -259,8 +256,7 @@ namespace AlperKocasalih.Chess.Grid
             currentHealth.Value += bonusHealth;
             if (debugBuffs)
             {
-                string pawnName = pawnData != null ? pawnData.pawnName : name;
-                Debug.Log($"Pawn: ApplyBuffsServer '{pawnName}' post max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
+                Debug.Log($"Pawn: ApplyBuffsServer post max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
             }
         }
 
