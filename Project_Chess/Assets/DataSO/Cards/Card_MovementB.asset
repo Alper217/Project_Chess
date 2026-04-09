@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.CardData
   cardName: Cannon
   cardSprite: {fileID: 0}
-  cardDesign: {fileID: 21300000, guid: cc3c3d1c1aa55f74b9e77104dd7cec35, type: 3}
-  pattern: {fileID: 11400000, guid: 3e48cef3f79fdc14fb7563874f809249, type: 2}
+  cardDesign: {fileID: -101055270, guid: e31b66387b24cff4faf96f5f2f1ba414, type: 3}
+  pattern: {fileID: 11400000, guid: e5750b2a47d773349be5a4e7ad1d3941, type: 2}
   healthToAdd: 5
   damageToAdd: 5
   runtimeBuffs: []

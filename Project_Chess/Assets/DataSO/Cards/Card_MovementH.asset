@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.CardData
   cardName: Cheriff
   cardSprite: {fileID: 0}
-  cardDesign: {fileID: 21300000, guid: cc3c3d1c1aa55f74b9e77104dd7cec35, type: 3}
-  pattern: {fileID: 11400000, guid: 3e48cef3f79fdc14fb7563874f809249, type: 2}
+  cardDesign: {fileID: -1311364421, guid: 704906fc1bc52314a8a3109f8d72f5a2, type: 3}
+  pattern: {fileID: 11400000, guid: f6ee2cc5ee1e34d4b8ccde5d17427069, type: 2}
   healthToAdd: 5
   damageToAdd: 5
   runtimeBuffs: []

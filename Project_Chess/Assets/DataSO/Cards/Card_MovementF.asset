@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.CardData
   cardName: Commander
   cardSprite: {fileID: 0}
-  cardDesign: {fileID: 21300000, guid: cc3c3d1c1aa55f74b9e77104dd7cec35, type: 3}
-  pattern: {fileID: 11400000, guid: 3e48cef3f79fdc14fb7563874f809249, type: 2}
+  cardDesign: {fileID: -1416958742, guid: ec223ca7e5c13d64e913724c45781f85, type: 3}
+  pattern: {fileID: 11400000, guid: 9a588567d49514b4ea80ad30aa904457, type: 2}
   healthToAdd: 5
   damageToAdd: 5
   runtimeBuffs: []
