@@ -24,6 +24,7 @@ public class PawnData: ScriptableObject
     public int damage;
     public int maxHealth;
     public int currentHealth;
+    public int pointValue; // Added this line
 
     [Header("Attack Pattern")] 
     public MovementPattern attackPattern;

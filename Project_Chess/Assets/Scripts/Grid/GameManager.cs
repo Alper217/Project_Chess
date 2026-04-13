@@ -33,6 +33,14 @@ namespace AlperKocasalih.Chess.Grid
         public GameObject player1Camera;
         public GameObject player2Camera;
 
+        [Header("Scores")]
+        [SerializeField, ReadOnly] public NetworkVariable<int> player1Score = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        [SerializeField, ReadOnly] public NetworkVariable<int> player2Score = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
+        [Header("Score UI")]
+        [SerializeField] private TextMeshProUGUI player1ScoreText;
+        [SerializeField] private TextMeshProUGUI player2ScoreText;
+
 
         #endregion
 
@@ -65,8 +73,18 @@ namespace AlperKocasalih.Chess.Grid
                 OnStateChanged?.Invoke(newValue);
             };
             
+            player1Score.OnValueChanged += (oldValue, newValue) => UpdateScoreUI();
+            player2Score.OnValueChanged += (oldValue, newValue) => UpdateScoreUI();
+            
             // Initial handle for current state
             HandleStateChange(currentState.Value);
+            UpdateScoreUI();
+        }
+
+        private void UpdateScoreUI()
+        {
+            if (player1ScoreText != null) player1ScoreText.text = $"P1 Score: {player1Score.Value}";
+            if (player2ScoreText != null) player2ScoreText.text = $"P2 Score: {player2Score.Value}";
         }
 
         private void Start()
@@ -139,6 +157,34 @@ namespace AlperKocasalih.Chess.Grid
             EndGameClientRpc(winnerID);
         }
 
+        public void AddScore(int playerID, int points)
+        {
+            if (!IsServer) return;
+            if (playerID == 1) player1Score.Value += points;
+            else if (playerID == 2) player2Score.Value += points;
+            
+            Debug.Log($"GameManager: Player {playerID} scored {points} points! Current Score -> P1: {player1Score.Value}, P2: {player2Score.Value}");
+        }
+
+        public void CheckWinConditionPoints()
+        {
+            if (!IsServer) return;
+            
+            if (player1Score.Value > player2Score.Value)
+            {
+                EndGame(1);
+            }
+            else if (player2Score.Value > player1Score.Value)
+            {
+                EndGame(2);
+            }
+            else
+            {
+                // Tie (0 means equality/draw)
+                EndGame(0);
+            }
+        }
+
         public void CheckWinCondition(int loserID)
         {
             if (!IsServer) return;
@@ -199,6 +245,9 @@ namespace AlperKocasalih.Chess.Grid
         public void RestartGame()
         {
             if (!IsServer) return;
+            
+            player1Score.Value = 0;
+            player2Score.Value = 0;
             
             Debug.Log("GameManager: Restarting Game...");
             RestartGameClientRpc();

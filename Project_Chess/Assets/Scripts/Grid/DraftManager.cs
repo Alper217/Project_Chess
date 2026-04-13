@@ -137,6 +137,16 @@ namespace AlperKocasalih.Chess.Grid
 
             currentChoices = DeckManager.Instance.DrawCards(3);
 
+            if (currentChoices.Count == 0)
+            {
+                if (GameManager.Instance != null)
+                {
+                    Debug.Log("DraftManager: Deck is empty! Deciding winner by points.");
+                    GameManager.Instance.CheckWinConditionPoints();
+                }
+                return;
+            }
+
             // Send card indices to clients instead of ScriptableObjects
             int[] drawnCardIndices = new int[currentChoices.Count];
             for(int i = 0; i < currentChoices.Count; ++i)
@@ -163,6 +173,16 @@ namespace AlperKocasalih.Chess.Grid
             if (!IsServer) return;
 
             currentChoices = DeckManager.Instance.DrawCards(3);
+
+            if (currentChoices.Count == 0)
+            {
+                if (GameManager.Instance != null)
+                {
+                    Debug.Log("DraftManager: Deck is empty! Deciding winner by points.");
+                    GameManager.Instance.CheckWinConditionPoints();
+                }
+                return;
+            }
 
             int[] drawnCardIndices = new int[currentChoices.Count];
             for (int i = 0; i < currentChoices.Count; ++i)

@@ -198,6 +198,12 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     {
         if (!IsServer) return;
 
+        if (_pawn != null && _pawn.PawnData != null && GameManager.Instance != null)
+        {
+            int opponentID = _pawn.PlayerID == 1 ? 2 : 1;
+            GameManager.Instance.AddScore(opponentID, _pawn.PawnData.pointValue);
+        }
+
         // Piyon öldüğünde UI'yi gizleme (istemcilerde de tetiklenmesi için OnNetworkDespawn kullanılabilir)
         // Objenin ağ üzerindeki varlığını sonlandır
         if (pawn != null)
