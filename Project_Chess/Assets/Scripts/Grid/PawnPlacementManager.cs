@@ -381,7 +381,7 @@ namespace AlperKocasalih.Chess.Grid
             int localPlayerID = NetworkManager.Singleton.IsHost ?  1 : 2;
             if (localPlayerID == playerID)
             {
-                if (currentSelectedPawn.pawnTypeIndex == placedPawnIndex)
+                if (currentSelectedPawn != null && currentSelectedPawn.pawnTypeIndex == placedPawnIndex)
                 {
                     currentSelectedPawn.MarkAsPlaced();
                     currentSelectedPawn = null;

@@ -22,6 +22,11 @@ public class PawnSelectionUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
     
     public bool isPlaced { get; private set; } = false;
 
+    private void Awake()
+    {
+        if (instance == null) instance = this;
+    }
+
     private void Start()
     {
         pawnIcon = GetComponent<Image>();
