@@ -134,7 +134,23 @@ namespace AlperKocasalih.Chess.Grid
 
             activePlayerID.Value = activePlayerID.Value == 1 ? 2 : 1;
             turnCount.Value++;
-            AuraManager.instance.RefreshAuraServer(gridLookup);
+            
+            // Safe Aura Refresh
+            if (AuraManager.instance == null)
+            {
+                AuraManager[] found = FindObjectsByType<AuraManager>(FindObjectsSortMode.None);
+                if (found.Length > 0) AuraManager.instance = found[0];
+            }
+
+            if (AuraManager.instance != null)
+            {
+                AuraManager.instance.RefreshAuraServer(gridLookup);
+            }
+            else
+            {
+                Debug.LogWarning("TurnManager: AuraManager.instance is null and none found; skipping aura refresh.");
+            }
+
             Debug.Log($"TurnManager: Player {activePlayerID.Value}'s turn.");
         }
 

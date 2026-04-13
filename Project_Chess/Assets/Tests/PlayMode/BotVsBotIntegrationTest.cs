@@ -123,12 +123,10 @@ namespace Tests.PlayMode
             List<HexCell> p1Cells = FindCellsInRows(new int[] { 7, 8, 9 }).Take(3).ToList();
             Assert.AreEqual(3, p1Cells.Count, "Could not find 3 valid cells for P1.");
 
-            for (int i = 0; i < 3; i++)
-            {
-                // Call spawn directly on server logic (since we are host)
-                // We'll use pawn index 0, 1, 2
-                PawnPlacementManager.Instance.ConfirmPlayerPlacementServerRpc(1); // Wait, need to place first
-            }
+            // Set maxPawns to 3 for this test
+            typeof(PawnPlacementManager)
+                .GetField("maxPawns", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                ?.SetValue(PawnPlacementManager.Instance, 3);
             // Actually let's use the public methods of PawnPlacementManager
             
             for (int i = 0; i < 3; i++)
