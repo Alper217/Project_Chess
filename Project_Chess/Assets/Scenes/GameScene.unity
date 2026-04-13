@@ -4589,8 +4589,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4ac89b2644219dd47b50828ebe65c1ab, type: 2}
   - {fileID: 11400000, guid: e823818435dd3164887550ef5269a929, type: 2}
   - {fileID: 11400000, guid: b19fc645a24b4c34dad7e47266454a82, type: 2}
-  - {fileID: 11400000, guid: 4444fe951717a0442ac82f74cced862b, type: 2}
-  initialDeckSize: 100
+  initialDeckSize: 120
   allPawnDatas:
   - {fileID: 11400000, guid: 94a340785c9894843b024a16412618a5, type: 2}
   - {fileID: 11400000, guid: dcaf0cd661207424988b345fa2155251, type: 2}
