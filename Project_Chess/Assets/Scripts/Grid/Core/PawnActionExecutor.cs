@@ -103,13 +103,7 @@ namespace AlperKocasalih.Chess.Grid.Core
                 
 
                
-                // Check Win Condition
-                /*
-                if (GameManager.Instance != null)
-                {
-                    GameManager.Instance.CheckWinCondition(defender.PlayerID);
-                }
-                */
+
             }
         }
 

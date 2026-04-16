@@ -34,7 +34,7 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, ReadOnly] private List<CardData> p2PendingIncoming = new List<CardData>();
 
         [Header("Early Round Restrictions")]
-        [SerializeField, Min(0)] private int blockDrawForRounds = 2;
+        [SerializeField, Min(0)] private int blockDrawForRounds = 1;
 
         [Header("Burn Lock")]
         [SerializeField, Min(0)] private int burnLockRounds = 2;
@@ -144,6 +144,9 @@ namespace AlperKocasalih.Chess.Grid
                     Debug.Log("DraftManager: Deck is empty! Deciding winner by points.");
                     GameManager.Instance.CheckWinConditionPoints();
                 }
+                isDraftingActive = false;
+                isActionDraftActive = false;
+                FinishDraft();
                 return;
             }
 
@@ -161,6 +164,7 @@ namespace AlperKocasalih.Chess.Grid
 
         private void StartActionDraftRound()
         {
+            Debug.Log($"DraftManager [DEBUG]: Starting Action Draft Round for Player {draftingPlayerID}. Clearing usedActions.");
             usedActionsThisRound.Clear();
             NotifyUsedActionsClientRpc(new DraftAction[0]);
 
@@ -181,6 +185,9 @@ namespace AlperKocasalih.Chess.Grid
                     Debug.Log("DraftManager: Deck is empty! Deciding winner by points.");
                     GameManager.Instance.CheckWinConditionPoints();
                 }
+                isDraftingActive = false;
+                isActionDraftActive = false;
+                FinishDraft();
                 return;
             }
 
@@ -228,9 +235,10 @@ namespace AlperKocasalih.Chess.Grid
 
             if (usedActionsThisRound.Contains(action))
             {
-                Debug.LogWarning($"DraftManager: Action {action} already used this round!");
+                Debug.LogWarning($"DraftManager [DEBUG]: Action {action} FAILED! Already used in round {roundCount}. Current Player: {draftingPlayerID}. ActionDraft: {isActionDraftActive}");
                 return;
             }
+            Debug.Log($"DraftManager [DEBUG]: Processing Action {action} for Player {draftingPlayerID}. Choices left: {currentChoices.Count}");
 
             CardData selected = currentChoices[cardIndex];
             
@@ -258,9 +266,10 @@ namespace AlperKocasalih.Chess.Grid
             NotifyUsedActionsClientRpc(actionsArray);
             
             currentChoices.RemoveAt(cardIndex);
+            if (isActionDraftActive) currentChoices.Clear();
 
             // If all 3 cards from the draw are processed, move to next round/player
-            if (currentChoices.Count == 0)
+            if (currentChoices.Count == 0 || isActionDraftActive)
             {
                 EndCurrentDraftTurn();
             }
@@ -458,6 +467,7 @@ namespace AlperKocasalih.Chess.Grid
         public bool IsDraftingActive => isDraftingActive;
         public bool IsOverflowBurnPending => pendingOverflowBurnCount > 0;
         public int DraftingPlayerID => draftingPlayerID;
+        public bool IsActionDraftActive => isActionDraftActive;
         public bool IsDrawAllowed => !IsDrawLocked();
 
         public List<CardData> GetCurrentChoices()
@@ -545,6 +555,13 @@ namespace AlperKocasalih.Chess.Grid
         public void DrawOneAndSkipTurnServerRpc(RpcParams rpcParams = default)
         {
             if (!IsServer) return;
+            int playerID = GetPlayerIdFromClientId(rpcParams.Receive.SenderClientId);
+            PerformDrawOneAndSkipTurn(playerID);
+        }
+
+        public void PerformDrawOneAndSkipTurn(int playerID)
+        {
+            if (!IsServer) return;
             if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.ActionPhase) return;
             if (TurnManager.Instance == null || DeckManager.Instance == null) return;
             if (isDraftingActive) return;
@@ -554,7 +571,6 @@ namespace AlperKocasalih.Chess.Grid
                 return;
             }
 
-            int playerID = GetPlayerIdFromClientId(rpcParams.Receive.SenderClientId);
             if (TurnManager.Instance.ActivePlayerID != playerID) return;
 
             int currentTurn = TurnManager.Instance.TurnCount;

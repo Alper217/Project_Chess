@@ -198,9 +198,11 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     {
         if (!IsServer) return;
 
+        int loserID = _pawn.PlayerID;
+
         if (_pawn != null && _pawn.PawnData != null && GameManager.Instance != null)
         {
-            int opponentID = _pawn.PlayerID == 1 ? 2 : 1;
+            int opponentID = loserID == 1 ? 2 : 1;
             GameManager.Instance.AddScore(opponentID, _pawn.PawnData.pointValue);
         }
 
@@ -212,17 +214,21 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             if (pawnNetworkObject != null && pawnNetworkObject.IsSpawned)
             {
                 pawnNetworkObject.Despawn();
-                return;
             }
         }
-        
-        if (NetworkObject.IsSpawned)
+        else if (NetworkObject.IsSpawned)
         {
             NetworkObject.Despawn();
         }
         else
         {
             Destroy(gameObject);
+        }
+
+        // Check if the player who lost the pawn has any units remaining
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.CheckWinCondition(loserID);
         }
     }
 }

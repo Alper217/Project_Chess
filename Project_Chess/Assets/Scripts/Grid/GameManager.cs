@@ -112,6 +112,13 @@ namespace AlperKocasalih.Chess.Grid
 
             if (currentState.Value == newState) return;
 
+            // State Protection: Cannot leave EndGame unless resetting to Setup
+            if (currentState.Value == GameState.EndGame && newState != GameState.Setup)
+            {
+                Debug.LogWarning("GameManager: Game has already ended. State change blocked.");
+                return;
+            }
+
             currentState.Value = newState;
         }
 
