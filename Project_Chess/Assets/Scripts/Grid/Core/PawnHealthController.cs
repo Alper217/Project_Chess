@@ -1,9 +1,8 @@
-using System;
 using System.Collections.Generic;
 using AlperKocasalih.Chess.Grid;
 using AlperKocasalih.Chess.Grid.Utils;
-using UnityEngine;
 using Unity.Netcode;
+using UnityEngine;
 
 public class PawnHealthController : NetworkBehaviour, IHoverable
 {
@@ -30,7 +29,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         base.OnNetworkDespawn();
         if (_pawn != null)
             _pawn.currentHealth.OnValueChanged -= OnHealthChanged;
-        
+
         ClearAttackRange();
         if (isHovered && HealthUIManager.Instance != null)
         {
@@ -48,42 +47,70 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     {
         if (isHovered && HealthUIManager.Instance != null)
         {
-            // Eğer UI açıksa yeni can değeri ile güncellenmesini sağla
-            HealthUIManager.Instance.ShowHealthBar(transform, newValue, _pawn.maxHealth.Value);
+            ShowPawnHoverUI(newValue);
         }
     }
 
-    // Fare piyonun üstüne gelince
     public void OnHoverEnter()
     {
         if (_pawn == null) return;
+
         isHovered = true;
         if (HealthUIManager.Instance != null)
-            HealthUIManager.Instance.ShowHealthBar(transform, _pawn.currentHealth.Value, _pawn.maxHealth.Value);
-        
+        {
+            ShowPawnHoverUI(_pawn.currentHealth.Value);
+        }
+
         ShowAttackRange();
     }
 
-    // Fare piyondan çıkınca
     public void OnHoverExit()
     {
         if (_pawn == null) return;
+
         isHovered = false;
         if (HealthUIManager.Instance != null)
+        {
             HealthUIManager.Instance.HideHealthBar();
-        
+        }
+
         ClearAttackRange();
+    }
+
+    private void ShowPawnHoverUI(int currentHealth)
+    {
+        if (_pawn == null || HealthUIManager.Instance == null)
+        {
+            return;
+        }
+
+        string buffsText = $"Damage: {_pawn.HoverDamagePreview}";
+        if (!string.IsNullOrWhiteSpace(_pawn.BuffSummary))
+        {
+            buffsText = $"{buffsText}\n{_pawn.BuffSummary}";
+        }
+
+        HealthUIManager.Instance.ShowHealthBar(
+            transform,
+            currentHealth,
+            _pawn.maxHealth.Value,
+            buffsText,
+            _pawn.DebuffSummary);
     }
 
     void Update()
     {
-        // Örnek hasar alma kodu (Yalnızca piyonun üzerine gelindiğinde ve sol tıklandığında test için hasar al)
+        if (isHovered && HealthUIManager.Instance != null && _pawn != null)
+        {
+            ShowPawnHoverUI(_pawn.currentHealth.Value);
+        }
+
         if (Input.GetMouseButtonDown(0) && isHovered)
         {
             TakeDamageServer(_pawn.damage.Value);
         }
     }
-    
+
     public void TakeDamageServer(int damageAmount)
     {
         if (!IsServer) return;
@@ -95,22 +122,21 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             Die();
         }
     }
+
     public void HealServer(int amount)
     {
         if (!IsServer) return;
 
         _pawn.currentHealth.Value += amount;
 
-        // Canın, maksimum canı (maxHealth) geçmesini engelle
         if (_pawn.currentHealth.Value > _pawn.maxHealth.Value)
         {
             _pawn.currentHealth.Value = _pawn.maxHealth.Value;
         }
-    
-        Debug.Log($"{_pawn.PawnData.pawnName} iyileştirildi. Yeni can: {_pawn.currentHealth.Value}");
+
+        Debug.Log($"{_pawn.PawnData.pawnName} healed. New health: {_pawn.currentHealth.Value}");
     }
-    
-    
+
     private void ShowAttackRange()
     {
         if (_pawn == null || _pawn.PawnData == null) return;
@@ -206,8 +232,6 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             GameManager.Instance.AddScore(opponentID, _pawn.PawnData.pointValue);
         }
 
-        // Piyon öldüğünde UI'yi gizleme (istemcilerde de tetiklenmesi için OnNetworkDespawn kullanılabilir)
-        // Objenin ağ üzerindeki varlığını sonlandır
         if (pawn != null)
         {
             NetworkObject pawnNetworkObject = pawn.GetComponent<NetworkObject>();
@@ -225,7 +249,6 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             Destroy(gameObject);
         }
 
-        // Check if the player who lost the pawn has any units remaining
         if (GameManager.Instance != null)
         {
             GameManager.Instance.CheckWinCondition(loserID);

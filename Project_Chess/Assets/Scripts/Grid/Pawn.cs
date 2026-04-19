@@ -1,3 +1,4 @@
+using System.Text;
 using UnityEngine;
 using Unity.Netcode;
 
@@ -6,7 +7,7 @@ namespace AlperKocasalih.Chess.Grid
     /// <summary>
     /// Represents a pawn in the game.
     /// Manages its relationship with the HexCell it occupies.
-    /// </summary>,
+    /// </summary>
     
     public class Pawn : NetworkBehaviour
     {
@@ -23,6 +24,9 @@ namespace AlperKocasalih.Chess.Grid
         private NetworkVariable<int> netPlayerID = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         private NetworkVariable<int> netTypeIndex = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         private NetworkVariable<Vector2Int> netCellCoords = new NetworkVariable<Vector2Int>(new Vector2Int(-999, -999), NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        private NetworkVariable<int> hoverDamagePreview = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        private string buffSummary = string.Empty;
+        private string debuffSummary = string.Empty;
 
         [Header("Active Buffs (Server-Side)")]
         public System.Collections.Generic.List<ServerActiveBuff> activeBuffs = new System.Collections.Generic.List<ServerActiveBuff>();
@@ -48,6 +52,9 @@ namespace AlperKocasalih.Chess.Grid
         public HexCell OccupiedCell => currentCell;
         public int PlayerID { get => netPlayerID.Value; set { if (IsServer) netPlayerID.Value = value; } }
         public int TypeIndex { get => netTypeIndex.Value; set { if (IsServer) netTypeIndex.Value = value; } }
+        public int HoverDamagePreview => hoverDamagePreview.Value;
+        public string BuffSummary => buffSummary;
+        public string DebuffSummary => debuffSummary;
         public NetworkVariable<bool> hasSynergy = new NetworkVariable<bool>(false);
         #endregion
 
@@ -73,6 +80,7 @@ namespace AlperKocasalih.Chess.Grid
                 damage.Value = pawnData.damage;
                 currentHealth.Value = pawnData.currentHealth;
                 currentHealth.Value = maxHealth.Value;
+                RefreshActiveBuffSummaries();
             }
             ApplyPlayerVisuals(netPlayerID.Value);
             if (TurnManager.Instance != null && IsServer)
@@ -236,6 +244,7 @@ namespace AlperKocasalih.Chess.Grid
                 currentHealth.Value = maxHealth.Value;
             }
             activeBuffs.Clear();
+            RefreshActiveBuffSummaries();
             if (debugBuffs)
             {
                 Debug.Log($"Pawn: ResetSynergyServer post max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
@@ -258,6 +267,8 @@ namespace AlperKocasalih.Chess.Grid
             {
                 Debug.Log($"Pawn: ApplyBuffsServer post max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
             }
+
+            RefreshActiveBuffSummaries();
         }
 
         public void ApplyCardEffectServer(int bonusHealth, int bonusDamage)
@@ -278,6 +289,8 @@ namespace AlperKocasalih.Chess.Grid
             {
                 damage.Value += bonusDamage;
             }
+
+            RefreshActiveBuffSummaries();
         }
 
         public void ApplyRuntimeBuffsServer(System.Collections.Generic.List<BuffData> buffs)
@@ -324,6 +337,8 @@ namespace AlperKocasalih.Chess.Grid
                     activeBuffs.Add(new ServerActiveBuff(buff));
                 }
             }
+
+            RefreshActiveBuffSummaries();
         }
 
         public void TickBuffsServer()
@@ -338,6 +353,8 @@ namespace AlperKocasalih.Chess.Grid
                     activeBuffs.RemoveAt(i);
                 }
             }
+
+            RefreshActiveBuffSummaries();
         }
 
         #region Buff Helper Methods
@@ -420,6 +437,7 @@ namespace AlperKocasalih.Chess.Grid
                 if (activeBuffs[i].buffData.effectType == EffectType.DamageBlock)
                 {
                     activeBuffs.RemoveAt(i);
+                    RefreshActiveBuffSummaries();
                     return true;
                 }
             }
@@ -458,6 +476,60 @@ namespace AlperKocasalih.Chess.Grid
                 if (buff.buffData.effectType == EffectType.DebuffImmunity) return true;
             }
             return false;
+        }
+
+        private void RefreshActiveBuffSummaries()
+        {
+            if (!IsServer)
+            {
+                return;
+            }
+
+            StringBuilder positiveBuilder = new StringBuilder();
+            StringBuilder negativeBuilder = new StringBuilder();
+
+            foreach (var activeBuff in activeBuffs)
+            {
+                if (activeBuff == null || activeBuff.buffData == null)
+                {
+                    continue;
+                }
+
+                string line = BuildBuffSummaryLine(activeBuff);
+                StringBuilder targetBuilder = activeBuff.buffData.isPositiveEffect ? positiveBuilder : negativeBuilder;
+
+                if (targetBuilder.Length > 0)
+                {
+                    targetBuilder.Append('\n');
+                }
+
+                targetBuilder.Append(line);
+            }
+
+            buffSummary = positiveBuilder.ToString();
+            debuffSummary = negativeBuilder.ToString();
+            hoverDamagePreview.Value = Mathf.RoundToInt(damage.Value * GetOutgoingDamageMultiplier());
+            UpdateBuffSummariesClientRpc(buffSummary, debuffSummary);
+        }
+
+        private static string BuildBuffSummaryLine(ServerActiveBuff activeBuff)
+        {
+            string name = activeBuff.buffData.buffName;
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                name = activeBuff.buffData.effectType.ToString();
+            }
+
+            return activeBuff.remainingTurns > 0
+                ? $"{name} ({activeBuff.remainingTurns}T)"
+                : name;
+        }
+
+        [ClientRpc]
+        private void UpdateBuffSummariesClientRpc(string buffs, string debuffs)
+        {
+            buffSummary = buffs ?? string.Empty;
+            debuffSummary = debuffs ?? string.Empty;
         }
 
         #endregion

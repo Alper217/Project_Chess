@@ -1,24 +1,27 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 
 public class HealthUIManager : MonoBehaviour
 {
     public static HealthUIManager Instance;
 
-    public GameObject healthCanvas; 
+    public GameObject healthCanvas;
     public Slider healthSlider;
-    [Tooltip("Kameradan bakıldığında can barlığının ne kadar yukarıda duracağını ayarlar.")]
-    public float heightOffsetMultiplier = 2f; 
-    public TextMeshProUGUI healthText; // Optional: Assign in inspector, or auto-found in Awake
+    public TextMeshProUGUI buffText;
+    public TextMeshProUGUI debuffText;
+    [Tooltip("Vertical offset for the hover UI relative to the pawn.")]
+    public float heightOffsetMultiplier = 2f;
+    public TextMeshProUGUI healthText;
+
     private Transform currentTarget;
 
-    private void Awake() 
+    private void Awake()
     {
         Instance = this;
         if (healthCanvas != null)
         {
-            healthCanvas.SetActive(false); // Başlangıçta gizli başlasın
+            healthCanvas.SetActive(false);
             if (healthText == null)
             {
                 healthText = healthCanvas.GetComponentInChildren<TextMeshProUGUI>(true);
@@ -26,31 +29,56 @@ public class HealthUIManager : MonoBehaviour
         }
     }
 
-    public void ShowHealthBar(Transform target, int current, int max)
+    public void ShowHealthBar(Transform target, int current, int max, string buffs = "", string debuffs = "")
     {
         currentTarget = target;
+
         if (healthSlider != null)
         {
             healthSlider.maxValue = max;
             healthSlider.value = current;
         }
-        
+
         if (healthText != null)
         {
             healthText.text = $"{current} / {max}";
         }
+
+        if (buffText != null)
+        {
+            buffText.text = string.IsNullOrWhiteSpace(buffs) ? "No buffs" : buffs;
+        }
+
+        if (debuffText != null)
+        {
+            debuffText.text = string.IsNullOrWhiteSpace(debuffs) ? "No debuffs" : debuffs;
+        }
+
         if (healthCanvas != null)
         {
-            healthCanvas.SetActive(true); 
-            UpdateHealthCanvasPosition(); // Açılır açılmaz doğru yere geçsin
+            healthCanvas.SetActive(true);
+            UpdateHealthCanvasPosition();
         }
     }
 
     public void HideHealthBar()
     {
         currentTarget = null;
+
+        if (buffText != null)
+        {
+            buffText.text = string.Empty;
+        }
+
+        if (debuffText != null)
+        {
+            debuffText.text = string.Empty;
+        }
+
         if (healthCanvas != null)
+        {
             healthCanvas.SetActive(false);
+        }
     }
 
     private void LateUpdate()
@@ -60,7 +88,6 @@ public class HealthUIManager : MonoBehaviour
 
     private void UpdateHealthCanvasPosition()
     {
-        // Eğer takip edilen piyon (hedef) yok edildiyse UI'ı hemen gizle
         if (currentTarget == null)
         {
             if (healthCanvas != null && healthCanvas.activeSelf)
@@ -70,21 +97,17 @@ public class HealthUIManager : MonoBehaviour
             return;
         }
 
-        // Piyonun kafasını takip etme ve kameraya dönük kalma işlemi
         if (healthCanvas != null && healthCanvas.activeSelf)
         {
             Camera mainCam = Camera.main;
             if (mainCam != null)
             {
-                // Can barını piyonun konumunda, ancak "kameranın yukarısı" (Camera.up) yönünde öteleyerek konumlandırıyoruz.
-                // Bu sayede ekranın neresinde olursa olsun bar her zaman piyonun tam tepesinde görünür.
                 healthCanvas.transform.position = currentTarget.position + (mainCam.transform.up * heightOffsetMultiplier);
                 healthCanvas.transform.rotation = mainCam.transform.rotation;
             }
-            else 
+            else
             {
-                // Kamera yoksa eski sistem düz çalışsın fallback olarak
-                healthCanvas.transform.position = currentTarget.position + new Vector3(0, heightOffsetMultiplier, 0);
+                healthCanvas.transform.position = currentTarget.position + new Vector3(0f, heightOffsetMultiplier, 0f);
             }
         }
     }
