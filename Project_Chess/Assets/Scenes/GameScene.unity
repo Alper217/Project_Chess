@@ -2936,7 +2936,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PawnSelectionUI
   pawnTypeIndex: 0
   pawnName: Archer
-  pawnDescription: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  pawnDescription: "Etraf\u0131ndaki 2 birimlik alana hasar verebilir. Her tur sald\u0131rabilir."
   highlightOutline: {fileID: 994364167}
 --- !u!114 &569937519
 MonoBehaviour:
@@ -3029,7 +3029,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PawnSelectionUI
   pawnTypeIndex: 1
   pawnName: Cannon
-  pawnDescription: AAAAAAAAAAAAAAAAAAAAA
+  pawnDescription: "Etraf\u0131ndaki 2 birimlik alana vurabilir. Alan hasar\u0131
+    verir. 3turda bir sald\u0131rabilir."
   highlightOutline: {fileID: 259578192}
 --- !u!114 &578763635
 MonoBehaviour:
@@ -3693,7 +3694,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PawnSelectionUI
   pawnTypeIndex: 7
   pawnName: Cheriff
-  pawnDescription: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  pawnDescription: "Etraf\u0131ndaki 2 birimlik alana sald\u0131rabilir. 2 turda
+    bir sald\u0131rabilir."
   highlightOutline: {fileID: 1323909770}
 --- !u!114 &758566188
 MonoBehaviour:
@@ -4295,7 +4297,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PawnSelectionUI
   pawnTypeIndex: 2
   pawnName: Horseman
-  pawnDescription: AAAAAAAAAAAAAAAAAAAAAAAA
+  pawnDescription: "Se\xE7ilen alana ve arkas\u0131ndaki bir bloa hasar verir. Her
+    tur sald\u0131rabilir."
   highlightOutline: {fileID: 2136455656}
 --- !u!114 &902811002
 MonoBehaviour:
@@ -5608,7 +5611,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PawnSelectionUI
   pawnTypeIndex: 8
   pawnName: Wizard
-  pawnDescription: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  pawnDescription: "Etraf\u0131ndaki 2 birimlik alandaki se\xE7ilen piyona can basabilir.
+    2 turda bir kullan\u0131labilir."
   highlightOutline: {fileID: 878406815}
 --- !u!114 &1179637692
 MonoBehaviour:
@@ -6864,7 +6868,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PawnSelectionUI
   pawnTypeIndex: 6
   pawnName: Ninja
-  pawnDescription: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  pawnDescription: "Se\xE7ili alana hasar verir. Engeller ve rakipler hareketini
+    engelleyemez. Her tur sald\u0131rabilir."
   highlightOutline: {fileID: 79690171}
 --- !u!114 &1469242480
 MonoBehaviour:
@@ -7032,7 +7037,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PawnSelectionUI
   pawnTypeIndex: 3
   pawnName: Knight
-  pawnDescription: AAAAAAAAAAAAAAAAAAAAAAAAA
+  pawnDescription: "Menzilsizdir, yak\u0131n\u0131ndaki se\xE7ili alana hasar verir.
+    Her tur sald\u0131rabilir."
   highlightOutline: {fileID: 280038621}
 --- !u!114 &1500878006
 MonoBehaviour:
@@ -7261,7 +7267,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PawnSelectionUI
   pawnTypeIndex: 4
   pawnName: Quenn
-  pawnDescription: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  pawnDescription: "Etraf\u0131ndaki 2 birimlik alandaki dost piyonlar\u0131n can\u0131n\u0131
+    artt\u0131r\u0131r."
   highlightOutline: {fileID: 949060387}
 --- !u!114 &1571542514
 MonoBehaviour:
@@ -12290,7 +12297,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PawnSelectionUI
   pawnTypeIndex: 5
   pawnName: Commander
-  pawnDescription: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+  pawnDescription: "Etraf\u0131ndaki 2 birimlik alandaki dost piyonlar\u0131n hasar\u0131n\u0131
+    artt\u0131r\u0131r."
   highlightOutline: {fileID: 11331062}
 --- !u!114 &1968020434
 MonoBehaviour:
