@@ -85,6 +85,11 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         }
 
         string buffsText = $"Damage: {_pawn.HoverDamagePreview}";
+        if (_pawn.forceAttackPattern.Value)
+        {
+            buffsText += " <color=yellow>(Pattern Only Attack)</color>";
+        }
+
         if (!string.IsNullOrWhiteSpace(_pawn.BuffSummary))
         {
             buffsText = $"{buffsText}\n{_pawn.BuffSummary}";
@@ -105,10 +110,28 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             ShowPawnHoverUI(_pawn.currentHealth.Value);
         }
 
+        // Toggle Force Attack Pattern with 'T' key when hovered (only for own pawns)
+        if (Input.GetKeyDown(KeyCode.T) && isHovered && _pawn != null)
+        {
+            int localPlayerID = 1;
+            if (Unity.Netcode.NetworkManager.Singleton != null)
+            {
+                localPlayerID = Unity.Netcode.NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            }
+
+            if (_pawn.PlayerID == localPlayerID)
+            {
+                _pawn.ToggleForceAttackPattern();
+            }
+        }
+
+        // Removed debug click-to-damage logic
+        /*
         if (Input.GetMouseButtonDown(0) && isHovered)
         {
             TakeDamageServer(_pawn.damage.Value);
         }
+        */
     }
 
     public void TakeDamageServer(int damageAmount)
@@ -229,7 +252,9 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         if (_pawn != null && _pawn.PawnData != null && GameManager.Instance != null)
         {
             int opponentID = loserID == 1 ? 2 : 1;
-            GameManager.Instance.AddScore(opponentID, _pawn.PawnData.pointValue);
+            int points = _pawn.PawnData.pointValue;
+            Debug.Log($"PawnHealthController: Pawn of Player {loserID} died. Awarding {points} points to Player {opponentID}.");
+            GameManager.Instance.AddScore(opponentID, points);
         }
 
         if (pawn != null)

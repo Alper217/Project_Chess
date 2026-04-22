@@ -73,8 +73,14 @@ namespace AlperKocasalih.Chess.Grid
                 OnStateChanged?.Invoke(newValue);
             };
             
-            player1Score.OnValueChanged += (oldValue, newValue) => UpdateScoreUI();
-            player2Score.OnValueChanged += (oldValue, newValue) => UpdateScoreUI();
+            player1Score.OnValueChanged += (oldValue, newValue) => {
+                Debug.Log($"GameManager: Player 1 Score changed from {oldValue} to {newValue}");
+                UpdateScoreUI();
+            };
+            player2Score.OnValueChanged += (oldValue, newValue) => {
+                Debug.Log($"GameManager: Player 2 Score changed from {oldValue} to {newValue}");
+                UpdateScoreUI();
+            };
             
             // Initial handle for current state
             HandleStateChange(currentState.Value);
@@ -83,8 +89,23 @@ namespace AlperKocasalih.Chess.Grid
 
         private void UpdateScoreUI()
         {
-            if (player1ScoreText != null) player1ScoreText.text = $"P1 Score: {player1Score.Value}";
-            if (player2ScoreText != null) player2ScoreText.text = $"P2 Score: {player2Score.Value}";
+            int localPlayerID = 1;
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            }
+
+            if (player1ScoreText != null) 
+            {
+                player1ScoreText.text = $"My Score: {player1Score.Value}";
+                player1ScoreText.gameObject.SetActive(localPlayerID == 1);
+            }
+
+            if (player2ScoreText != null) 
+            {
+                player2ScoreText.text = $"My Score: {player2Score.Value}";
+                player2ScoreText.gameObject.SetActive(localPlayerID == 2);
+            }
         }
 
         private void Start()

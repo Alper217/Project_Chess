@@ -28,6 +28,7 @@ public class PawnData: ScriptableObject
 
     [Header("Attack Pattern")] 
     public MovementPattern attackPattern;
+    public bool startWithForceAttackPattern;
 
     public int attackCooldown;
     [Header("AOE Effects")]

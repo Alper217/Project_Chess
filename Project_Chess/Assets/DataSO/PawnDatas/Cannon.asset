@@ -18,8 +18,16 @@ MonoBehaviour:
   damage: 40
   maxHealth: 10
   currentHealth: 10
+  pointValue: 2
   attackPattern: {fileID: 11400000, guid: f5a79135514e46b4b999ff0589c1f927, type: 2}
+  startWithForceAttackPattern: 1
   attackCooldown: 3
   isAoE: 1
   AoERadius: 3
   AoEDamageFallOff: 10
+  hasAura: 0
+  auraRadius: 2
+  damageBuff: 0
+  healthbuff: 0
+  isHealer: 0
+  healAmount: 0

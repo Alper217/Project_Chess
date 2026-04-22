@@ -22,6 +22,13 @@ public class HealthUIManager : MonoBehaviour
         if (healthCanvas != null)
         {
             healthCanvas.SetActive(false);
+
+            // Ensure Health UI does not block raycasts/clicks
+            CanvasGroup group = healthCanvas.GetComponent<CanvasGroup>();
+            if (group == null) group = healthCanvas.AddComponent<CanvasGroup>();
+            group.blocksRaycasts = false;
+            group.interactable = false;
+
             if (healthText == null)
             {
                 healthText = healthCanvas.GetComponentInChildren<TextMeshProUGUI>(true);

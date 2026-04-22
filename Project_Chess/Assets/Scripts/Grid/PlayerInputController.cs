@@ -28,6 +28,7 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, ReadOnly] private MovementPattern activePattern;
         [SerializeField, ReadOnly] private CardData activeCardData;
         [SerializeField, ReadOnly] private int activeCardRemainingUses = 1;
+        [SerializeField, ReadOnly] private int initialCardUses = 1;
         [SerializeField, ReadOnly] private Pawn selectedPawn;
 
         private readonly List<HexCell> highlightedCells = new List<HexCell>();
@@ -35,6 +36,7 @@ namespace AlperKocasalih.Chess.Grid
         private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
 
         public bool IsActive => currentState != SelectionState.None;
+        public bool IsMultiActionInProgress => activeCardData != null && activeCardRemainingUses > 0 && activeCardRemainingUses < initialCardUses;
 
         #endregion
 
@@ -111,6 +113,12 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (gridLookup.Count == 0) InitializeGrid();
             
+            if (IsMultiActionInProgress)
+            {
+                Debug.LogWarning("Multi-action in progress. You must finish your current card's actions first.");
+                return;
+            }
+
             CancelSelection();
             activeCardData = card;
             activePattern = card.pattern;
@@ -126,6 +134,7 @@ namespace AlperKocasalih.Chess.Grid
                     }
                 }
             }
+            initialCardUses = activeCardRemainingUses;
 
             if (card.isObstacleCard)
             {
@@ -151,7 +160,7 @@ namespace AlperKocasalih.Chess.Grid
 
                 foreach (var pObj in GameObject.FindObjectsByType<Pawn>(FindObjectsSortMode.None))
                 {
-                    if (pObj.PlayerID != localPlayerID) continue;
+                    if (pObj.PlayerID != localPlayerID || pObj.HasStun()) continue;
                     
                     SetPawnLayer(pObj.gameObject, "Outline_Selectable");
                     highlightedPawns.Add(pObj);
@@ -199,7 +208,13 @@ namespace AlperKocasalih.Chess.Grid
             if (Physics.Raycast(ray, out RaycastHit hit, 100f, cellLayer))
             {
                 HexCell cell = hit.collider.GetComponent<HexCell>();
-                if (cell == null) return;
+                if (cell == null) 
+                {
+                    Debug.Log($"PlayerInputController: Hit {hit.collider.name} but no HexCell found.");
+                    return;
+                }
+
+                Debug.Log($"PlayerInputController: Selected cell {cell.Coordinates} in state {currentState}");
 
                 if (currentState == SelectionState.CardSelected)
                 {
@@ -214,6 +229,10 @@ namespace AlperKocasalih.Chess.Grid
                     HandleCellSelection(cell);
                 }
             }
+            else
+            {
+                Debug.Log("PlayerInputController: Raycast missed cellLayer.");
+            }
         }
 
         private void HandlePawnSelection(HexCell cell)
@@ -227,7 +246,7 @@ namespace AlperKocasalih.Chess.Grid
                     localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
                 }
 
-                if (pawn.PlayerID != localPlayerID) return;
+                if (pawn.PlayerID != localPlayerID || pawn.HasStun()) return;
 
                 if (pawn.HasStun())
                 {
@@ -259,6 +278,15 @@ namespace AlperKocasalih.Chess.Grid
             if (highlightedCells.Contains(cell))
             {
                 Pawn enemy = FindPawnOnCell(cell);
+
+                // Determine if this action should end the turn
+                bool shouldEndTurn = true;
+                if (activeCardData != null)
+                {
+                    // If we have a card with multiple uses, only end turn on the last use
+                    shouldEndTurn = (activeCardRemainingUses <= 1);
+                }
+
                 if (enemy != null)
                 {
                     if (selectedPawn != null && enemy.PlayerID == selectedPawn.PlayerID)
@@ -284,7 +312,7 @@ namespace AlperKocasalih.Chess.Grid
                             Core.PawnActionExecutor.Instance.ApplyCardEffectServerRpc(selectedPawn.NetworkObjectId, cardIndex);
                         }
 
-                        Core.PawnActionExecutor.Instance.ExecuteCombatServerRpc(selectedPawn.NetworkObjectId, enemy.NetworkObjectId, cell.Coordinates);
+                        Core.PawnActionExecutor.Instance.ExecuteCombatServerRpc(selectedPawn.NetworkObjectId, enemy.NetworkObjectId, cell.Coordinates, shouldEndTurn);
                     }
                 }
                 else
@@ -300,7 +328,7 @@ namespace AlperKocasalih.Chess.Grid
                         {
                             Core.PawnActionExecutor.Instance.ApplyCardEffectServerRpc(selectedPawn.NetworkObjectId, cardIndex);
                         }
-                        Core.PawnActionExecutor.Instance.ExecuteMoveServerRpc(selectedPawn.NetworkObjectId, cell.Coordinates);
+                        Core.PawnActionExecutor.Instance.ExecuteMoveServerRpc(selectedPawn.NetworkObjectId, cell.Coordinates, shouldEndTurn);
                     }
                 }
                 
@@ -390,6 +418,28 @@ namespace AlperKocasalih.Chess.Grid
 
         private void CancelSelection()
         {
+            if (IsMultiActionInProgress)
+            {
+                // During multi-action, Escape only clears the pawn selection, not the card
+                ClearCellHighlights();
+                ClearPawnHighlights();
+                if (selectedPawn != null) SetPawnLayer(selectedPawn.gameObject, "Default");
+                selectedPawn = null;
+                currentState = SelectionState.CardSelected;
+                
+                // Redraw outlines for selectable pawns
+                int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                foreach (var pObj in GameObject.FindObjectsByType<Pawn>(FindObjectsSortMode.None))
+                {
+                    if (pObj.PlayerID == localPlayerID && !pObj.HasStun())
+                    {
+                        SetPawnLayer(pObj.gameObject, "Outline_Selectable");
+                        highlightedPawns.Add(pObj);
+                    }
+                }
+                return;
+            }
+
             ClearCellHighlights();
             ClearPawnHighlights();
             if (selectedPawn != null) 
@@ -399,6 +449,8 @@ namespace AlperKocasalih.Chess.Grid
             selectedPawn = null;
             activePattern = null;
             activeCardData = null;
+            initialCardUses = 1;
+            activeCardRemainingUses = 1;
             currentState = SelectionState.None;
         }
 
@@ -441,7 +493,11 @@ namespace AlperKocasalih.Chess.Grid
                     {
                         if (occupant.PlayerID != pawn.PlayerID)
                         {
-                            AddClickableCell(targetCell);
+                            // If forceAttackPattern is true, don't allow attacking through movement blocks
+                            if (!pawn.forceAttackPattern.Value)
+                            {
+                                AddClickableCell(targetCell);
+                            }
                         }
                     }
                     else

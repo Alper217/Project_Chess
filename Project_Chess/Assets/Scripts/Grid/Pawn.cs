@@ -56,6 +56,7 @@ namespace AlperKocasalih.Chess.Grid
         public string BuffSummary => buffSummary;
         public string DebuffSummary => debuffSummary;
         public NetworkVariable<bool> hasSynergy = new NetworkVariable<bool>(false);
+        public NetworkVariable<bool> forceAttackPattern = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
         #endregion
 
         #region Methods
@@ -80,6 +81,7 @@ namespace AlperKocasalih.Chess.Grid
                 damage.Value = pawnData.damage;
                 currentHealth.Value = pawnData.currentHealth;
                 currentHealth.Value = maxHealth.Value;
+                forceAttackPattern.Value = pawnData.startWithForceAttackPattern;
                 RefreshActiveBuffSummaries();
             }
             ApplyPlayerVisuals(netPlayerID.Value);
@@ -543,6 +545,18 @@ namespace AlperKocasalih.Chess.Grid
 
         #endregion
      
+        public void ToggleForceAttackPattern()
+        {
+            if (IsServer) forceAttackPattern.Value = !forceAttackPattern.Value;
+            else ToggleForceAttackPatternServerRpc();
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        private void ToggleForceAttackPatternServerRpc()
+        {
+            forceAttackPattern.Value = !forceAttackPattern.Value;
+        }
+
         #endregion
     }
 }

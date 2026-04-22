@@ -18,6 +18,7 @@ MonoBehaviour:
   damage: 15
   maxHealth: 60
   currentHealth: 60
+  pointValue: 5
   attackPattern: {fileID: 0}
   attackCooldown: 0
   isAoE: 0

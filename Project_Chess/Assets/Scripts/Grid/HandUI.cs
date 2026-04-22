@@ -70,6 +70,12 @@ namespace AlperKocasalih.Chess.Grid
 
         public void OnCardClicked(HandCard card)
         {
+            if (PlayerInputController.Instance != null && PlayerInputController.Instance.IsMultiActionInProgress)
+            {
+                Debug.Log("HandUI: Cannot change card during a multi-action sequence.");
+                return;
+            }
+
             if (isBurnSelectionActive)
             {
                 TryBurnSelectedCard(card);

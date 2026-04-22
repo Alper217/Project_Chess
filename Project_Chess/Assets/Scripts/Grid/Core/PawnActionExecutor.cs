@@ -27,7 +27,7 @@ namespace AlperKocasalih.Chess.Grid.Core
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void ExecuteMoveServerRpc(ulong pawnNetworkID, Vector2Int targetCoords)
+        public void ExecuteMoveServerRpc(ulong pawnNetworkID, Vector2Int targetCoords, bool endTurn = true)
         {
             NetworkObject pawnObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[pawnNetworkID];
             if (pawnObj == null) return;
@@ -43,7 +43,7 @@ namespace AlperKocasalih.Chess.Grid.Core
                 
                 ExecuteMoveClientRpc(pawnNetworkID, targetCoords);
                 
-                if (TurnManager.Instance != null) TurnManager.Instance.NextTurn();
+                if (endTurn && TurnManager.Instance != null) TurnManager.Instance.NextTurn();
             }
         }
 
@@ -68,7 +68,7 @@ namespace AlperKocasalih.Chess.Grid.Core
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void ExecuteCombatServerRpc(ulong attackerID, ulong defenderID, Vector2Int targetCoords)
+        public void ExecuteCombatServerRpc(ulong attackerID, ulong defenderID, Vector2Int targetCoords, bool endTurn = true)
         {
             NetworkObject attackerObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[attackerID];
             NetworkObject defenderObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[defenderID];
@@ -94,16 +94,12 @@ namespace AlperKocasalih.Chess.Grid.Core
                 if (attackHandler != null && attackHandler.CanAttack())
                 {
                     attackHandler.ExecuteAttack(defender.OccupiedCell.Coordinates, gridLookup);
-                    if(TurnManager.Instance != null) TurnManager.Instance.NextTurn();
+                    if (endTurn && TurnManager.Instance != null) TurnManager.Instance.NextTurn();
                 }
                 else
                 {
                     Debug.Log("Attack on cooldown.");
                 }
-                
-
-               
-
             }
         }
 

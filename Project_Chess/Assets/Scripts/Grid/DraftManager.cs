@@ -34,7 +34,7 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, ReadOnly] private List<CardData> p2PendingIncoming = new List<CardData>();
 
         [Header("Early Round Restrictions")]
-        [SerializeField, Min(0)] private int blockDrawForRounds = 1;
+        [SerializeField, Min(0)] private int blockDrawForRounds = 2;
 
         [Header("Burn Lock")]
         [SerializeField, Min(0)] private int burnLockRounds = 2;
@@ -266,10 +266,9 @@ namespace AlperKocasalih.Chess.Grid
             NotifyUsedActionsClientRpc(actionsArray);
             
             currentChoices.RemoveAt(cardIndex);
-            if (isActionDraftActive) currentChoices.Clear();
 
             // If all 3 cards from the draw are processed, move to next round/player
-            if (currentChoices.Count == 0 || isActionDraftActive)
+            if (currentChoices.Count == 0)
             {
                 EndCurrentDraftTurn();
             }
