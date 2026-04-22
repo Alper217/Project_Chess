@@ -128,16 +128,45 @@ namespace AlperKocasalih.Chess.Grid.Core
             if (card == null) return;
             if (pawn.PawnData == null) return;
 
-            if (pawn.PawnData.type != card.pawnClass) return;
+            bool isMatch = (pawn.PawnData.type == card.pawnClass);
 
-            if (card.healthToAdd != 0 || card.damageToAdd != 0)
+            // 1. Handle Legacy Stats (healthToAdd, damageToAdd)
+            int finalH = 0;
+            int finalD = 0;
+
+            // Health: Apply debuff always, buff only if match
+            if (card.healthToAdd < 0) finalH = card.healthToAdd;
+            else if (isMatch) finalH = card.healthToAdd;
+
+            // Damage: Apply debuff always, buff only if match
+            if (card.damageToAdd < 0) finalD = card.damageToAdd;
+            else if (isMatch) finalD = card.damageToAdd;
+
+            if (finalH != 0 || finalD != 0)
             {
-                pawn.ApplyCardEffectServer(card.healthToAdd, card.damageToAdd);
+                pawn.ApplyCardEffectServer(finalH, finalD);
             }
 
+            // 2. Handle Runtime Buffs
             if (card.runtimeBuffs != null && card.runtimeBuffs.Count > 0)
             {
-                pawn.ApplyRuntimeBuffsServer(card.runtimeBuffs);
+                List<BuffData> buffsToApply = new List<BuffData>();
+                foreach (var b in card.runtimeBuffs)
+                {
+                    if (b == null) continue;
+                    
+                    // Apply debuffs (negative effects) always. 
+                    // Apply buffs (positive effects) only if the pawn class matches.
+                    if (!b.isPositiveEffect || isMatch)
+                    {
+                        buffsToApply.Add(b);
+                    }
+                }
+
+                if (buffsToApply.Count > 0)
+                {
+                    pawn.ApplyRuntimeBuffsServer(buffsToApply);
+                }
             }
         }
     }

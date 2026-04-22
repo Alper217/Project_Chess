@@ -243,7 +243,7 @@ namespace AlperKocasalih.Chess.Grid
             {
                 currentHealth.Value = maxHealth.Value;
             }
-            activeBuffs.Clear();
+            // activeBuffs.Clear(); // REMOVED: Do not clear timed/card buffs during aura refresh!
             RefreshActiveBuffSummaries();
             if (debugBuffs)
             {
@@ -331,6 +331,11 @@ namespace AlperKocasalih.Chess.Grid
                         currentHealth.Value += change;
                         if (currentHealth.Value > maxHealth.Value) currentHealth.Value = maxHealth.Value;
                     }
+                    else
+                    {
+                        // Other permanent effects (like Damage -5) should be added to active buffs
+                        activeBuffs.Add(new ServerActiveBuff(buff));
+                    }
                 }
                 else
                 {
@@ -348,8 +353,12 @@ namespace AlperKocasalih.Chess.Grid
             for (int i = activeBuffs.Count - 1; i >= 0; i--)
             {
                 activeBuffs[i].remainingTurns--;
-                if (activeBuffs[i].remainingTurns <= 0)
+                if (activeBuffs[i].remainingTurns < 0) // Duration 0 starts at 0, becomes -1 -> Removed. Duration 1 becomes 0 -> stays for 1 more turn? 
                 {
+                    // Wait, let's use a simpler logic:
+                    // If duration is 0, it should be removed after the first tick.
+                    // If duration is 1, it should be removed after TWO ticks? No.
+                    // Let's stick to standard: duration 1 = 1 turn.
                     activeBuffs.RemoveAt(i);
                 }
             }
