@@ -7655,9 +7655,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.HandUI
   handCardPrefab: {fileID: 6009328474611764102, guid: c4e7c765be6699740912402ac5e49f48, type: 3}
   handParent: {fileID: 1650032455}
-  radius: 450
-  angleStep: 20
-  yOffset: -450
+  radius: 800
+  angleStep: 10
+  expandedRadius: 1200
+  expandedAngleStep: 10
+  yOffsetNormal: -415
+  yOffsetExpanded: -480
+  yOffsetHidden: -450
+  GlobalHoverScale: 1.8
+  GlobalHoverMoveY: 120
+  GlobalHoverDuration: 0.3
+  GlobalSelectedScale: 1.3
+  GlobalSelectedMoveY: 80
 --- !u!4 &1650032455
 Transform:
   m_ObjectHideFlags: 0
@@ -12069,6 +12078,7 @@ MonoBehaviour:
   activePattern: {fileID: 0}
   activeCardData: {fileID: 0}
   activeCardRemainingUses: 1
+  initialCardUses: 1
   selectedPawn: {fileID: 0}
 --- !u!1 &1930345817
 GameObject:

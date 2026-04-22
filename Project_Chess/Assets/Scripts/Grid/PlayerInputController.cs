@@ -38,6 +38,8 @@ namespace AlperKocasalih.Chess.Grid
         public bool IsActive => currentState != SelectionState.None;
         public bool IsMultiActionInProgress => activeCardData != null && activeCardRemainingUses > 0 && activeCardRemainingUses < initialCardUses;
 
+        public event System.Action OnSelectionCancelled;
+
         #endregion
 
         #region Unity Methods
@@ -452,6 +454,7 @@ namespace AlperKocasalih.Chess.Grid
             initialCardUses = 1;
             activeCardRemainingUses = 1;
             currentState = SelectionState.None;
+            OnSelectionCancelled?.Invoke();
         }
 
         #endregion

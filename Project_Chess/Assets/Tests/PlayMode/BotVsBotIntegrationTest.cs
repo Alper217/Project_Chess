@@ -203,7 +203,7 @@ namespace Tests.PlayMode
             // ENSURE MANAGERS ARE READY
             if (AuraManager.instance == null)
             {
-                AuraManager am = GameObject.FindObjectOfType<AuraManager>();
+                AuraManager am = Object.FindFirstObjectByType<AuraManager>();
                 if (am != null) AuraManager.instance = am;
             }
 
@@ -345,7 +345,7 @@ namespace Tests.PlayMode
             // AuraManager Check
             if (AuraManager.instance == null)
             {
-                AuraManager am = GameObject.FindObjectOfType<AuraManager>();
+                AuraManager am = Object.FindFirstObjectByType<AuraManager>();
                 if (am != null) AuraManager.instance = am;
             }
 

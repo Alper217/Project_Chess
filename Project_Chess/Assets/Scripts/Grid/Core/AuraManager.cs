@@ -33,7 +33,7 @@ public class AuraManager : NetworkBehaviour
         {
             Debug.Log($"AuraManager: Grid lookup ready. count={lookup.Count}");
         }
-        Pawn[] allPawns = FindObjectsOfType<Pawn>();
+        Pawn[] allPawns = Object.FindObjectsByType<Pawn>(FindObjectsSortMode.None);
         if (debugLogs)
         {
             Debug.Log($"AuraManager: Found pawns={allPawns.Length}");

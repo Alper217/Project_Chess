@@ -20,11 +20,18 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private Image cardImage; // The ONLY background image (the full design)
 
         [Header("Animation Settings")]
-        [SerializeField] private float hoverScale = 1.1f;
-        [SerializeField] private float hoverMoveY = 30f;
-        [SerializeField] private float animationDuration = 0.2f;
+        [SerializeField] private float hoverScale = 1.8f;
+        [SerializeField] private float hoverMoveY = 120f;
+        [SerializeField] private float animationDuration = 0.25f;
 
-        private Vector3 originalPosition;
+        private bool isHovered = false;
+        private bool isSelected = false; // NEW: Selection state
+        public bool IsSelected => isSelected;
+
+        private Vector3 layoutPosition; // Controlled by HandUI
+        private Vector3 layoutRotation; // Controlled by HandUI
+        private float hoverYOffset;     // Controlled by HandCard
+        
         private Vector3 originalScale;
         private int originalSiblingIndex;
         private RectTransform rectTransform;
@@ -51,11 +58,44 @@ namespace AlperKocasalih.Chess.Grid
             else if (cardImage != null) cardImage.sprite = data.cardSprite; // Fallback
         }
 
-        public void SetOriginalState(Vector3 pos, int siblingIndex)
+        public void SetOriginalState(Vector3 pos, Vector3 rot, int siblingIndex)
         {
-            originalPosition = pos;
+            layoutPosition = pos;
+            layoutRotation = rot;
             originalSiblingIndex = siblingIndex;
+            
+            if (rectTransform == null) rectTransform = GetComponent<RectTransform>();
             rectTransform.localPosition = pos;
+            rectTransform.localRotation = Quaternion.Euler(rot);
+        }
+
+        public void UpdateLayoutState(Vector3 newPos, Vector3 newRot, int siblingIndex)
+        {
+            originalSiblingIndex = siblingIndex;
+            
+            // Animate layout targets
+            DOTween.To(() => layoutPosition, x => layoutPosition = x, newPos, 0.4f).SetEase(Ease.OutCubic).SetId(this + "layout");
+            DOTween.To(() => layoutRotation, x => layoutRotation = x, newRot, 0.4f).SetEase(Ease.OutCubic).SetId(this + "layout");
+        }
+
+        public void SetSelected(bool selected)
+        {
+            isSelected = selected;
+            // No need for immediate animation here, Update() will handle the scale/pos
+        }
+
+        private void Update()
+        {
+            // Combine layout from HandUI + Hover from Card logic
+            float selMoveY = HandUI.Instance != null ? HandUI.Instance.GlobalSelectedMoveY : 40f;
+            float targetY = isSelected ? selMoveY : hoverYOffset; 
+            
+            rectTransform.localPosition = layoutPosition + new Vector3(0, targetY, 0);
+            rectTransform.localRotation = Quaternion.Euler(layoutRotation);
+
+            float selScale = HandUI.Instance != null ? HandUI.Instance.GlobalSelectedScale : 1.2f;
+            float targetScale = isSelected ? selScale : (isHovered ? (HandUI.Instance != null ? HandUI.Instance.GlobalHoverScale : 1.8f) : 1.0f);
+            rectTransform.localScale = Vector3.Lerp(rectTransform.localScale, originalScale * targetScale, Time.deltaTime * 10f);
         }
 
         public void SetHandIndex(int index)
@@ -71,30 +111,42 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        public void SetInteractionState(bool interactive)
+        {
+            CanvasGroup cg = GetComponent<CanvasGroup>();
+            if (cg == null) cg = gameObject.AddComponent<CanvasGroup>();
+            
+            cg.alpha = interactive ? 1f : 0.4f;
+            cg.blocksRaycasts = interactive;
+        }
+
         #endregion
 
         #region Interaction
 
         public void OnPointerEnter(PointerEventData eventData)
         {
-            // Bring to front
+            if (isSelected) return; // Don't hover if already selected
+            isHovered = true;
             transform.SetAsLastSibling();
 
-            // Animate
-            rectTransform.DOComplete();
-            rectTransform.DOScale(originalScale * hoverScale, animationDuration);
-            rectTransform.DOLocalMoveY(originalPosition.y + hoverMoveY, animationDuration);
+            float scale = HandUI.Instance != null ? HandUI.Instance.GlobalHoverScale : hoverScale;
+            float moveY = HandUI.Instance != null ? HandUI.Instance.GlobalHoverMoveY : hoverMoveY;
+            float duration = HandUI.Instance != null ? HandUI.Instance.GlobalHoverDuration : animationDuration;
+
+            DOTween.To(() => hoverYOffset, x => hoverYOffset = x, moveY, duration).SetEase(Ease.OutCubic);
+            // Scale handled in Update
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            // Restore sibling index
-            transform.SetSiblingIndex(originalSiblingIndex);
+            isHovered = false;
+            if (!isSelected) transform.SetSiblingIndex(originalSiblingIndex);
 
-            // Animate back
-            rectTransform.DOComplete();
-            rectTransform.DOScale(originalScale, animationDuration);
-            rectTransform.DOLocalMove(originalPosition, animationDuration);
+            float duration = HandUI.Instance != null ? HandUI.Instance.GlobalHoverDuration : animationDuration;
+
+            DOTween.To(() => hoverYOffset, x => hoverYOffset = x, 0f, duration).SetEase(Ease.OutCubic);
+            // Scale handled in Update
         }
 
         public void OnPointerClick(PointerEventData eventData)

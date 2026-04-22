@@ -6,8 +6,18 @@ using Unity.Netcode;
 
 namespace AlperKocasalih.Chess.Grid
 {
-    public class HandUI : MonoBehaviour
+    public class HandUI : MonoBehaviour, UnityEngine.EventSystems.IPointerEnterHandler, UnityEngine.EventSystems.IPointerExitHandler
     {
+        public void OnPointerEnter(UnityEngine.EventSystems.PointerEventData eventData)
+        {
+            SetHandExpanded(true);
+        }
+
+        public void OnPointerExit(UnityEngine.EventSystems.PointerEventData eventData)
+        {
+            SetHandExpanded(false);
+        }
+
         public static HandUI Instance { get; private set; }
 
         #region Fields
@@ -17,13 +27,29 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private Transform handParent;
 
         [Header("Layout Settings")]
-        [SerializeField] private float radius = 500f;
-        [SerializeField] private float angleStep = 10f;
-        [SerializeField] private float yOffset = -450f;
+        [SerializeField] private float radius = 400f; // Normal: 400
+        [SerializeField] private float angleStep = 20f; // Normal: 20
+        [SerializeField] private float expandedRadius = 1200f; // NEW: Hover Radius
+        [SerializeField] private float expandedAngleStep = 10f; // NEW: Hover Angle
+        [SerializeField] private float yOffsetNormal = -300f;
+        [SerializeField] private float yOffsetExpanded = -260f;
+        [SerializeField] private float yOffsetHidden = -350f;
+
+        [Header("Global Hover Settings (Applied to Cards)")]
+        public float GlobalHoverScale = 1.8f;
+        public float GlobalHoverMoveY = 120f;
+        public float GlobalHoverDuration = 0.3f;
+
+        [Header("Global Selection Settings")]
+        public float GlobalSelectedScale = 1.3f; // NEW: Scaling when selected
+        public float GlobalSelectedMoveY = 80f;  // NEW: Lift when selected
 
         private List<HandCard> spawnedCards = new List<HandCard>();
         private bool isBurnSelectionActive = false;
         private int pendingBurnCount = 0;
+        private bool isHandVisible = true;
+        private bool isHandExpanded = false;
+        private float currentYOffset;
 
         #endregion
 
@@ -37,10 +63,20 @@ namespace AlperKocasalih.Chess.Grid
 
         private void Start()
         {
+            // Fix DOTween capacity warnings
+            DOTween.SetTweensCapacity(800, 50);
+
+            currentYOffset = yOffsetNormal;
             if (DraftManager.Instance != null)
             {
                 DraftManager.Instance.OnHandUpdated += OnHandUpdated;
                 DraftManager.Instance.OnOverflowBurnRequested += OnOverflowBurnRequested;
+            }
+
+            // Sync with PlayerInputController to hide hand during targeting
+            if (PlayerInputController.Instance != null)
+            {
+                PlayerInputController.Instance.OnSelectionCancelled += () => SetHandVisibility(true);
             }
         }
 
@@ -90,14 +126,87 @@ namespace AlperKocasalih.Chess.Grid
 
             if (TurnManager.Instance == null) return;
 
-            // Optional: Check if card belongs to the active player
-            // In local multiplayer, we assume the person clicking is the active player 
-            // but we can add a check if HandCard stores playerID
-
             if (PlayerInputController.Instance != null)
             {
+                // Reset all other selections first
+                foreach (var c in spawnedCards) c.SetSelected(false);
+                card.SetSelected(true); // Mark current card as selected
+
                 PlayerInputController.Instance.SelectMovementCard(card.CardData);
+                // Push down/Hide hand when card is selected to clear the board
+                SetHandVisibility(false);
             }
+        }
+
+        public void SetHandVisibility(bool visible)
+        {
+            isHandVisible = visible;
+            
+            // Force retract and reset selections if becoming visible again (ESC/Cancel fix)
+            if (visible) 
+            {
+                isHandExpanded = false;
+                foreach (var card in spawnedCards) card.SetSelected(false);
+            }
+            
+            float targetY = visible ? (isHandExpanded ? yOffsetExpanded : yOffsetNormal) : yOffsetHidden;
+            
+            handParent.DOLocalMoveY(targetY, 0.4f).SetEase(Ease.OutCubic);
+            currentYOffset = targetY;
+
+            // Immediately refresh layout to match the new visibility state (Normal Arc)
+            if (visible) 
+            {
+                // Multi-action lockout check: Dim other cards if we are in a sequence
+                bool isMulti = PlayerInputController.Instance != null && PlayerInputController.Instance.IsMultiActionInProgress;
+                if (isMulti)
+                {
+                    foreach (var c in spawnedCards)
+                    {
+                        // Keep only the selected one bright and interactive
+                        c.SetInteractionState(c.IsSelected);
+                    }
+                }
+                else
+                {
+                    foreach (var c in spawnedCards) c.SetInteractionState(true);
+                }
+
+                SetHandExpanded(false);
+            }
+        }
+
+        public void SetHandExpanded(bool expanded)
+        {
+            if (!isHandVisible) return;
+            isHandExpanded = expanded;
+            float targetY = expanded ? yOffsetExpanded : yOffsetNormal;
+            
+            handParent.DOKill();
+            handParent.DOLocalMoveY(targetY, 0.35f).SetEase(Ease.OutCubic);
+            
+            // Dynamic Radius and Angle
+            float currentRadius = expanded ? expandedRadius : radius;
+            float currentAngleStep = expanded ? expandedAngleStep : angleStep;
+
+            // Arrange cards
+            int count = spawnedCards.Count;
+            float startAngle = -(count - 1) * currentAngleStep / 2f;
+
+            for (int i = 0; i < count; i++)
+            {
+                if (spawnedCards[i] == null) continue;
+
+                float angle = startAngle + (i * currentAngleStep);
+                float x = Mathf.Sin(angle * Mathf.Deg2Rad) * currentRadius;
+                float y = Mathf.Cos(angle * Mathf.Deg2Rad) * currentRadius;
+
+                Vector3 targetPos = new Vector3(x, y, 0);
+                Vector3 targetRot = new Vector3(0, 0, -angle);
+
+                spawnedCards[i].UpdateLayoutState(targetPos, targetRot, i);
+            }
+            currentYOffset = targetY;
         }
 
         #endregion
@@ -139,17 +248,24 @@ namespace AlperKocasalih.Chess.Grid
                 // Calculate position on arc
                 float angle = startAngle + (i * angleStep);
                 float x = Mathf.Sin(angle * Mathf.Deg2Rad) * radius;
-                float y = Mathf.Cos(angle * Mathf.Deg2Rad) * radius + yOffset;
+                float y = Mathf.Cos(angle * Mathf.Deg2Rad) * radius; 
                 
                 Vector3 pos = new Vector3(x, y, 0);
-                Quaternion rot = Quaternion.Euler(0, 0, -angle);
+                Vector3 rot = new Vector3(0, 0, -angle);
                 
                 cardObj.transform.localPosition = pos;
-                cardObj.transform.localRotation = rot;
+                cardObj.transform.localRotation = Quaternion.Euler(rot);
                 
-                handCard.SetOriginalState(pos, i);
+                handCard.SetOriginalState(pos, rot, i);
                 spawnedCards.Add(handCard);
             }
+
+            // Re-apply current state if we are already hovered
+            if (isHandExpanded) SetHandExpanded(true);
+            else SetHandExpanded(false);
+
+            // Reset parent position properly
+            handParent.localPosition = new Vector3(0, isHandVisible ? (isHandExpanded ? yOffsetExpanded : yOffsetNormal) : yOffsetHidden, 0);
         }
 
         #endregion
@@ -166,11 +282,6 @@ namespace AlperKocasalih.Chess.Grid
 
             pendingBurnCount = burnCount;
             isBurnSelectionActive = burnCount > 0;
-
-            if (isBurnSelectionActive)
-            {
-                Debug.Log($"HandUI: Choose {pendingBurnCount} card(s) to burn.");
-            }
 
             for (int i = 0; i < spawnedCards.Count; i++)
             {
@@ -194,13 +305,12 @@ namespace AlperKocasalih.Chess.Grid
             {
                 if (DraftManager.Instance.IsBurnLocked(localPlayerID, card.HandIndex))
                 {
-                    Debug.LogWarning("HandUI: Cannot burn this card, it is locked!");
                     card.transform.DOShakePosition(0.2f, 10f, 20, 90f, false, true);
                     return;
                 }
 
                 DraftManager.Instance.BurnOverflowCardAtIndexServerRpc(localPlayerID, card.HandIndex);
-                isBurnSelectionActive = false; // will be re-enabled if more burns are required
+                isBurnSelectionActive = false; 
             }
         }
     }
