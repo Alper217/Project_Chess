@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using DG.Tweening;
 using Unity.Netcode;
 
+
 namespace AlperKocasalih.Chess.Grid
 {
     public class DraftUI : MonoBehaviour
@@ -18,6 +19,11 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private GameObject[] cardSlots; // Should have 3
         [SerializeField] private TextMeshProUGUI[] cardNameTexts;
         [SerializeField] private Image[] cardImages; // The ONLY background image (the full design)
+        [SerializeField] private Transform opponentCardSlot;
+        [SerializeField] private Transform playerCardSlot;
+        private Vector3[] slotInitalPositions;
+        private Vector3[] slotInitalScales;
+        
 
         [Header("Choice Buttons Parent")]
         [SerializeField] private GameObject choicePanel;
@@ -40,6 +46,14 @@ namespace AlperKocasalih.Chess.Grid
                 DraftManager.Instance.OnDraftFinished += HideDraftUI;
                 DraftManager.Instance.OnOverflowBurnRequested += HandleOverflowBurnRequested;
             }
+            
+            slotInitalPositions = new Vector3[cardSlots.Length];
+            slotInitalScales = new Vector3[cardSlots.Length];
+            for (int i = 0; i < cardSlots.Length; i++)
+            {
+                slotInitalPositions[i] = cardSlots[i].transform.localPosition;
+                slotInitalScales[i] = cardSlots[i].transform.localScale;
+            }
 
             // Initially hide the Draft UI
             if (draftPanel != null)
@@ -49,6 +63,8 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             if (choicePanel != null) choicePanel.SetActive(false);
+            
+          
         }
 
         private void OnDestroy()
@@ -110,7 +126,14 @@ namespace AlperKocasalih.Chess.Grid
                 for (int i = 0; i < cards.Count; i++)
                 {
                     if (i >= cardSlots.Length) break;
+                    
+                    GameObject cardSlot = cardSlots[i];
+                    cardSlot.SetActive(true);
 
+                    cardSlot.transform.DOKill();
+                    cardSlot.transform.localPosition = slotInitalPositions[i];
+                    cardSlot.transform. localScale = slotInitalScales[i];
+                    
                     cardSlots[i].SetActive(true);
                     if (cardNameTexts.Length > i) cardNameTexts[i].text = cards[i].GetBuffsText();
                     if (cardImages.Length > i && cards[i].cardDesign != null) cardImages[i].sprite = cards[i].cardDesign;
@@ -153,9 +176,12 @@ namespace AlperKocasalih.Chess.Grid
         public void OnCardClicked(int index)
         {
             if (isBurnBlockingDraft) return;
+            Transform cardTransform = cardSlots[index].transform;
+            cardTransform.DOPunchScale(Vector3.one * 0.1f, 0.5f, 10, 1f);
             Debug.Log($"DraftUI: Card slot {index} clicked.");
             currentPendingCardIndex = index;
             if (choicePanel != null) choicePanel.SetActive(true);
+            
         }
 
         /// <summary>
@@ -165,14 +191,40 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (isBurnBlockingDraft) return;
             DraftAction action = (DraftAction)actionInt;
-            Debug.Log($"DraftUI: Action {action} selected for card index {currentPendingCardIndex}.");
-            
-            if (DraftManager.Instance != null && currentPendingCardIndex != -1)
+            if (currentPendingCardIndex != -1 && currentPendingCardIndex < cardSlots.Length)
             {
-                DraftManager.Instance.HandleChoiceServerRpc(currentPendingCardIndex, action);
-                currentPendingCardIndex = -1;
-                if (choicePanel != null) choicePanel.SetActive(false);
+                GameObject selectedCard = cardSlots[currentPendingCardIndex];
+                float animationDuration = 0.5f;
+
+                switch (action)
+                {
+                    case DraftAction.Keep:
+                        selectedCard.transform.DOMove(playerCardSlot.position, animationDuration);
+                        selectedCard.transform.DOScale(Vector3.zero, animationDuration);
+                        break;
+                    case DraftAction.Give:
+                        selectedCard.transform.DOMove(opponentCardSlot.position, animationDuration);
+                        selectedCard.transform.DOScale(Vector3.zero, animationDuration);
+                        break;
+                    case DraftAction.Burn:
+                        break;
+                }
+
+                DOVirtual.DelayedCall(animationDuration, () =>
+                    {
+                        if (DraftManager.Instance != null && currentPendingCardIndex != -1)
+                        {
+                            int indexToSend = currentPendingCardIndex;
+                            DraftManager.Instance.HandleChoiceServerRpc(indexToSend, action);
+                            
+                            currentPendingCardIndex = -1;
+                            if(choicePanel != null) choicePanel.SetActive(false);
+                        }
+                    }
+                );
             }
+            Debug.Log($"DraftUI: Action {action} selected for card index {currentPendingCardIndex}.");
+  
         }
 
         private void UpdateActionButtons(HashSet<DraftAction> usedActions)

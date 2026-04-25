@@ -6,12 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="3d9e23b9-49f8-4e62-afbc-c164cc147016" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Resources/DOTweenSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Resources/DOTweenSettings.asset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -72,7 +68,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.AcpAgentsConfigurable&quot;,
     &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -153,6 +149,8 @@
       <workItem from="1774870204071" duration="2202000" />
       <workItem from="1775378136331" duration="725000" />
       <workItem from="1776601964704" duration="3735000" />
+      <workItem from="1777036069436" duration="7244000" />
+      <workItem from="1777119721771" duration="4846000" />
     </task>
     <servers />
   </component>
@@ -187,5 +185,9 @@
         </breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
