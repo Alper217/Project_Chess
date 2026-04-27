@@ -78,6 +78,32 @@ namespace AlperKocasalih.Chess.Grid
             DOTween.To(() => layoutRotation, x => layoutRotation = x, newRot, 0.4f).SetEase(Ease.OutCubic).SetId(this + "layout");
         }
 
+        /// <summary>
+        /// Call this right after spawning to play a "pop-in" entrance animation.
+        /// Starts from scale zero, overshoots, then settles at originalScale.
+        /// </summary>
+        /// <param name="delay">Optional stagger delay in seconds.</param>
+        public void PlaySpawnPop(float delay = 0f)
+        {
+            if (rectTransform == null) rectTransform = GetComponent<RectTransform>();
+
+            // Start hidden and slightly below final position
+            rectTransform.localScale = Vector3.zero;
+            Vector3 finalPos = layoutPosition;
+            rectTransform.localPosition = finalPos + new Vector3(0, -30f, 0);
+
+            Sequence popSeq = DOTween.Sequence();
+            popSeq.AppendInterval(delay);
+
+            // Slide up to position
+            popSeq.Append(rectTransform.DOLocalMove(finalPos, 0.4f).SetEase(Ease.OutCubic));
+
+            // Scale with OutBack for the springy overshoot feel
+            popSeq.Join(rectTransform.DOScale(originalScale, 0.4f).SetEase(Ease.OutBack, 2.2f));
+
+            popSeq.Play();
+        }
+
         public void SetSelected(bool selected)
         {
             isSelected = selected;

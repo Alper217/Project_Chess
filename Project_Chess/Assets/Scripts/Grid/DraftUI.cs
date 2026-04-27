@@ -16,46 +16,62 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private TextMeshProUGUI turnStatusText;
 
         [Header("Card Slots")]
-        [SerializeField] private GameObject[] cardSlots; // Should have 3
+        [SerializeField] private GameObject[] cardSlots;
         [SerializeField] private TextMeshProUGUI[] cardNameTexts;
-        [SerializeField] private Image[] cardImages; // The ONLY background image (the full design)
+        [SerializeField] private Image[] cardImages;
         [SerializeField] private Transform opponentCardSlot;
         [SerializeField] private Transform playerCardSlot;
-        private Vector3[] slotInitalPositions;
-        private Vector3[] slotInitalScales;
-        
+
+        // Cached initial transforms (set once in Start)
+        private Vector3[]     slotInitialPositions;
+        private Vector3[]     slotInitialScales;
+        private Quaternion[]  slotInitialRotations;   // ← NEW: store initial rotation
 
         [Header("Choice Buttons Parent")]
         [SerializeField] private GameObject choicePanel;
         [SerializeField] private Button keepButton;
         [SerializeField] private Button giveButton;
         [SerializeField] private Button burnButton;
-        
-        private int currentPendingCardIndex = -1;
-        private bool isBurnBlockingDraft = false;
 
+        [Header("Animation Settings")]
+        [Tooltip("Delay between each card appearing (seconds)")]
+        [SerializeField] private float cardStaggerDelay  = 0.06f;
+        [Tooltip("Card entrance slide + scale duration")]
+        [SerializeField] private float cardEnterDuration = 0.35f;
+        [Tooltip("Keep / Give / Burn action duration")]
+        [SerializeField] private float actionDuration    = 0.40f;
+        [Tooltip("Arc height when throwing a card to a slot")]
+        [SerializeField] private float arcJumpPower      = 100f;
+
+        private int  currentPendingCardIndex = -1;
+        private bool isBurnBlockingDraft     = false;
+
+        // ─────────────────────────────────────────────────────────────────────────
         #region Unity Methods
 
         private void Start()
         {
             if (DraftManager.Instance != null)
             {
-                DraftManager.Instance.OnCardsDrawn += UpdateDraftUI;
-                DraftManager.Instance.OnDraftTurnChanged += UpdateTurnStatus;
-                DraftManager.Instance.OnUsedActionsChanged += UpdateActionButtons;
-                DraftManager.Instance.OnDraftFinished += HideDraftUI;
+                DraftManager.Instance.OnCardsDrawn           += UpdateDraftUI;
+                DraftManager.Instance.OnDraftTurnChanged     += UpdateTurnStatus;
+                DraftManager.Instance.OnUsedActionsChanged   += UpdateActionButtons;
+                DraftManager.Instance.OnDraftFinished        += HideDraftUI;
                 DraftManager.Instance.OnOverflowBurnRequested += HandleOverflowBurnRequested;
             }
-            
-            slotInitalPositions = new Vector3[cardSlots.Length];
-            slotInitalScales = new Vector3[cardSlots.Length];
+
+            // Cache transforms ONCE so they are never altered by a previous animation
+            slotInitialPositions = new Vector3[cardSlots.Length];
+            slotInitialScales    = new Vector3[cardSlots.Length];
+            slotInitialRotations = new Quaternion[cardSlots.Length];
+
             for (int i = 0; i < cardSlots.Length; i++)
             {
-                slotInitalPositions[i] = cardSlots[i].transform.localPosition;
-                slotInitalScales[i] = cardSlots[i].transform.localScale;
+                slotInitialPositions[i] = cardSlots[i].transform.localPosition;
+                slotInitialScales[i]    = cardSlots[i].transform.localScale;
+                slotInitialRotations[i] = cardSlots[i].transform.localRotation;   // ← cache
             }
 
-            // Initially hide the Draft UI
             if (draftPanel != null)
             {
                 draftPanel.alpha = 0;
@@ -63,168 +79,290 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             if (choicePanel != null) choicePanel.SetActive(false);
-            
-          
         }
 
         private void OnDestroy()
         {
             if (DraftManager.Instance != null)
             {
-                DraftManager.Instance.OnCardsDrawn -= UpdateDraftUI;
-                DraftManager.Instance.OnDraftTurnChanged -= UpdateTurnStatus;
-                DraftManager.Instance.OnUsedActionsChanged -= UpdateActionButtons;
-                DraftManager.Instance.OnDraftFinished -= HideDraftUI;
+                DraftManager.Instance.OnCardsDrawn           -= UpdateDraftUI;
+                DraftManager.Instance.OnDraftTurnChanged     -= UpdateTurnStatus;
+                DraftManager.Instance.OnUsedActionsChanged   -= UpdateActionButtons;
+                DraftManager.Instance.OnDraftFinished        -= HideDraftUI;
                 DraftManager.Instance.OnOverflowBurnRequested -= HandleOverflowBurnRequested;
             }
         }
 
         #endregion
 
+        // ─────────────────────────────────────────────────────────────────────────
         #region Draft UI Logic
 
         public void ShowDraftUI()
         {
-            if (draftPanel != null)
-            {
-                draftPanel.gameObject.SetActive(true);
-                draftPanel.DOFade(1, 0.5f);
-                draftPanel.blocksRaycasts = !isBurnBlockingDraft;
-            }
+            if (draftPanel == null) return;
+            draftPanel.gameObject.SetActive(true);
+            draftPanel.DOFade(1f, 0.4f).SetEase(Ease.OutCubic);
+            draftPanel.blocksRaycasts = !isBurnBlockingDraft;
         }
 
         private void HideDraftUI()
         {
             if (TurnManager.Instance != null)
-            {
                 TurnManager.Instance.RefreshTurnInfoUI();
-            }
 
             if (draftPanel != null)
-            {
-                draftPanel.DOFade(0, 0.5f).OnComplete(() => draftPanel.gameObject.SetActive(false));
-            }
+                draftPanel.DOFade(0f, 0.4f).SetEase(Ease.InCubic)
+                          .OnComplete(() => draftPanel.gameObject.SetActive(false));
         }
 
+        // ── Called when new cards are drawn ──────────────────────────────────────
         private void UpdateDraftUI(int playerID, List<CardData> cards)
         {
             ShowDraftUI();
 
-            int localPlayerID = 1;
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
-            {
-                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-            }
+            int  localPlayerID = GetLocalPlayerID();
+            bool isMyTurn      = (localPlayerID == playerID);
 
-            bool isMyTurn = (localPlayerID == playerID);
-
-            // Disable all slots first
             foreach (var slot in cardSlots) slot.SetActive(false);
 
-            if (isMyTurn)
-            {
-                for (int i = 0; i < cards.Count; i++)
-                {
-                    if (i >= cardSlots.Length) break;
-                    
-                    GameObject cardSlot = cardSlots[i];
-                    cardSlot.SetActive(true);
+            if (!isMyTurn) { if (choicePanel != null) choicePanel.SetActive(false); return; }
 
-                    cardSlot.transform.DOKill();
-                    cardSlot.transform.localPosition = slotInitalPositions[i];
-                    cardSlot.transform. localScale = slotInitalScales[i];
-                    
-                    cardSlots[i].SetActive(true);
-                    if (cardNameTexts.Length > i) cardNameTexts[i].text = cards[i].GetBuffsText();
-                    if (cardImages.Length > i && cards[i].cardDesign != null) cardImages[i].sprite = cards[i].cardDesign;
-                    else if (cardImages.Length > i) cardImages[i].sprite = cards[i].cardSprite; // Fallback
-                    
-                    // Add simple animation
-                    cardSlots[i].transform.DOPunchScale(Vector3.one * 0.1f, 0.2f);
+            for (int i = 0; i < cards.Count; i++)
+            {
+                if (i >= cardSlots.Length) break;
+
+                GameObject slot = cardSlots[i];
+
+                slot.transform.DOKill();
+                slot.transform.localPosition = slotInitialPositions[i] + new Vector3(0f, -50f, 0f);
+                slot.transform.localScale    = Vector3.zero;
+                slot.transform.localRotation = slotInitialRotations[i];
+
+                // Reset CanvasGroup alpha (from a previous Keep/Give fade)
+                CanvasGroup slotCG = slot.GetComponent<CanvasGroup>();
+                if (slotCG != null) slotCG.alpha = 1f;
+
+                slot.SetActive(true);
+
+                if (cardNameTexts.Length > i)
+                    cardNameTexts[i].text = cards[i].GetBuffsText();
+
+                if (cardImages.Length > i)
+                {
+                    cardImages[i].sprite = cards[i].cardDesign != null
+                        ? cards[i].cardDesign
+                        : cards[i].cardSprite;
+                    cardImages[i].color = Color.white;
                 }
+
+                // ── Staggered Entrance: slide up + OutBack spring ─────────────────
+                int   ci    = i;
+                float delay = i * cardStaggerDelay;
+
+                Sequence enterSeq = DOTween.Sequence();
+                enterSeq.AppendInterval(delay);
+                enterSeq.Append(slot.transform
+                    .DOLocalMove(slotInitialPositions[ci], cardEnterDuration)
+                    .SetEase(Ease.OutCubic));
+                enterSeq.Join(slot.transform
+                    .DOScale(slotInitialScales[ci], cardEnterDuration)
+                    .SetEase(Ease.OutBack, 1.8f));
+                enterSeq.Join(slot.transform
+                    .DOLocalRotateQuaternion(slotInitialRotations[ci], cardEnterDuration)
+                    .SetEase(Ease.OutCubic));
+                enterSeq.Play();
             }
-            
+
             if (choicePanel != null) choicePanel.SetActive(false);
         }
 
         private void UpdateTurnStatus(int playerID)
         {
-            int localPlayerID = 1;
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
-            {
-                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-            }
+            int localPlayerID = GetLocalPlayerID();
 
-            if (turnStatusText != null)
+            if (turnStatusText == null) return;
+
+            if (localPlayerID == playerID)
             {
-                if (localPlayerID == playerID)
-                {
-                    turnStatusText.text = "Senin S\u0131ran - Kart Se\u00E7";
-                    turnStatusText.color = Color.green;
-                }
-                else
-                {
-                    turnStatusText.text = "Rakibin S\u0131ras\u0131...";
-                    turnStatusText.color = Color.gray;
-                }
+                turnStatusText.text  = "Senin Sıran - Kart Seç";
+                turnStatusText.color = Color.green;
+            }
+            else
+            {
+                turnStatusText.text  = "Rakibin Sırası...";
+                turnStatusText.color = Color.gray;
             }
         }
 
-        /// <summary>
-        /// Called when a card slot is clicked.
-        /// </summary>
+        // ── Card slot clicked ─────────────────────────────────────────────────────
         public void OnCardClicked(int index)
         {
             if (isBurnBlockingDraft) return;
-            Transform cardTransform = cardSlots[index].transform;
-            cardTransform.DOPunchScale(Vector3.one * 0.1f, 0.5f, 10, 1f);
-            Debug.Log($"DraftUI: Card slot {index} clicked.");
+
+            Transform t = cardSlots[index].transform;
+            t.DOKill();
+
+            // Quick click-pop feedback
+            Vector3 baseScale = slotInitialScales[index];
+            Sequence clickSeq = DOTween.Sequence();
+            clickSeq.Append(t.DOScale(baseScale * 1.12f, 0.08f).SetEase(Ease.OutQuad));
+            clickSeq.Append(t.DOScale(baseScale,         0.12f).SetEase(Ease.OutCubic));
+            clickSeq.Play();
+
             currentPendingCardIndex = index;
             if (choicePanel != null) choicePanel.SetActive(true);
-            
         }
 
-        /// <summary>
-        /// Called from Buttons (Keep, Give, Burn).
-        /// </summary>
+        // ── Action buttons ────────────────────────────────────────────────────────
         public void SelectAction(int actionInt)
         {
             if (isBurnBlockingDraft) return;
+
             DraftAction action = (DraftAction)actionInt;
-            if (currentPendingCardIndex != -1 && currentPendingCardIndex < cardSlots.Length)
+
+            if (currentPendingCardIndex < 0 || currentPendingCardIndex >= cardSlots.Length)
             {
-                GameObject selectedCard = cardSlots[currentPendingCardIndex];
-                float animationDuration = 0.5f;
-
-                switch (action)
-                {
-                    case DraftAction.Keep:
-                        selectedCard.transform.DOMove(playerCardSlot.position, animationDuration);
-                        selectedCard.transform.DOScale(Vector3.zero, animationDuration);
-                        break;
-                    case DraftAction.Give:
-                        selectedCard.transform.DOMove(opponentCardSlot.position, animationDuration);
-                        selectedCard.transform.DOScale(Vector3.zero, animationDuration);
-                        break;
-                    case DraftAction.Burn:
-                        break;
-                }
-
-                DOVirtual.DelayedCall(animationDuration, () =>
-                    {
-                        if (DraftManager.Instance != null && currentPendingCardIndex != -1)
-                        {
-                            int indexToSend = currentPendingCardIndex;
-                            DraftManager.Instance.HandleChoiceServerRpc(indexToSend, action);
-                            
-                            currentPendingCardIndex = -1;
-                            if(choicePanel != null) choicePanel.SetActive(false);
-                        }
-                    }
-                );
+                Debug.LogWarning("DraftUI: SelectAction called with invalid card index.");
+                return;
             }
-            Debug.Log($"DraftUI: Action {action} selected for card index {currentPendingCardIndex}.");
-  
+
+            int         capturedIndex = currentPendingCardIndex;
+            GameObject  selectedCard  = cardSlots[capturedIndex];
+
+            if (choicePanel != null) choicePanel.SetActive(false);
+            currentPendingCardIndex = -1;
+
+            switch (action)
+            {
+                case DraftAction.Keep:  PlayKeepAnimation(selectedCard, capturedIndex); break;
+                case DraftAction.Give:  PlayGiveAnimation(selectedCard, capturedIndex); break;
+                case DraftAction.Burn:  PlayBurnAnimation(selectedCard, capturedIndex); break;
+            }
+
+            Debug.Log($"DraftUI: Action {action} on card {capturedIndex}.");
+        }
+
+        // ─────────────────────────────────────────────────────────────────────────
+        // ── Keep: card sweeps toward player — magnetic pull + directional lean ──────
+        private void PlayKeepAnimation(GameObject card, int cardIndex)
+        {
+            Transform t = card.transform;
+            t.DOKill();
+
+            CanvasGroup cg = card.GetComponent<CanvasGroup>();
+            if (cg == null) cg = card.AddComponent<CanvasGroup>();
+            cg.alpha = 1f;
+
+            Vector3 baseScale = slotInitialScales[cardIndex];
+            float   fly       = actionDuration;
+
+            Sequence seq = DOTween.Sequence();
+
+            // 1. Brief anticipation scale pop
+            seq.Append(t.DOScale(baseScale * 1.15f, 0.08f).SetEase(Ease.OutQuad));
+
+            // 2. Magnetic pull toward player slot (InCubic = accelerates, "sucked in")
+            seq.Append(t.DOMove(playerCardSlot.position, fly).SetEase(Ease.InCubic));
+
+            // 3. Directional lean: magnitude depends on slot position.
+            //    Keep always leans POSITIVE (card tips backward, like being swept toward you).
+            //    Center card gets 0°, left/right scale with distance from center.
+            float keepLean = GetLeanMagnitude(cardIndex);
+            seq.Join(t.DOLocalRotate(new Vector3(0f, 0f, keepLean), fly * 0.55f)
+                      .SetEase(Ease.OutCubic));
+
+            // 4. Progressive shrink — card feels like it’s flying into the distance
+            seq.Join(t.DOScale(Vector3.zero, fly).SetEase(Ease.InQuad));
+
+            // 5. Alpha fade starts after 30% of the flight
+            seq.Join(cg.DOFade(0f, fly * 0.70f)
+                       .SetDelay(fly * 0.30f)
+                       .SetEase(Ease.InQuad));
+
+            seq.OnComplete(() => SendActionToServer(cardIndex, DraftAction.Keep));
+            seq.Play();
+        }
+
+        // ── Give: windup → deal to opponent with forward lean + shrink + fade ──────
+        private void PlayGiveAnimation(GameObject card, int cardIndex)
+        {
+            Transform t = card.transform;
+            t.DOKill();
+
+            CanvasGroup cg = card.GetComponent<CanvasGroup>();
+            if (cg == null) cg = card.AddComponent<CanvasGroup>();
+            cg.alpha = 1f;
+
+            float fly = actionDuration;
+
+            Sequence seq = DOTween.Sequence();
+
+            // Per-slot Give rotation — edit each value independently to test:
+            float giveLean;
+            if      (cardIndex == 0) giveLean = -18f;  // Sol  kart
+            else if (cardIndex == 1) giveLean =   0f;  // Orta kart
+            else                    giveLean = 25f;    // Sağ  kart  ← slot 2  (+25° = test edilen değer)
+
+            float giveWindup = -giveLean * 0.45f;      // Windup: giveLean'in karşı yönü, yarı kuvvet
+            seq.Append(t.DOLocalRotate(new Vector3(0f, 0f, giveWindup), 0.09f).SetEase(Ease.OutQuad));
+
+            // 2. Deal motion: InQuad = card accelerates, feels like a deliberate push
+            seq.Append(t.DOMove(opponentCardSlot.position, fly).SetEase(Ease.InQuad));
+
+            // 3. Forward lean into travel direction — slot-aware angle, no full spin
+            seq.Join(t.DOLocalRotate(new Vector3(0f, 0f, giveLean), fly * 0.65f)
+                      .SetEase(Ease.OutCubic));
+
+            // 4. Shrink starts after 20% of the throw
+            seq.Join(t.DOScale(Vector3.zero, fly * 0.80f)
+                       .SetDelay(fly * 0.20f)
+                       .SetEase(Ease.InCubic));
+
+            // 5. Fade starts after 20% of the throw
+            seq.Join(cg.DOFade(0f, fly * 0.80f)
+                       .SetDelay(fly * 0.20f)
+                       .SetEase(Ease.InQuad));
+
+            seq.OnComplete(() => SendActionToServer(cardIndex, DraftAction.Give));
+            seq.Play();
+        }
+
+        // ── Burn: shake → red → implode ──────────────────────────────────────────
+        private void PlayBurnAnimation(GameObject card, int cardIndex)
+        {
+            Transform t   = card.transform;
+            Image     img = cardIndex < cardImages.Length ? cardImages[cardIndex] : null;
+            t.DOKill();
+
+            Sequence seq = DOTween.Sequence();
+
+            // 1. Shake position + rotation
+            seq.Append(t.DOShakePosition(0.30f, new Vector3(16f, 8f, 0f), 22, 90f, false, true));
+            seq.Join(t.DOShakeRotation(0.30f,   new Vector3(0f, 0f, 10f),  18, 90f, true));
+
+            // 2. Color → dark ember
+            if (img != null)
+                seq.Join(img.DOColor(new Color(0.9f, 0.12f, 0.04f, 1f), 0.30f)
+                            .SetEase(Ease.InQuad));
+
+            // 3. Brief beat
+            seq.AppendInterval(0.04f);
+
+            // 4. Implode: scale + fade to black
+            seq.Append(t.DOScale(Vector3.zero, 0.28f).SetEase(Ease.InBack, 2.8f));
+            if (img != null)
+                seq.Join(img.DOColor(new Color(0f, 0f, 0f, 0f), 0.28f).SetEase(Ease.InQuad));
+
+            seq.OnComplete(() => SendActionToServer(cardIndex, DraftAction.Burn));
+            seq.Play();
+        }
+
+        // ── Dispatch to server ────────────────────────────────────────────────────
+        private void SendActionToServer(int cardIndex, DraftAction action)
+        {
+            if (DraftManager.Instance != null)
+                DraftManager.Instance.HandleChoiceServerRpc(cardIndex, action);
         }
 
         private void UpdateActionButtons(HashSet<DraftAction> usedActions)
@@ -236,48 +374,38 @@ namespace AlperKocasalih.Chess.Grid
 
         #endregion
 
+        // ─────────────────────────────────────────────────────────────────────────
+        #region Overflow Burn
+
         private void HandleOverflowBurnRequested(int playerID, int burnCount)
         {
-            int localPlayerID = 1;
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
-            {
-                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-            }
-
-            if (playerID != localPlayerID) return;
+            if (playerID != GetLocalPlayerID()) return;
 
             isBurnBlockingDraft = burnCount > 0;
 
             if (draftPanel != null)
             {
                 draftPanel.blocksRaycasts = !isBurnBlockingDraft;
-                draftPanel.alpha = isBurnBlockingDraft ? 0.2f : 1f;
+                draftPanel.alpha          = isBurnBlockingDraft ? 0.2f : 1f;
             }
 
             if (choicePanel != null) choicePanel.SetActive(false);
 
             if (turnStatusText != null && isBurnBlockingDraft)
             {
-                turnStatusText.text = $"Kart yak: {burnCount}";
+                turnStatusText.text  = $"Kart yak: {burnCount}";
                 turnStatusText.color = Color.red;
             }
 
             if (!isBurnBlockingDraft)
-            {
                 RefreshDraftUIAfterBurn();
-            }
         }
 
         private void RefreshDraftUIAfterBurn()
         {
-            if (DraftManager.Instance == null) return;
-            if (!DraftManager.Instance.IsDraftingActive) return;
+            if (DraftManager.Instance == null || !DraftManager.Instance.IsDraftingActive) return;
 
-            int localPlayerID = 1;
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
-            {
-                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-            }
+            int localPlayerID = GetLocalPlayerID();
 
             if (DraftManager.Instance.DraftingPlayerID == localPlayerID)
             {
@@ -285,5 +413,48 @@ namespace AlperKocasalih.Chess.Grid
                 UpdateDraftUI(DraftManager.Instance.DraftingPlayerID, choices);
             }
         }
+
+        #endregion
+
+        // ─────────────────────────────────────────────────────────────────────────
+        #region Helpers
+
+        private int GetLocalPlayerID()
+        {
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+                return NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            return 1;
+        }
+
+        /// <summary>
+        /// Returns the lean angle MAGNITUDE for a card slot.
+        /// Left slot  (0) → 18° | Center slot (1) → 0° | Right slot (2) → 25°
+        /// Keep uses +magnitude, Give uses -magnitude.
+        /// For N slots: left half scales to 18°, right half scales to 25°.
+        /// </summary>
+        private float GetLeanMagnitude(int slotIndex)
+        {
+            if (cardSlots.Length < 2) return 0f;
+
+            float center = (cardSlots.Length - 1) / 2f;
+            float offset = slotIndex - center;  // negative = left, 0 = center, positive = right
+
+            if (offset < 0f)
+            {
+                // Left side: t=1 at leftmost → 18°
+                float t = -offset / center;
+                return t * 18f;
+            }
+            else if (offset > 0f)
+            {
+                // Right side: t=1 at rightmost → 25°
+                float t = offset / center;
+                return t * 25f;  // magnitude always positive; callers apply the sign
+            }
+
+            return 0f; // center
+        }
+
+        #endregion
     }
 }

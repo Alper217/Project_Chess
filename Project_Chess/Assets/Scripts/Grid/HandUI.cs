@@ -229,6 +229,9 @@ namespace AlperKocasalih.Chess.Grid
             int count = hand.Count;
             float startAngle = -(count - 1) * angleStep / 2f;
 
+            // Reset parent position before spawning so pop positions are correct
+            handParent.localPosition = new Vector3(0, isHandVisible ? (isHandExpanded ? yOffsetExpanded : yOffsetNormal) : yOffsetHidden, 0);
+
             for (int i = 0; i < count; i++)
             {
                 GameObject cardObj = Instantiate(handCardPrefab, handParent);
@@ -253,19 +256,18 @@ namespace AlperKocasalih.Chess.Grid
                 Vector3 pos = new Vector3(x, y, 0);
                 Vector3 rot = new Vector3(0, 0, -angle);
                 
-                cardObj.transform.localPosition = pos;
-                cardObj.transform.localRotation = Quaternion.Euler(rot);
-                
+                // SetOriginalState first so PlaySpawnPop knows the target position
                 handCard.SetOriginalState(pos, rot, i);
+
+                // ── Staggered Pop-in Entrance (OutBack spring feel) ───────────────
+                handCard.PlaySpawnPop(i * 0.07f);
+
                 spawnedCards.Add(handCard);
             }
 
             // Re-apply current state if we are already hovered
             if (isHandExpanded) SetHandExpanded(true);
             else SetHandExpanded(false);
-
-            // Reset parent position properly
-            handParent.localPosition = new Vector3(0, isHandVisible ? (isHandExpanded ? yOffsetExpanded : yOffsetNormal) : yOffsetHidden, 0);
         }
 
         #endregion
