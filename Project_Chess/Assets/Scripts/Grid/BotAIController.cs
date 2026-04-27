@@ -654,6 +654,11 @@ namespace AlperKocasalih.Chess.Grid
             if (attacker == null || attackPattern == null || attacker.OccupiedCell == null)
                 return (null, float.NegativeInfinity);
 
+            // Check if attack is on cooldown
+            AttackHandler attackHandler = attacker.GetComponent<AttackHandler>();
+            if (attackHandler != null && !attackHandler.CanAttack())
+                return (null, float.NegativeInfinity);
+
             Vector2Int origin = attacker.OccupiedCell.Coordinates;
             bool isP2 = attacker.PlayerID == 2;
             List<Vector2Int> offsets = attackPattern.GetValidOffsets(origin, isP2);
@@ -669,8 +674,9 @@ namespace AlperKocasalih.Chess.Grid
                 Pawn occupant = FindPawnOnCell(cell);
                 if (occupant == null || occupant.PlayerID == attacker.PlayerID) continue;
 
-                // Prefer low-health targets (easier to eliminate)
-                float score = -occupant.currentHealth.Value;
+                // Prefer low-health targets (easier to eliminate).
+                // Base attack score is 1000 so it ALWAYS strictly overrides moving (which gives scores like 1 or 2).
+                float score = 1000f - occupant.currentHealth.Value;
                 if (score > bestScore)
                 {
                     bestScore = score;
