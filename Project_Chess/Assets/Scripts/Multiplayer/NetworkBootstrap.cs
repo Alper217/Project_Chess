@@ -17,6 +17,7 @@ namespace AlperKocasalih.Chess.Multiplayer
         [SerializeField] private GameObject bootstrapUI;
         [SerializeField] private Button hostButton;
         [SerializeField] private Button clientButton;
+        [SerializeField] private Button playVsBotButton;        // ← Yeni: Bot Modu butonu
         [SerializeField] private TMP_InputField codeInputField; // Artık IP değil, Relay Kodu girişi
         [SerializeField] private TextMeshProUGUI relayCodeText; // Host olduğumuzda kodu göstereceğimiz text
         [SerializeField] private string gameSceneName = "GameScene";
@@ -135,6 +136,43 @@ namespace AlperKocasalih.Chess.Multiplayer
             catch (RelayServiceException e)
             {
                 Debug.LogError($"Relay Client Error: {e.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Bot modunu başlatır: Relay gerektirmez, local host olarak oyunu yükler.
+        /// GameScene yüklendiğinde BotSpawner, BotSession.IsActive'i kontrol ederek
+        /// BotAIController'ı otomatik spawn eder.
+        /// </summary>
+        public void StartVsBot()
+        {
+            if (NetworkManager.Singleton == null)
+            {
+                Debug.LogError("NetworkManager.Singleton is null!");
+                return;
+            }
+
+            if (NetworkManager.Singleton.IsListening)
+                NetworkManager.Singleton.Shutdown();
+
+            // UnityTransport, Relay kurulmadığında default olarak 127.0.0.1:7777 kullanır.
+            // SetConnectionData() çağrısı Unity.Networking.Transport assembly'si gerektirdiği için kullanılmıyor.
+
+            // Bot modunu PlayerPrefs ile işaretle (namespace/assembly bağımlılığı yok)
+            PlayerPrefs.SetInt("BotMode", 1);
+            PlayerPrefs.Save();
+            JoinCode = "BOT";
+
+            if (NetworkManager.Singleton.StartHost())
+            {
+                Debug.Log("[VsBot] Host başlatıldı (local). Sahne yükleniyor...");
+                NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
+            }
+            else
+            {
+                Debug.LogError("[VsBot] Host başlatılamadı!");
+                PlayerPrefs.DeleteKey("BotMode");
+                PlayerPrefs.Save();
             }
         }
 

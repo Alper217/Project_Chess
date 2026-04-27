@@ -461,6 +461,77 @@ namespace AlperKocasalih.Chess.Grid
             return GetPlacementCap();
         }
 
+        // ─────────────────── Bot AI Support ───────────────────
+
+        /// <summary>
+        /// Returns a read-only list of PawnData derived from all pawn prefabs.
+        /// Used by BotAIController to evaluate power scores.
+        /// </summary>
+        public List<PawnData> GetAllPawnDatas()
+        {
+            List<PawnData> result = new List<PawnData>();
+            if (pawnPrefabs == null) return result;
+            foreach (var prefab in pawnPrefabs)
+            {
+                if (prefab == null) { result.Add(null); continue; }
+                Pawn p = prefab.GetComponent<Pawn>();
+                result.Add(p != null ? p.PawnData : null);
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the PawnData for a prefab at the given index.
+        /// </summary>
+        public PawnData GetPawnDataByIndex(int index)
+        {
+            if (pawnPrefabs == null || index < 0 || index >= pawnPrefabs.Length) return null;
+            GameObject prefab = pawnPrefabs[index];
+            if (prefab == null) return null;
+            Pawn p = prefab.GetComponent<Pawn>();
+            return p != null ? p.PawnData : null;
+        }
+
+        /// <summary>
+        /// Server-only: Directly spawns a pawn for a bot player without requiring mouse input.
+        /// Skips the duplication and region checks that apply to human players;
+        /// those are already validated in BotAIController.BotSetupRoutine.
+        /// </summary>
+        public void SpawnBotPawn(HexCell cell, int pawnIndex, int playerID)
+        {
+            if (!IsServer) return;
+            if (cell == null || cell.IsOccupied) return;
+            if (pawnPrefabs == null || pawnIndex < 0 || pawnIndex >= pawnPrefabs.Length) return;
+
+            GameObject prefab = pawnPrefabs[pawnIndex];
+            if (prefab == null) return;
+
+            bool isP1Region = playerID == 1;
+            Quaternion spawnRot = isP1Region ? Quaternion.Euler(0, 180, 0) : Quaternion.identity;
+            Vector3 targetPos   = cell.transform.position + pawnVisualOffset;
+            Vector3 spawnPos    = targetPos + Vector3.up * dropHeight;
+
+            GameObject pawnObj = Instantiate(prefab, spawnPos, spawnRot);
+            Pawn pawn = pawnObj.GetComponent<Pawn>();
+            if (pawn == null) { Destroy(pawnObj); return; }
+
+            pawn.Initialize(cell);
+
+            if (playerID == 1) p1SpawnedTypes.Add(pawnIndex);
+            else               p2SpawnedTypes.Add(pawnIndex);
+
+            NetworkObject netObj = pawnObj.GetComponent<NetworkObject>();
+            if (netObj != null && NetworkManager.Singleton.IsServer)
+                netObj.Spawn(true);
+
+            pawn.SetNetworkData(playerID, pawnIndex, cell.Coordinates);
+            StartCoroutine(AnimatePawnDrop(pawnObj, targetPos));
+            RefreshAuraServerIfAvailable();
+            SynergyManager.instance.EvaluateSynergiesOnServer(playerID);
+
+            Debug.Log($"[BotAI] SpawnBotPawn: Player {playerID} spawned pawn index {pawnIndex} at {cell.Coordinates}.");
+        }
+
         private void NotifyLocalPlacementChanged()
         {
             OnLocalPlacementChanged?.Invoke();

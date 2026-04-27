@@ -185,6 +185,18 @@ namespace AlperKocasalih.Chess.Grid
             EndGameClientRpc(winnerID);
         }
 
+        /// <summary>
+        /// Called when a pawn is eliminated and we need to check if that player is wiped out.
+        /// Sets WinCondition to AllEnemyPawnsEliminated before ending.
+        /// </summary>
+        public void EndGameByElimination(int winnerID)
+        {
+            if (!IsServer) return;
+            if (BotMatchReporter.Instance != null)
+                BotMatchReporter.Instance.SetWinCondition(WinConditionType.AllEnemyPawnsEliminated);
+            EndGame(winnerID);
+        }
+
         public void AddScore(int playerID, int points)
         {
             if (!IsServer) return;
@@ -197,17 +209,24 @@ namespace AlperKocasalih.Chess.Grid
         public void CheckWinConditionPoints()
         {
             if (!IsServer) return;
-            
+
+            WinConditionType condType;
             if (player1Score.Value > player2Score.Value)
             {
+                condType = WinConditionType.PointAdvantage;
+                if (BotMatchReporter.Instance != null) BotMatchReporter.Instance.SetWinCondition(condType);
                 EndGame(1);
             }
             else if (player2Score.Value > player1Score.Value)
             {
+                condType = WinConditionType.PointAdvantage;
+                if (BotMatchReporter.Instance != null) BotMatchReporter.Instance.SetWinCondition(condType);
                 EndGame(2);
             }
             else
             {
+                condType = WinConditionType.Draw;
+                if (BotMatchReporter.Instance != null) BotMatchReporter.Instance.SetWinCondition(condType);
                 // Tie (0 means equality/draw)
                 EndGame(0);
             }
@@ -231,6 +250,9 @@ namespace AlperKocasalih.Chess.Grid
             if (!hasPawnsLeft)
             {
                 int winnerID = loserID == 1 ? 2 : 1;
+                // Set win condition before ending
+                if (BotMatchReporter.Instance != null)
+                    BotMatchReporter.Instance.SetWinCondition(WinConditionType.AllEnemyPawnsEliminated);
                 EndGame(winnerID);
             }
         }
