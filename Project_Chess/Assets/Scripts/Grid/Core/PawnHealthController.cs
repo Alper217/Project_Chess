@@ -3,6 +3,7 @@ using AlperKocasalih.Chess.Grid;
 using AlperKocasalih.Chess.Grid.Utils;
 using Unity.Netcode;
 using UnityEngine;
+using MoreMountains.Feedbacks;
 
 public class PawnHealthController : NetworkBehaviour, IHoverable
 {
@@ -12,10 +13,12 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     [SerializeField] private Color attackHighlightColor = Color.blue;
     private readonly List<HexCell> highlightedCells = new List<HexCell>();
     private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
+    public MMF_Player targetPlayer;
 
     private void Awake()
     {
         _pawn = GetComponent<Pawn>();
+        
     }
 
     public override void OnNetworkSpawn()
@@ -139,7 +142,11 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         if (!IsServer) return;
 
         _pawn.currentHealth.Value -= damageAmount;
-
+        
+        MMF_FloatingText floatingTextFeedback = targetPlayer.GetFeedbackOfType<MMF_FloatingText>();
+        floatingTextFeedback.Value = damageAmount.ToString();
+        targetPlayer.PlayFeedbacks(this.transform.position);
+        
         if (_pawn.currentHealth.Value <= 0)
         {
             Die();
