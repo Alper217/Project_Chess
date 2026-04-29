@@ -143,9 +143,8 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
 
         _pawn.currentHealth.Value -= damageAmount;
         
-        MMF_FloatingText floatingTextFeedback = targetPlayer.GetFeedbackOfType<MMF_FloatingText>();
-        floatingTextFeedback.Value = damageAmount.ToString();
-        targetPlayer.PlayFeedbacks(this.transform.position);
+        // Trigger damage feedback on all clients
+        ShowDamageFeedbackClientRpc(damageAmount, false);
         
         if (_pawn.currentHealth.Value <= 0)
         {
@@ -164,7 +163,33 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             _pawn.currentHealth.Value = _pawn.maxHealth.Value;
         }
 
+        // Trigger healing feedback on all clients
+        ShowDamageFeedbackClientRpc(amount, true);
+
         Debug.Log($"{_pawn.PawnData.pawnName} healed. New health: {_pawn.currentHealth.Value}");
+    }
+
+    [ClientRpc]
+    private void ShowDamageFeedbackClientRpc(int amount, bool isHeal)
+    {
+        if (targetPlayer == null) return;
+
+        MMF_FloatingText floatingTextFeedback = targetPlayer.GetFeedbackOfType<MMF_FloatingText>();
+        if (floatingTextFeedback != null)
+        {
+            // Simplified: Just set the color. Outline should be handled in the TMP Material settings.
+            string color = isHeal ? "#00FF00" : "#FF0000"; 
+            string prefix = isHeal ? "+" : "-";
+            
+            floatingTextFeedback.Value = $"<color={color}>{prefix}{amount}</color>";
+        }
+
+        // Professional Movement: A slight arc movement instead of straight up
+        // Randomized X offset for a "burst" feel
+        float randomX = Random.Range(-0.4f, 0.4f);
+        Vector3 spawnPos = this.transform.position + new Vector3(randomX, 1.5f, Random.Range(-0.2f, 0.2f));
+        
+        targetPlayer.PlayFeedbacks(spawnPos);
     }
 
     private void ShowAttackRange()
