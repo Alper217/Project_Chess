@@ -455,6 +455,29 @@ namespace AlperKocasalih.Chess.Grid
             return false;
         }
 
+        public bool HasDoubleUseBuff()
+        {
+            foreach (var buff in activeBuffs)
+            {
+                if (buff.buffData.effectType == EffectType.DoubleUse) return true;
+            }
+            return false;
+        }
+
+        public void ConsumeDoubleUseBuff()
+        {
+            if (!IsServer) return;
+            for (int i = 0; i < activeBuffs.Count; i++)
+            {
+                if (activeBuffs[i].buffData.effectType == EffectType.DoubleUse)
+                {
+                    activeBuffs.RemoveAt(i);
+                    RefreshActiveBuffSummaries();
+                    return;
+                }
+            }
+        }
+
         public bool HasStun()
         {
             foreach (var buff in activeBuffs)

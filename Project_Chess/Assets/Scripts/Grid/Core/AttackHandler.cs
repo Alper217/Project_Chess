@@ -39,7 +39,7 @@ public class AttackHandler : NetworkBehaviour
         }
     }
     
-    public bool CanAttack() => currentCooldown.Value <= 0 && !pawn.HasStun();
+    public bool CanAttack() => (currentCooldown.Value <= 0 || pawn.HasDoubleUseBuff()) && !pawn.HasStun();
 
     public void ExecuteAttack(Vector2Int targetPos, Dictionary<Vector2Int, HexCell> gridLookup)
     {
@@ -54,7 +54,12 @@ public class AttackHandler : NetworkBehaviour
            ApplySingleDamage(targetPos, gridLookup, pawn.damage.Value);
         }
 
-        currentCooldown.Value = pawn.PawnData.attackCooldown;
+        bool usedDoubleUse = currentCooldown.Value > 0 && pawn.HasDoubleUseBuff();
+        if (usedDoubleUse) {
+            pawn.ConsumeDoubleUseBuff();
+        } else {
+            currentCooldown.Value = pawn.PawnData.attackCooldown;
+        }
     }
 
     private void ApplySingleDamage(Vector2Int targetPos, Dictionary<Vector2Int, HexCell> gridLookup, int damageAmount)
