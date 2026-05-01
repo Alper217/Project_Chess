@@ -87,9 +87,19 @@ namespace AlperKocasalih.Chess.Grid
             ApplyPlayerVisuals(netPlayerID.Value);
             if (TurnManager.Instance != null && IsServer)
             {
+                TurnManager.Instance.OnTurnChanged -= OnTurnChanged;
                 TurnManager.Instance.OnTurnChanged += OnTurnChanged;
             }
             UpdateDebugStats();
+        }
+
+        private void Start()
+        {
+            if (IsServer && TurnManager.Instance != null)
+            {
+                TurnManager.Instance.OnTurnChanged -= OnTurnChanged;
+                TurnManager.Instance.OnTurnChanged += OnTurnChanged;
+            }
         }
 
         public override void OnNetworkDespawn()
@@ -237,14 +247,20 @@ namespace AlperKocasalih.Chess.Grid
             {
                 Debug.Log($"Pawn: ResetSynergyServer pre max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
             }
-            hasSynergy.Value = false;
-            maxHealth.Value = pawnData.maxHealth;
-            damage.Value = pawnData.damage;
-
-            if (currentHealth.Value > maxHealth.Value)
+            
+            // If this pawn had an aura health bonus applied, subtract it before resetting
+            // This preserves combat damage (currentHealth) while removing aura bonuses from max
+            if (hasSynergy.Value)
             {
-                currentHealth.Value = maxHealth.Value;
+                int auraBonusMax = maxHealth.Value - pawnData.maxHealth;
+                maxHealth.Value = pawnData.maxHealth;
+                // Only clamp currentHealth to new max, do NOT add back — preserves combat damage
+                if (currentHealth.Value > maxHealth.Value)
+                    currentHealth.Value = maxHealth.Value;
             }
+            
+            damage.Value = pawnData.damage;
+            hasSynergy.Value = false;
             // activeBuffs.Clear(); // REMOVED: Do not clear timed/card buffs during aura refresh!
             RefreshActiveBuffSummaries();
             if (debugBuffs)
@@ -264,7 +280,9 @@ namespace AlperKocasalih.Chess.Grid
             
             maxHealth.Value += bonusHealth;
             damage.Value += bonusDamage;
-            currentHealth.Value += bonusHealth;
+            // NOTE: We intentionally do NOT touch currentHealth here.
+            // Aura bonuses increase the max capacity but do not heal combat damage.
+            // This prevents HP appearing to "restore" after the player deals damage.
             if (debugBuffs)
             {
                 Debug.Log($"Pawn: ApplyBuffsServer post max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");

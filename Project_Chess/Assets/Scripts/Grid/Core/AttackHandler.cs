@@ -18,21 +18,35 @@ public class AttackHandler : NetworkBehaviour
         pawn = GetComponent<Pawn>();
     }
 
-    protected override void OnNetworkPostSpawn()
+    public override void OnNetworkSpawn()
     {
-        if (TurnManager.Instance != null)
+        if (TurnManager.Instance != null && IsServer)
         {
+            TurnManager.Instance.OnTurnChanged -= HandleTurnChanged; // Safe unsubscribe
+            TurnManager.Instance.OnTurnChanged += HandleTurnChanged;
+        }
+    }
+
+    private void Start()
+    {
+        if (IsServer && TurnManager.Instance != null)
+        {
+            TurnManager.Instance.OnTurnChanged -= HandleTurnChanged; // Safe unsubscribe
             TurnManager.Instance.OnTurnChanged += HandleTurnChanged;
         }
     }
 
     public override void OnNetworkDespawn()
     {
-        TurnManager.Instance.OnTurnChanged -= HandleTurnChanged;
+        if (TurnManager.Instance != null && IsServer)
+        {
+            TurnManager.Instance.OnTurnChanged -= HandleTurnChanged;
+        }
     }
 
     private void HandleTurnChanged(int activePlayerID)
     {
+        if (!IsServer) return;
         if (activePlayerID == pawn.PlayerID && currentCooldown.Value > 0)
         {
             currentCooldown.Value--;
@@ -71,13 +85,18 @@ public class AttackHandler : NetworkBehaviour
             {
                 if (targetPawn.ConsumeDamageBlock())
                 {
-                    Debug.Log("Damage Blocked by Shield/Echo!");
+                    var hc = targetPawn.GetComponent<PawnHealthController>();
+                    if (hc != null) hc.ShowBlockedFeedbackClientRpc();
                     return;
                 }
 
                 float outMultiplier = pawn.GetOutgoingDamageMultiplier();
                 float inMultiplier = targetPawn.GetIncomingDamageMultiplier();
                 int finalDamage = Mathf.RoundToInt(damageAmount * outMultiplier * inMultiplier);
+
+                Debug.Log($"[COMBAT] Attacker: {pawn.PawnData.pawnName} (Mult: {outMultiplier}) -> " +
+                          $"Target: {targetPawn.PawnData.pawnName} (Mult: {inMultiplier}) | " +
+                          $"Base: {damageAmount}, Final: {finalDamage}");
 
                 var healthController = targetPawn.GetComponent<PawnHealthController>();
                 if (healthController != null)
