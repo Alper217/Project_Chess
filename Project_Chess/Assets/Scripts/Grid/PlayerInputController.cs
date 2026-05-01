@@ -373,6 +373,11 @@ namespace AlperKocasalih.Chess.Grid
                                 highlightedPawns.Add(pObj);
                             }
                         }
+
+                        if (HandUI.Instance != null)
+                        {
+                            HandUI.Instance.SetHandVisibility(true);
+                        }
                     }
                 }
                 else

@@ -83,6 +83,24 @@ public class AttackHandler : NetworkBehaviour
                 if (healthController != null)
                 {
                     healthController.TakeDamageServer(finalDamage);
+
+                    // --- NEW: LIFESTEAL ---
+                    float lifestealPct = pawn.GetLifestealPercentage();
+                    if (lifestealPct > 0)
+                    {
+                        int healAmount = Mathf.RoundToInt(finalDamage * lifestealPct);
+                        var selfHealth = pawn.GetComponent<PawnHealthController>();
+                        if (selfHealth != null) selfHealth.HealServer(healAmount);
+                    }
+
+                    // --- NEW: RECOIL ---
+                    float recoilPct = pawn.GetRecoilPercentage();
+                    if (recoilPct > 0)
+                    {
+                        int recoilDamage = Mathf.RoundToInt(finalDamage * recoilPct);
+                        var selfHealth = pawn.GetComponent<PawnHealthController>();
+                        if (selfHealth != null) selfHealth.TakeDamageServer(recoilDamage);
+                    }
                 }
             }
 

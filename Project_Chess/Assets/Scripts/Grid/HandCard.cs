@@ -142,8 +142,14 @@ namespace AlperKocasalih.Chess.Grid
             CanvasGroup cg = GetComponent<CanvasGroup>();
             if (cg == null) cg = gameObject.AddComponent<CanvasGroup>();
             
-            cg.alpha = interactive ? 1f : 0.4f;
+            cg.alpha = interactive ? 1f : 0.8f;
             cg.blocksRaycasts = interactive;
+
+            if (cardImage != null)
+            {
+                // Darken the card if it's not the active multi-action card
+                cardImage.color = interactive ? Color.white : new Color(0.25f, 0.25f, 0.25f, 1f);
+            }
         }
 
         #endregion

@@ -18,5 +18,5 @@ MonoBehaviour:
   amount: 2
   isPercentage: 0
   durationTurns: 0
-  neutralizationTag: 
+  neutralizationTag: God
   isPositiveEffect: 1

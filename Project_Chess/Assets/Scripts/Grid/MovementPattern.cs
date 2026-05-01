@@ -8,15 +8,9 @@ namespace AlperKocasalih.Chess.Grid
     public class MovementPattern : ScriptableObject
     {
         public string patternName;
-        // 7x7 grid representation (flat array for Unity serialization)
-        // True means the target hex is a valid move
         [HideInInspector]
         public bool[] gridData = new bool[49]; // 7x7
 
-        /// <summary>
-        /// Gets the boolean value at grid coordinates where center is (3,3).
-        /// Returns relative offsets if the cell is true.
-        /// </summary>
         private List<Vector2Int> GetPatternOffsets()
         {
             List<Vector2Int> activeOffsets = new List<Vector2Int>();
@@ -30,10 +24,8 @@ namespace AlperKocasalih.Chess.Grid
                     int index = y * 7 + x;
                     if (gridData[index])
                     {
-                        // Calculate offset from center (3,3)
                         int dq = x - centerIdxX;
-                        int dr = -(y - centerIdxY); // Invert Y because array 0,0 is top-left
-
+                        int dr = -(y - centerIdxY); 
                         activeOffsets.Add(new Vector2Int(dq, dr));
                     }
                 }
@@ -41,10 +33,6 @@ namespace AlperKocasalih.Chess.Grid
             return activeOffsets;
         }
 
-        /// <summary>
-        /// Converts the pattern into movement offsets in world coordinates,
-        /// using the pawn as the center and accounting for odd-q layout, rotation, and range modifiers.
-        /// </summary>
         public List<Vector2Int> GetValidOffsets(Vector2Int centerWorldCoords, bool rotate180, int rangeModifier = 0)
         {
             List<Vector2Int> localOffsets = GetPatternOffsets();
@@ -74,51 +62,50 @@ namespace AlperKocasalih.Chess.Grid
 
         private List<Vector2Int> ApplyRangeModifier(List<Vector2Int> localOffsets, int rangeModifier)
         {
+            if (rangeModifier == 0 || localOffsets.Count == 0) return localOffsets;
+
             List<Vector2Int> modifiedOffsets = new List<Vector2Int>(localOffsets);
             Vector3Int localCenterCube = HexGridMath.OffsetToCube(new Vector2Int(3, 3));
 
-            Dictionary<Vector3, int> maxDistPerDir = new Dictionary<Vector3, int>();
-            Dictionary<Vector3, Vector3Int> tipDiffPerDir = new Dictionary<Vector3, Vector3Int>();
+            // Store max distance per exact direction string to avoid floating point key issues
+            Dictionary<string, int> maxDistPerDir = new Dictionary<string, int>();
+            Dictionary<string, Vector3> dirVectors = new Dictionary<string, Vector3>();
 
-            // Convert to cube diffs and find tips
-            List<Vector3Int> allDiffs = new List<Vector3Int>();
             foreach (var loc in localOffsets)
             {
                 Vector2Int absLoc = new Vector2Int(3 + loc.x, 3 + loc.y);
-                Vector3Int diff = HexGridMath.OffsetToCube(absLoc) - localCenterCube;
-                allDiffs.Add(diff);
+                Vector3Int cubePos = HexGridMath.OffsetToCube(absLoc);
+                Vector3Int diff = cubePos - localCenterCube;
 
                 if (diff == Vector3Int.zero) continue;
 
                 int dist = Mathf.Max(Mathf.Abs(diff.x), Mathf.Abs(diff.y), Mathf.Abs(diff.z));
                 Vector3 dir = new Vector3((float)diff.x / dist, (float)diff.y / dist, (float)diff.z / dist);
                 
-                // Discretize to avoid float issues
-                dir = new Vector3(Mathf.Round(dir.x * 100f) / 100f, Mathf.Round(dir.y * 100f) / 100f, Mathf.Round(dir.z * 100f) / 100f);
+                // Use a string key for the direction to ensure points in the same line are grouped
+                string dirKey = dir.ToString("F2"); 
 
-                if (!maxDistPerDir.ContainsKey(dir) || dist > maxDistPerDir[dir])
+                if (!maxDistPerDir.ContainsKey(dirKey) || dist > maxDistPerDir[dirKey])
                 {
-                    maxDistPerDir[dir] = dist;
-                    tipDiffPerDir[dir] = diff;
+                    maxDistPerDir[dirKey] = dist;
+                    dirVectors[dirKey] = dir;
                 }
             }
 
             if (rangeModifier > 0)
             {
-                // Expand
-                foreach (var kvp in tipDiffPerDir)
+                foreach (var kvp in maxDistPerDir)
                 {
-                    Vector3 dir = kvp.Key;
-                    int currentMaxDist = maxDistPerDir[dir];
+                    string key = kvp.Key;
+                    Vector3 dir = dirVectors[key];
+                    int currentMaxDist = kvp.Value;
 
                     for (int i = 1; i <= rangeModifier; i++)
                     {
                         int newDist = currentMaxDist + i;
-                        Vector3Int newDiff = new Vector3Int(
-                            Mathf.RoundToInt(dir.x * newDist),
-                            Mathf.RoundToInt(dir.y * newDist),
-                            Mathf.RoundToInt(dir.z * newDist)
-                        );
+                        // For hex grid, we must round to nearest cube coordinate carefully
+                        Vector3 fracPos = new Vector3(dir.x * newDist, dir.y * newDist, dir.z * newDist);
+                        Vector3Int newDiff = HexGridMath.CubeRound(fracPos);
                         
                         Vector3Int newLocalCube = localCenterCube + newDiff;
                         Vector2Int newAbsLoc = HexGridMath.CubeToOffset(newLocalCube);
@@ -133,14 +120,14 @@ namespace AlperKocasalih.Chess.Grid
             }
             else if (rangeModifier < 0)
             {
-                // Shrink: Remove points that are at distance > maxDist - |rangeModifier|
                 int shrinkAmount = -rangeModifier;
                 modifiedOffsets.Clear();
 
                 foreach (var loc in localOffsets)
                 {
                     Vector2Int absLoc = new Vector2Int(3 + loc.x, 3 + loc.y);
-                    Vector3Int diff = HexGridMath.OffsetToCube(absLoc) - localCenterCube;
+                    Vector3Int cubePos = HexGridMath.OffsetToCube(absLoc);
+                    Vector3Int diff = cubePos - localCenterCube;
                     
                     if (diff == Vector3Int.zero) 
                     {
@@ -150,10 +137,10 @@ namespace AlperKocasalih.Chess.Grid
 
                     int dist = Mathf.Max(Mathf.Abs(diff.x), Mathf.Abs(diff.y), Mathf.Abs(diff.z));
                     Vector3 dir = new Vector3((float)diff.x / dist, (float)diff.y / dist, (float)diff.z / dist);
-                    dir = new Vector3(Mathf.Round(dir.x * 100f) / 100f, Mathf.Round(dir.y * 100f) / 100f, Mathf.Round(dir.z * 100f) / 100f);
+                    string dirKey = dir.ToString("F2");
 
-                    int maxDistForThisDir = maxDistPerDir.ContainsKey(dir) ? maxDistPerDir[dir] : dist;
-                    if (dist <= maxDistForThisDir - shrinkAmount || dist == 0)
+                    int maxDistForThisDir = maxDistPerDir.ContainsKey(dirKey) ? maxDistPerDir[dirKey] : dist;
+                    if (dist <= maxDistForThisDir - shrinkAmount)
                     {
                         modifiedOffsets.Add(loc);
                     }

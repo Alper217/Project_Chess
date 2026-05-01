@@ -1,12 +1,13 @@
 using UnityEngine;
 using Unity.Netcode;
+using System;
 using System.Collections.Generic;
 using AlperKocasalih.Chess.Grid;
 
 namespace AlperKocasalih.Chess.Grid.Utils
 {
     /// <summary>
-    /// A simple on-screen debug tool to test the Buff/Debuff system.
+    /// A powerful on-screen debug tool to test ALL 14+ Buff/Debuff types.
     /// Toggle with the 'F1' key.
     /// </summary>
     public class BuffDebugger : NetworkBehaviour
@@ -17,11 +18,11 @@ namespace AlperKocasalih.Chess.Grid.Utils
         [SerializeField] private bool showUI = false;
         [SerializeField] private KeyCode toggleKey = KeyCode.F1;
 
-        [Header("Test Buffs (Assign in Inspector or use Defaults)")]
-        public BuffData healthBuff;
-        public BuffData damageDebuff;
-        public BuffData stunDebuff;
-        public BuffData permanentAuraBuff;
+        private Vector2 scrollPos;
+        private Pawn selectedPawn;
+        private float testAmount = 5f;
+        private int testDuration = 2;
+        private bool testIsPercentage = false;
 
         private void Awake()
         {
@@ -31,105 +32,131 @@ namespace AlperKocasalih.Chess.Grid.Utils
 
         private void Update()
         {
-            if (Input.GetKeyDown(toggleKey))
-            {
-                showUI = !showUI;
-            }
+            if (Input.GetKeyDown(toggleKey)) showUI = !showUI;
         }
 
         private void OnGUI()
         {
             if (!showUI) return;
 
-            GUI.Box(new Rect(10, 10, 300, 450), "Buff/Debuff Test System (Server Only)");
+            GUI.Box(new Rect(10, 10, 450, 600), "BUFF/DEBUFF MASTER TESTER (F1)");
 
             if (!IsServer)
             {
-                GUI.Label(new Rect(20, 40, 260, 40), "ERROR: You must be the HOST/SERVER to apply buffs via this tool.");
+                GUI.Label(new Rect(20, 40, 400, 30), "<color=red>HATA: Sadece HOST/SERVER üzerinden buff basılabilir.</color>");
                 return;
             }
 
-            int activePID = TurnManager.Instance != null ? TurnManager.Instance.ActivePlayerID : 1;
-            GUI.Label(new Rect(20, 40, 260, 20), $"Active Player ID: {activePID}");
-
+            // --- Left Column: Pawn List ---
+            GUI.Label(new Rect(20, 40, 150, 20), "<b>Select Pawn:</b>");
             Pawn[] allPawns = FindObjectsByType<Pawn>(FindObjectsSortMode.None);
-            List<Pawn> myPawns = new List<Pawn>();
+            
+            float pawnY = 60;
             foreach (var p in allPawns)
             {
-                if (p.PlayerID == activePID) myPawns.Add(p);
+                if (p == null) continue;
+                string label = $"[{p.PlayerID}] {p.PawnData.pawnName}";
+                if (GUI.Button(new Rect(20, pawnY, 150, 25), label))
+                {
+                    selectedPawn = p;
+                }
+                pawnY += 30;
             }
 
-            if (myPawns.Count == 0)
+            if (selectedPawn == null)
             {
-                GUI.Label(new Rect(20, 70, 260, 20), "No pawns found for active player.");
+                GUI.Label(new Rect(180, 60, 250, 20), "Please select a pawn from the left...");
                 return;
             }
 
-            float y = 70;
-            foreach (var p in myPawns)
+            // --- Right Column: Details & Controls ---
+            float startX = 180;
+            GUI.Label(new Rect(startX, 40, 250, 20), $"<b>Selected:</b> {selectedPawn.PawnData.pawnName}");
+            GUI.Label(new Rect(startX, 60, 250, 20), $"HP: {selectedPawn.currentHealth.Value}/{selectedPawn.maxHealth.Value} | DMG: {selectedPawn.damage.Value}");
+
+            // Parameter Settings
+            GUI.Label(new Rect(startX, 90, 60, 20), "Amount:");
+            string amtStr = GUI.TextField(new Rect(startX + 60, 90, 40, 20), testAmount.ToString());
+            float.TryParse(amtStr, out testAmount);
+            
+            GUI.Label(new Rect(startX + 110, 90, 40, 20), "Turns:");
+            string durStr = GUI.TextField(new Rect(startX + 150, 90, 40, 20), testDuration.ToString());
+            int.TryParse(durStr, out testDuration);
+
+            testIsPercentage = GUI.Toggle(new Rect(startX + 200, 90, 60, 20), testIsPercentage, " %");
+
+            // --- Buff List (Scroll View) ---
+            Rect viewRect = new Rect(startX, 120, 250, 400);
+            Rect contentRect = new Rect(0, 0, 230, 700);
+            scrollPos = GUI.BeginScrollView(viewRect, scrollPos, contentRect);
+
+            float buttonY = 0;
+            foreach (EffectType effect in Enum.GetValues(typeof(EffectType)))
             {
-                GUI.Label(new Rect(20, y, 260, 20), $"[{p.PawnData.pawnName}] HP:{p.currentHealth.Value}");
-                y += 25;
+                if (effect == EffectType.None) continue;
 
-                if (GUI.Button(new Rect(20, y, 85, 20), "+HP (Inst)")) ApplyBuff(p, "HealthInst");
-                if (GUI.Button(new Rect(110, y, 85, 20), "-DMG (2T)")) ApplyBuff(p, "DamageTimed");
-                if (GUI.Button(new Rect(200, y, 85, 20), "Stun (1T)")) ApplyBuff(p, "StunTimed");
-                
-                y += 25;
-                if (GUI.Button(new Rect(20, y, 130, 20), "+Range (Perm)")) ApplyBuff(p, "RangePerm");
-                if (GUI.Button(new Rect(155, y, 130, 20), "Clear (Synergy)") ) p.ResetSynergyServer();
-
-                y += 35;
-                if (y > 400) break; // Simple overflow protection
+                if (GUI.Button(new Rect(0, buttonY, 220, 25), $"Apply {effect}"))
+                {
+                    QuickApply(effect);
+                }
+                buttonY += 30;
             }
 
-            if (GUI.Button(new Rect(10, 420, 280, 20), "Skip Turn (Test Expiry)"))
+            // Special Controls (The "13th and 14th" logic types)
+            GUI.color = Color.yellow;
+            if (GUI.Button(new Rect(0, buttonY, 220, 25), "DEBUG: Move this Pawn (No Card)"))
+            {
+                if (PlayerInputController.Instance != null && selectedPawn != null)
+                {
+                    PlayerInputController.Instance.SelectMovementPattern(selectedPawn.PawnData.attackPattern);
+                }
+            }
+            buttonY += 30;
+
+            if (GUI.Button(new Rect(0, buttonY, 220, 25), "Toggle Force Attack Pattern"))
+            {
+                selectedPawn.ToggleForceAttackPattern();
+            }
+            buttonY += 30;
+
+            if (GUI.Button(new Rect(0, buttonY, 220, 25), "Add Synergy (+10 HP/DMG)"))
+            {
+                selectedPawn.ApplyBuffsServer(10, 10);
+            }
+            buttonY += 30;
+            GUI.color = Color.white;
+
+            GUI.EndScrollView();
+
+            // Bottom Buttons
+            if (GUI.Button(new Rect(startX, 530, 120, 30), "RESET ALL"))
+            {
+                selectedPawn.ResetSynergyServer();
+                selectedPawn.activeBuffs.Clear();
+            }
+
+            if (GUI.Button(new Rect(startX + 130, 530, 120, 30), "NEXT TURN"))
             {
                 if (TurnManager.Instance != null) TurnManager.Instance.NextTurn();
             }
         }
 
-        private void ApplyBuff(Pawn p, string type)
+        private void QuickApply(EffectType type)
         {
-            if (!IsServer) return;
+            if (selectedPawn == null) return;
 
             BuffData data = ScriptableObject.CreateInstance<BuffData>();
-            data.isPercentage = false;
+            data.buffName = "Debug " + type;
+            data.effectType = type;
+            data.amount = testAmount;
+            data.durationTurns = testDuration;
+            data.isPercentage = testIsPercentage;
+            
+            // Logic: Positive amount = Positive effect (Green UI), Negative = Debuff (Red UI)
+            data.isPositiveEffect = testAmount >= 0;
 
-            switch (type)
-            {
-                case "HealthInst":
-                    data.buffName = "Instant Heal";
-                    data.effectType = EffectType.CurrentHealth;
-                    data.amount = 10;
-                    data.durationTurns = 0;
-                    data.isPositiveEffect = true;
-                    break;
-                case "DamageTimed":
-                    data.buffName = "Damage Weakness";
-                    data.effectType = EffectType.OutgoingDamageModifier;
-                    data.amount = -5; // -5 flat damage? Code uses it as multiplier if percentage, but let's see.
-                    data.isPercentage = false;
-                    data.durationTurns = 2;
-                    data.isPositiveEffect = false;
-                    break;
-                case "StunTimed":
-                    data.buffName = "Freeze";
-                    data.effectType = EffectType.Stun;
-                    data.durationTurns = 1;
-                    data.isPositiveEffect = false;
-                    break;
-                case "RangePerm":
-                    data.buffName = "Swift Foot";
-                    data.effectType = EffectType.MovementRangeModifier;
-                    data.amount = 1;
-                    data.durationTurns = 0; // Permanent!
-                    data.isPositiveEffect = true;
-                    break;
-            }
-
-            p.ApplyRuntimeBuffsServer(new List<BuffData> { data });
-            Debug.Log($"Applied {data.buffName} to {p.PawnData.pawnName}");
+            selectedPawn.ApplyRuntimeBuffsServer(new List<BuffData> { data });
+            Debug.Log($"[BUFF DEBUGGER] Applied {type} (Amt:{testAmount}, Dur:{testDuration}, %:{testIsPercentage}) to {selectedPawn.PawnData.pawnName}");
         }
     }
 }
