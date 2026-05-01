@@ -6,18 +6,12 @@
   <component name="ChangeListManager">
     <list default="true" id="3d9e23b9-49f8-4e62-afbc-c164cc147016" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/ArcherMovement1.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/ArcherMovement1.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/CannonMovement1.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/CannonMovement1.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/CheriffMovement1.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/CheriffMovement1.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/HorsemanMovement1 7.asset" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/HorsemanMovement1 7.asset.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/HorsemanMovement1.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/HorsemanMovement1.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/KnightMovement1.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/KnightMovement1.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/NinjaMovement1.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/NinjaMovement1.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/WizardMovement1.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/WizardMovement1.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/HandCardPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/HandCardPrefab.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/AttackHandler.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/AttackHandler.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/TurnManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/TurnManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -162,7 +156,8 @@
       <workItem from="1777119721771" duration="4846000" />
       <workItem from="1777285029442" duration="76000" />
       <workItem from="1777401296722" duration="5737000" />
-      <workItem from="1777560923166" duration="5656000" />
+      <workItem from="1777560923166" duration="6845000" />
+      <workItem from="1777631640457" duration="5836000" />
     </task>
     <servers />
   </component>
