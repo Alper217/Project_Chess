@@ -565,12 +565,13 @@ namespace AlperKocasalih.Chess.Grid
                     bool classMatch  = pawn.PawnData != null && pawn.PawnData.type == card.pawnClass;
                     MovementPattern movePattern = classMatch ? card.pattern : card.mismatchPattern;
 
-                    if (!isObstacle && movePattern != null)
+                    if (!isObstacle)
                     {
-                        // Evaluate attack options
+                        // Evaluate attack options — independent of movePattern being null
                         (HexCell attackCell, float attackScore) = FindBestAttackTarget(pawn, pawn.PawnData?.attackPattern, enemies);
                         if (attackCell != null && attackScore > bestScore)
                         {
+                            if (verboseLog) Debug.Log($"[BotAI] Selected ATTACK for pawn {pawn.PawnData.pawnName} with score {attackScore}");
                             bestScore  = attackScore;
                             bestCard   = card;
                             bestPawn   = pawn;
@@ -578,15 +579,19 @@ namespace AlperKocasalih.Chess.Grid
                             isAttack   = true;
                         }
 
-                        // Evaluate move options
-                        (HexCell moveCell, float moveScore) = FindBestMoveTarget(pawn, movePattern, enemies);
-                        if (moveCell != null && moveScore > bestScore)
+                        // Evaluate move options — only if a valid movement pattern exists
+                        if (movePattern != null)
                         {
-                            bestScore  = moveScore;
-                            bestCard   = card;
-                            bestPawn   = pawn;
-                            bestTarget = moveCell;
-                            isAttack   = false;
+                            (HexCell moveCell, float moveScore) = FindBestMoveTarget(pawn, movePattern, enemies);
+                            if (moveCell != null && moveScore > bestScore)
+                            {
+                                if (verboseLog) Debug.Log($"[BotAI] Selected MOVE for pawn {pawn.PawnData.pawnName} with score {moveScore}");
+                                bestScore  = moveScore;
+                                bestCard   = card;
+                                bestPawn   = pawn;
+                                bestTarget = moveCell;
+                                isAttack   = false;
+                            }
                         }
                     }
                 }
@@ -604,6 +609,7 @@ namespace AlperKocasalih.Chess.Grid
 
                 if (isAttack)
                 {
+                    if (verboseLog) Debug.Log($"[BotAI] Executing ATTACK action! Target: {bestTarget.Coordinates}");
                     // Find the enemy pawn on that cell
                     Pawn enemy = FindPawnOnCell(bestTarget);
                     if (enemy != null)
@@ -611,9 +617,14 @@ namespace AlperKocasalih.Chess.Grid
                         Core.PawnActionExecutor.Instance.ExecuteCombatServerRpc(
                             bestPawn.NetworkObjectId, enemy.NetworkObjectId, bestTarget.Coordinates, true);
                     }
+                    else
+                    {
+                        Debug.LogError("[BotAI] isAttack was true but enemy was null on target cell!");
+                    }
                 }
                 else
                 {
+                    if (verboseLog) Debug.Log($"[BotAI] Executing MOVE action for Pawn {bestPawn.NetworkObjectId} to {bestTarget.Coordinates}");
                     Core.PawnActionExecutor.Instance.ExecuteMoveServerRpc(
                         bestPawn.NetworkObjectId, bestTarget.Coordinates, true);
                 }
@@ -651,17 +662,38 @@ namespace AlperKocasalih.Chess.Grid
         /// </summary>
         private (HexCell, float) FindBestAttackTarget(Pawn attacker, MovementPattern attackPattern, List<Pawn> enemies)
         {
-            if (attacker == null || attackPattern == null || attacker.OccupiedCell == null)
+            if (attacker == null || attacker.OccupiedCell == null)
+            {
                 return (null, float.NegativeInfinity);
+            }
 
-            // Check if attack is on cooldown
             AttackHandler attackHandler = attacker.GetComponent<AttackHandler>();
             if (attackHandler != null && !attackHandler.CanAttack())
+            {
+                if (verboseLog) Debug.LogWarning($"[BotAI] {attacker.PawnData.pawnName} cannot attack. Cooldown: {attackHandler.currentCooldown.Value}, Stun: {attacker.HasStun()}");
                 return (null, float.NegativeInfinity);
+            }
 
             Vector2Int origin = attacker.OccupiedCell.Coordinates;
             bool isP2 = attacker.PlayerID == 2;
-            List<Vector2Int> offsets = attackPattern.GetValidOffsets(origin, isP2);
+            int rangeMod = attacker.GetMovementRangeModifier();
+            
+            List<Vector2Int> offsets;
+            if (attackPattern != null)
+            {
+                offsets = attackPattern.GetValidOffsets(origin, isP2, rangeMod);
+            }
+            else
+            {
+                // FALLBACK: If user forgot to assign an attack pattern, use adjacent hexes!
+                if (verboseLog) Debug.LogWarning($"[BotAI] {attacker.PawnData?.pawnName} HAS NO ATTACK PATTERN! Using default adjacent attack.");
+                offsets = new List<Vector2Int>();
+                var adjacentHexes = Utils.HexGridMath.GetHexesWithDistance(origin, 1);
+                foreach (var hex in adjacentHexes.Keys)
+                {
+                    if (hex != origin) offsets.Add(hex - origin);
+                }
+            }
 
             HexCell bestCell  = null;
             float   bestScore = float.NegativeInfinity;
@@ -674,9 +706,19 @@ namespace AlperKocasalih.Chess.Grid
                 Pawn occupant = FindPawnOnCell(cell);
                 if (occupant == null || occupant.PlayerID == attacker.PlayerID) continue;
 
-                // Prefer low-health targets (easier to eliminate).
-                // Base attack score is 1000 so it ALWAYS strictly overrides moving (which gives scores like 1 or 2).
-                float score = 1000f - occupant.currentHealth.Value;
+                // AGGRESSIVE SCORING:
+                // Base attack score is MASSIVE to absolutely guarantee it beats move scores.
+                float score = 10000f - occupant.currentHealth.Value;
+                
+                // Extra priority if we can kill it
+                if (occupant.currentHealth.Value <= attacker.damage.Value)
+                    score += 5000f;
+
+                if (verboseLog)
+                {
+                    Debug.Log($"[BotAI] FindBestAttackTarget: Found enemy {occupant.PawnData.pawnName} at {cell.Coordinates}. Score: {score}");
+                }
+
                 if (score > bestScore)
                 {
                     bestScore = score;
@@ -705,6 +747,7 @@ namespace AlperKocasalih.Chess.Grid
             float   bestScore = float.NegativeInfinity;
 
             float currentMinDist = MinDistanceToEnemies(origin, enemies);
+            MovementPattern attackPattern = pawn.PawnData?.attackPattern;
 
             foreach (var offset in offsets)
             {
@@ -712,9 +755,40 @@ namespace AlperKocasalih.Chess.Grid
                 if (!gridLookup.TryGetValue(targetCoords, out HexCell cell)) continue;
                 if (cell.IsOccupied || cell.IsObstacle) continue;
 
-                // Score = reduction in distance to nearest enemy
+                // 1. Distance score (keep it closing in)
                 float newDist = MinDistanceToEnemies(targetCoords, enemies);
-                float score   = currentMinDist - newDist; // Positive = getting closer
+                float score   = (currentMinDist - newDist) * 2f; 
+
+                // 2. POSITIONING BONUS:
+                // If moving to this cell puts an enemy in our attack range, give a HUGE bonus!
+                List<Vector2Int> attackOffsets;
+                if (attackPattern != null)
+                {
+                    attackOffsets = attackPattern.GetValidOffsets(targetCoords, isP2, rangeMod);
+                }
+                else
+                {
+                    attackOffsets = new List<Vector2Int>();
+                    var adjacentHexes = Utils.HexGridMath.GetHexesWithDistance(targetCoords, 1);
+                    foreach (var hex in adjacentHexes.Keys)
+                    {
+                        if (hex != targetCoords) attackOffsets.Add(hex - targetCoords);
+                    }
+                }
+
+                foreach (var aOffset in attackOffsets)
+                {
+                    Vector2Int potentialAttackCoords = targetCoords + aOffset;
+                    if (gridLookup.TryGetValue(potentialAttackCoords, out HexCell attackCell))
+                    {
+                        Pawn enemy = FindPawnOnCell(attackCell);
+                        if (enemy != null && enemy.PlayerID != pawn.PlayerID)
+                        {
+                            score += 50f; // High bonus for finding an attack position
+                            break; 
+                        }
+                    }
+                }
 
                 if (score > bestScore)
                 {

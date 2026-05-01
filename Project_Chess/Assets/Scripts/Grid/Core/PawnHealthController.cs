@@ -181,7 +181,14 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             string color = isHeal ? "#00FF00" : "#FF0000"; 
             string prefix = isHeal ? "+" : "-";
             
-            floatingTextFeedback.Value = $"<color={color}>{prefix}{amount}</color>";
+            if (amount == 0 && !isHeal)
+            {
+                floatingTextFeedback.Value = "<color=#FFFFFF>0</color>";
+            }
+            else
+            {
+                floatingTextFeedback.Value = $"<color={color}>{prefix}{amount}</color>";
+            }
         }
 
         // Professional Movement: A slight arc movement instead of straight up
@@ -189,6 +196,20 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         float randomX = Random.Range(-0.4f, 0.4f);
         Vector3 spawnPos = this.transform.position + new Vector3(randomX, 1.5f, Random.Range(-0.2f, 0.2f));
         
+        targetPlayer.PlayFeedbacks(spawnPos);
+    }
+
+    [ClientRpc]
+    public void ShowBlockedFeedbackClientRpc()
+    {
+        if (targetPlayer == null) return;
+        MMF_FloatingText floatingTextFeedback = targetPlayer.GetFeedbackOfType<MMF_FloatingText>();
+        if (floatingTextFeedback != null)
+        {
+            floatingTextFeedback.Value = "<color=#00CCFF>BLOCKED</color>";
+        }
+        float randomX = Random.Range(-0.3f, 0.3f);
+        Vector3 spawnPos = this.transform.position + new Vector3(randomX, 1.8f, 0);
         targetPlayer.PlayFeedbacks(spawnPos);
     }
 

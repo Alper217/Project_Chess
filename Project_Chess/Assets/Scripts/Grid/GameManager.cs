@@ -180,8 +180,14 @@ namespace AlperKocasalih.Chess.Grid
         public void EndGame(int winnerID)
         {
             if (!IsServer) return;
+            
+            Debug.Log($"GameManager: EndGame called. Winner: {winnerID}");
             ChangeState(GameState.EndGame);
+            
+            // Invoke locally for host/singleplayer
             OnGameEnded?.Invoke(winnerID);
+            
+            // Notify clients
             EndGameClientRpc(winnerID);
         }
 
@@ -284,11 +290,27 @@ namespace AlperKocasalih.Chess.Grid
 
         private void CheckForRestart()
         {
-            if (hostWantsRestart.Value && clientWantsRestart.Value)
+            // In Singleplayer (only 1 connected client), only the host needs to want a restart
+            bool isSingleplayer = NetworkManager.Singleton.ConnectedClients.Count <= 1;
+            
+            if (isSingleplayer)
             {
-                hostWantsRestart.Value = false;
-                clientWantsRestart.Value = false;
-                RestartGame();
+                if (hostWantsRestart.Value)
+                {
+                    hostWantsRestart.Value = false;
+                    clientWantsRestart.Value = false;
+                    RestartGame();
+                }
+            }
+            else
+            {
+                // In Multiplayer, both must confirm
+                if (hostWantsRestart.Value && clientWantsRestart.Value)
+                {
+                    hostWantsRestart.Value = false;
+                    clientWantsRestart.Value = false;
+                    RestartGame();
+                }
             }
         }
 

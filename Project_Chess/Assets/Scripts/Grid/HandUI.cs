@@ -146,7 +146,13 @@ namespace AlperKocasalih.Chess.Grid
             if (visible) 
             {
                 isHandExpanded = false;
-                foreach (var card in spawnedCards) card.SetSelected(false);
+                
+                // Only reset selections if we are NOT in the middle of a multi-action (Double Use)
+                bool isMulti = PlayerInputController.Instance != null && PlayerInputController.Instance.IsMultiActionInProgress;
+                if (!isMulti)
+                {
+                    foreach (var card in spawnedCards) card.SetSelected(false);
+                }
             }
             
             float targetY = visible ? (isHandExpanded ? yOffsetExpanded : yOffsetNormal) : yOffsetHidden;
@@ -159,20 +165,13 @@ namespace AlperKocasalih.Chess.Grid
             {
                 // Multi-action lockout check: Dim other cards if we are in a sequence
                 bool isMulti = PlayerInputController.Instance != null && PlayerInputController.Instance.IsMultiActionInProgress;
-                if (isMulti)
+                foreach (var c in spawnedCards)
                 {
-                    foreach (var c in spawnedCards)
-                    {
-                        // Keep only the selected one bright and interactive
-                        c.SetInteractionState(c.IsSelected);
-                    }
-                }
-                else
-                {
-                    foreach (var c in spawnedCards) c.SetInteractionState(true);
+                    bool shouldBeInteractive = !isMulti || c.IsSelected;
+                    c.SetInteractionState(shouldBeInteractive);
                 }
 
-                SetHandExpanded(false);
+                if (!isMulti) SetHandExpanded(false);
             }
         }
 
@@ -238,6 +237,13 @@ namespace AlperKocasalih.Chess.Grid
                 HandCard handCard = cardObj.GetComponent<HandCard>();
                 
                 handCard.Setup(hand[i]);
+
+                // --- FIX: Remember selection if this card is part of a multi-action ---
+                if (PlayerInputController.Instance != null && PlayerInputController.Instance.activeCardData == hand[i])
+                {
+                    handCard.SetSelected(true);
+                }
+
                 handCard.SetHandIndex(i);
                 
                 int localPlayerID = 1;

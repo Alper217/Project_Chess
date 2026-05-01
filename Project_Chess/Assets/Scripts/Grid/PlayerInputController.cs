@@ -26,7 +26,7 @@ namespace AlperKocasalih.Chess.Grid
         [Header("State")]
         [SerializeField, ReadOnly] private SelectionState currentState = SelectionState.None;
         [SerializeField, ReadOnly] private MovementPattern activePattern;
-        [SerializeField, ReadOnly] private CardData activeCardData;
+        [SerializeField, ReadOnly] public CardData activeCardData;
         [SerializeField, ReadOnly] private int activeCardRemainingUses = 1;
         [SerializeField, ReadOnly] private int initialCardUses = 1;
         [SerializeField, ReadOnly] private Pawn selectedPawn;
@@ -126,17 +126,7 @@ namespace AlperKocasalih.Chess.Grid
             activePattern = card.pattern;
             
             activeCardRemainingUses = 1;
-            if (card.runtimeBuffs != null)
-            {
-                foreach(var buff in card.runtimeBuffs)
-                {
-                    if (buff != null && buff.effectType == EffectType.DoubleUse)
-                    {
-                        activeCardRemainingUses = 2; // Or buff.amount if we want variable uses
-                    }
-                }
-            }
-            initialCardUses = activeCardRemainingUses;
+            initialCardUses = 1;
 
             if (card.isObstacleCard)
             {
@@ -257,6 +247,24 @@ namespace AlperKocasalih.Chess.Grid
                 }
 
                 selectedPawn = pawn;
+
+                // --- NEW: Double Use Class Restriction ---
+                if (activeCardRemainingUses <= 1 && initialCardUses <= 1) // Only set on first selection
+                {
+                    bool isMatch = (selectedPawn.PawnData.type == activeCardData.pawnClass);
+                    if (isMatch && activeCardData.runtimeBuffs != null)
+                    {
+                        foreach(var buff in activeCardData.runtimeBuffs)
+                        {
+                            if (buff != null && buff.effectType == EffectType.DoubleUse)
+                            {
+                                activeCardRemainingUses = 2;
+                                initialCardUses = 2;
+                            }
+                        }
+                    }
+                }
+
                 currentState = SelectionState.PawnSelected;
                 
                 ClearPawnHighlights();
@@ -504,7 +512,8 @@ namespace AlperKocasalih.Chess.Grid
                             // If forceAttackPattern is true, don't allow attacking through movement blocks
                             if (!pawn.forceAttackPattern.Value)
                             {
-                                AddClickableCell(targetCell);
+                                // Highlight white so player sees attackable enemy
+                                HighlightCell(targetCell, Color.white);
                             }
                         }
                     }
@@ -523,7 +532,8 @@ namespace AlperKocasalih.Chess.Grid
             MovementPattern attackPattern = pawn.PawnData.attackPattern;
             if (attackPattern == null) return;
 
-            List<Vector2Int> attackOffsets = attackPattern.GetValidOffsets(currentCoords, pawn.PlayerID == 2);
+            int rangeMod = pawn.GetMovementRangeModifier();
+            List<Vector2Int> attackOffsets = attackPattern.GetValidOffsets(currentCoords, pawn.PlayerID == 2, rangeMod);
             if (attackOffsets == null || attackOffsets.Count == 0) return;
 
             foreach (var offset in attackOffsets)
@@ -536,7 +546,10 @@ namespace AlperKocasalih.Chess.Grid
                     Pawn occupant = FindPawnOnCell(targetCell);
                     if (occupant != null && occupant.PlayerID != pawn.PlayerID)
                     {
-                        AddClickableCell(targetCell);
+                        // Always force white on the cell, even if already added via movement pass
+                        if (!highlightedCells.Contains(targetCell))
+                            highlightedCells.Add(targetCell);
+                        targetCell.Highlight(Color.white);
                     }
                 }
             }
