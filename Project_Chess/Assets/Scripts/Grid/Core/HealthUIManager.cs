@@ -12,6 +12,7 @@ public class HealthUIManager : MonoBehaviour
     public TextMeshProUGUI debuffText;
     [Tooltip("Vertical offset for the hover UI relative to the pawn.")]
     public float heightOffsetMultiplier = 2f;
+    public float zOffset = 10f;
     public TextMeshProUGUI healthText;
 
     private Transform currentTarget;
@@ -109,7 +110,11 @@ public class HealthUIManager : MonoBehaviour
             Camera mainCam = Camera.main;
             if (mainCam != null)
             {
-                healthCanvas.transform.position = currentTarget.position + (mainCam.transform.up * heightOffsetMultiplier);
+                Vector3 dirToCam = (mainCam.transform.position - healthCanvas.transform.position).normalized;
+                healthCanvas.transform.position = currentTarget.position 
+                                                  + (mainCam.transform.up * heightOffsetMultiplier) 
+                                                  + (dirToCam * zOffset);
+                
                 healthCanvas.transform.rotation = mainCam.transform.rotation;
             }
             else
