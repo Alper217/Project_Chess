@@ -189,22 +189,27 @@ namespace AlperKocasalih.Chess.Grid
             writer.WriteEndElement(); // SelectedPawns
 
             // Remaining alive pawns
-            writer.WriteStartElement("SurvivingPawns");
             Pawn[] allPawns = FindObjectsByType<Pawn>(FindObjectsSortMode.None);
-            int survivorCount = 0;
+            List<Pawn> survivors = new List<Pawn>();
             foreach (var p in allPawns)
             {
                 if (p != null && p.IsSpawned && p.PlayerID == playerID && p.currentHealth.Value > 0)
                 {
-                    survivorCount++;
-                    writer.WriteStartElement("Pawn");
-                    writer.WriteAttributeString("name",   p.PawnData?.pawnName ?? "Unknown");
-                    writer.WriteAttributeString("hp",     p.currentHealth.Value.ToString());
-                    writer.WriteAttributeString("maxHp",  p.maxHealth.Value.ToString());
-                    writer.WriteEndElement();
+                    survivors.Add(p);
                 }
             }
-            writer.WriteAttributeString("count", survivorCount.ToString());
+
+            writer.WriteStartElement("SurvivingPawns");
+            writer.WriteAttributeString("count", survivors.Count.ToString());
+            
+            foreach (var p in survivors)
+            {
+                writer.WriteStartElement("Pawn");
+                writer.WriteAttributeString("name",   p.PawnData?.pawnName ?? "Unknown");
+                writer.WriteAttributeString("hp",     p.currentHealth.Value.ToString());
+                writer.WriteAttributeString("maxHp",  p.maxHealth.Value.ToString());
+                writer.WriteEndElement();
+            }
             writer.WriteEndElement(); // SurvivingPawns
 
             // Move count

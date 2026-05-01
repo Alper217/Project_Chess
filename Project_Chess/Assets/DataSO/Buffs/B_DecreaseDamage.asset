@@ -16,7 +16,7 @@ MonoBehaviour:
   effectType: 4
   effectDescription: "Al\u0131nan hasar\u0131 %20 azalt\u0131r"
   amount: -20
-  isPercentage: 0
+  isPercentage: 1
   durationTurns: 1
   neutralizationTag: 
   isPositiveEffect: 1

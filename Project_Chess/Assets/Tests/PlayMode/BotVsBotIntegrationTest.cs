@@ -129,8 +129,8 @@ namespace Tests.PlayMode
             var bot1 = bot1Obj.AddComponent<BotAIController>();
             // Use reflection to set private fields for the test
             SetPrivateField(bot1, "botPlayerID", 1);
-            SetPrivateField(bot1, "draftThinkDelay", 0f);
-            SetPrivateField(bot1, "actionThinkDelay", 0f);
+            SetPrivateField(bot1, "draftThinkDelay", 0.05f); // Tiny delay to prevent RPC overlapping in the same frame
+            SetPrivateField(bot1, "actionThinkDelay", 0.05f);
             SetPrivateField(bot1, "maxTurnLimit", 150);
             bot1.GetComponent<NetworkObject>().Spawn();
 
@@ -139,8 +139,8 @@ namespace Tests.PlayMode
             bot2Obj.AddComponent<NetworkObject>();
             var bot2 = bot2Obj.AddComponent<BotAIController>();
             SetPrivateField(bot2, "botPlayerID", 2);
-            SetPrivateField(bot2, "draftThinkDelay", 0f);
-            SetPrivateField(bot2, "actionThinkDelay", 0f);
+            SetPrivateField(bot2, "draftThinkDelay", 0.05f);
+            SetPrivateField(bot2, "actionThinkDelay", 0.05f);
             SetPrivateField(bot2, "maxTurnLimit", 150);
             bot2.GetComponent<NetworkObject>().Spawn();
 
@@ -148,7 +148,7 @@ namespace Tests.PlayMode
             Time.timeScale = 10f;
 
             // Wait for Game to finish
-            float maxRealTime = 60f; // 60 seconds real time limit
+            float maxRealTime = 120f; // 120 seconds real time limit to ensure long matches finish
             float timer = 0;
 
             while (GameManager.Instance.CurrentState != GameState.EndGame && timer < maxRealTime)

@@ -123,12 +123,12 @@ public class AttackHandler : NetworkBehaviour
                 }
             }
 
-            if (pawn.PawnData.isHealer)
+            if (pawn.PawnData.isHealer && targetPawn != null)
             {
                 if (targetPawn.PlayerID == pawn.PlayerID)
                 {
                     PawnHealthController healthController = targetPawn.GetComponent<PawnHealthController>();
-                    healthController.HealServer(pawn.PawnData.healAmount);
+                    if (healthController != null) healthController.HealServer(pawn.PawnData.healAmount);
                 }
             }
         }
@@ -155,10 +155,11 @@ public class AttackHandler : NetworkBehaviour
     
     private Pawn FindPawnOnCell(HexCell cell)
     {
+        if (cell == null) return null;
         Pawn[] allPawns = FindObjectsByType<Pawn>(FindObjectsSortMode.None);
-        foreach (var pawn in allPawns)
+        foreach (var p in allPawns)
         {
-            if(pawn.OccupiedCell == cell) return pawn;
+            if(p.OccupiedCell == cell) return p;
         }
         return null;
     }

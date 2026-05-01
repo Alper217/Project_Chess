@@ -42,9 +42,9 @@ namespace AlperKocasalih.Chess.Grid.Core
                 targetCell.IsOccupied = true;
                 
                 ExecuteMoveClientRpc(pawnNetworkID, targetCoords);
-                
-                if (endTurn && TurnManager.Instance != null) TurnManager.Instance.NextTurn();
             }
+            
+            if (endTurn && TurnManager.Instance != null) TurnManager.Instance.NextTurn();
         }
 
         [ClientRpc]
@@ -82,25 +82,26 @@ namespace AlperKocasalih.Chess.Grid.Core
                 if (attacker.PlayerID == defender.PlayerID && !attacker.PawnData.isHealer)
                 {
                     Debug.LogWarning("PawnActionExecutor: Friendly fire attempt blocked on server.");
-                    return;
                 }
-                if (attacker.PlayerID != defender.PlayerID && attacker.PawnData.isHealer)
+                else if (attacker.PlayerID != defender.PlayerID && attacker.PawnData.isHealer)
                 {
                     Debug.LogWarning("Şifacılar düşman birimlerini iyileştiremez!");
-                    return;
-                }
-
-                AttackHandler attackHandler = attacker.GetComponent<AttackHandler>();
-                if (attackHandler != null && attackHandler.CanAttack())
-                {
-                    attackHandler.ExecuteAttack(defender.OccupiedCell.Coordinates, gridLookup);
-                    if (endTurn && TurnManager.Instance != null) TurnManager.Instance.NextTurn();
                 }
                 else
                 {
-                    Debug.Log("Attack on cooldown.");
+                    AttackHandler attackHandler = attacker.GetComponent<AttackHandler>();
+                    if (attackHandler != null && attackHandler.CanAttack())
+                    {
+                        attackHandler.ExecuteAttack(defender.OccupiedCell.Coordinates, gridLookup);
+                    }
+                    else
+                    {
+                        Debug.LogWarning("Attack blocked on server (cooldown or missing handler).");
+                    }
                 }
             }
+            
+            if (endTurn && TurnManager.Instance != null) TurnManager.Instance.NextTurn();
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]

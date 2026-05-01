@@ -85,6 +85,7 @@ namespace AlperKocasalih.Chess.Grid
             {
                 DraftManager.Instance.OnCardsDrawn    += HandleCardsDrawn;
                 DraftManager.Instance.OnDraftFinished += HandleDraftFinished;
+                DraftManager.Instance.OnOverflowBurnRequested += HandleOverflowBurnRequested;
             }
 
             if (TurnManager.Instance != null)
@@ -102,6 +103,7 @@ namespace AlperKocasalih.Chess.Grid
             {
                 DraftManager.Instance.OnCardsDrawn    -= HandleCardsDrawn;
                 DraftManager.Instance.OnDraftFinished -= HandleDraftFinished;
+                DraftManager.Instance.OnOverflowBurnRequested -= HandleOverflowBurnRequested;
             }
 
             if (TurnManager.Instance != null)
@@ -161,6 +163,59 @@ namespace AlperKocasalih.Chess.Grid
             if (isProcessingAction) return;
 
             StartCoroutine(BotActionRoutine());
+        }
+
+        private void HandleOverflowBurnRequested(int playerID, int burnCount)
+        {
+            if (!IsServer) return;
+            if (playerID != botPlayerID) return;
+            if (burnCount <= 0) return;
+
+            StartCoroutine(BotOverflowBurnRoutine());
+        }
+
+        private IEnumerator BotOverflowBurnRoutine()
+        {
+            yield return new WaitForSeconds(draftThinkDelay);
+
+            if (DraftManager.Instance == null) yield break;
+
+            List<CardData> hand = DraftManager.Instance.GetHand(botPlayerID);
+            if (hand.Count == 0) yield break;
+
+            int worstIndex = -1;
+            float worstScore = float.PositiveInfinity;
+            int fallbackIndex = -1;
+
+            for (int j = 0; j < hand.Count; j++)
+            {
+                if (DraftManager.Instance.IsBurnLocked(botPlayerID, j)) continue;
+                
+                if (fallbackIndex == -1) fallbackIndex = j;
+
+                float score = EvaluateCardForSelf(hand[j]);
+                if (score < worstScore)
+                {
+                    worstScore = score;
+                    worstIndex = j;
+                }
+            }
+
+            if (worstIndex >= 0)
+            {
+                if (verboseLog) Debug.Log($"[BotAI P{botPlayerID}] Burning overflow card '{hand[worstIndex].cardName}' at index {worstIndex}");
+                DraftManager.Instance.BurnOverflowCardAtIndexServerRpc(botPlayerID, worstIndex);
+            }
+            else if (fallbackIndex >= 0)
+            {
+                Debug.LogWarning($"[BotAI P{botPlayerID}] Could not find a strictly worst card to burn! Burning fallback index {fallbackIndex}.");
+                DraftManager.Instance.BurnOverflowCardAtIndexServerRpc(botPlayerID, fallbackIndex);
+            }
+            else
+            {
+                Debug.LogWarning($"[BotAI P{botPlayerID}] All cards locked! Force burning index 0 to prevent soft-lock.");
+                DraftManager.Instance.BurnOverflowCardAtIndexServerRpc(botPlayerID, 0);
+            }
         }
 
         // ═══════════════════════════════════════════════════════════
@@ -539,9 +594,20 @@ namespace AlperKocasalih.Chess.Grid
 
             if (myPawns.Count == 0)
             {
+                if (verboseLog) Debug.Log($"[BotAI P{botPlayerID}] No pawns left. Drawing & skipping turn.");
+                if (DraftManager.Instance.IsDrawAllowed)
+                    DraftManager.Instance.PerformDrawOneAndSkipTurn(botPlayerID);
+                else if (TurnManager.Instance != null)
+                    TurnManager.Instance.NextTurn();
+                    
                 isProcessingAction = false;
                 yield break;
             }
+
+            // Create O(1) lookup to prevent freezing from FindObjectsByType in nested loops
+            Dictionary<HexCell, Pawn> cellPawnMap = new Dictionary<HexCell, Pawn>();
+            foreach (var p in myPawns) if (p.OccupiedCell != null) cellPawnMap[p.OccupiedCell] = p;
+            foreach (var p in enemies) if (p.OccupiedCell != null) cellPawnMap[p.OccupiedCell] = p;
 
             // ── Pick best card to play ──
             CardData bestCard   = null;
@@ -568,7 +634,7 @@ namespace AlperKocasalih.Chess.Grid
                     if (!isObstacle)
                     {
                         // Evaluate attack options — independent of movePattern being null
-                        (HexCell attackCell, float attackScore) = FindBestAttackTarget(pawn, pawn.PawnData?.attackPattern, enemies);
+                        (HexCell attackCell, float attackScore) = FindBestAttackTarget(pawn, pawn.PawnData?.attackPattern, enemies, cellPawnMap);
                         if (attackCell != null && attackScore > bestScore)
                         {
                             if (verboseLog) Debug.Log($"[BotAI] Selected ATTACK for pawn {pawn.PawnData.pawnName} with score {attackScore}");
@@ -582,7 +648,7 @@ namespace AlperKocasalih.Chess.Grid
                         // Evaluate move options — only if a valid movement pattern exists
                         if (movePattern != null)
                         {
-                            (HexCell moveCell, float moveScore) = FindBestMoveTarget(pawn, movePattern, enemies);
+                            (HexCell moveCell, float moveScore) = FindBestMoveTarget(pawn, movePattern, enemies, cellPawnMap);
                             if (moveCell != null && moveScore > bestScore)
                             {
                                 if (verboseLog) Debug.Log($"[BotAI] Selected MOVE for pawn {pawn.PawnData.pawnName} with score {moveScore}");
@@ -611,7 +677,7 @@ namespace AlperKocasalih.Chess.Grid
                 {
                     if (verboseLog) Debug.Log($"[BotAI] Executing ATTACK action! Target: {bestTarget.Coordinates}");
                     // Find the enemy pawn on that cell
-                    Pawn enemy = FindPawnOnCell(bestTarget);
+                    cellPawnMap.TryGetValue(bestTarget, out Pawn enemy);
                     if (enemy != null)
                     {
                         Core.PawnActionExecutor.Instance.ExecuteCombatServerRpc(
@@ -620,6 +686,7 @@ namespace AlperKocasalih.Chess.Grid
                     else
                     {
                         Debug.LogError("[BotAI] isAttack was true but enemy was null on target cell!");
+                        if (TurnManager.Instance != null) TurnManager.Instance.NextTurn();
                     }
                 }
                 else
@@ -658,9 +725,9 @@ namespace AlperKocasalih.Chess.Grid
 
         /// <summary>
         /// Finds the best attack target cell using the pawn's attack pattern.
-        /// Returns (cell, score) — score is the defender's remaining HP (lower = better target).
+        /// Returns (TargetCell, Score).
         /// </summary>
-        private (HexCell, float) FindBestAttackTarget(Pawn attacker, MovementPattern attackPattern, List<Pawn> enemies)
+        private (HexCell, float) FindBestAttackTarget(Pawn attacker, MovementPattern attackPattern, List<Pawn> enemies, Dictionary<HexCell, Pawn> cellPawnMap)
         {
             if (attacker == null || attacker.OccupiedCell == null)
             {
@@ -668,9 +735,13 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             AttackHandler attackHandler = attacker.GetComponent<AttackHandler>();
-            if (attackHandler != null && !attackHandler.CanAttack())
+            if (attackHandler == null || !attackHandler.CanAttack())
             {
-                if (verboseLog) Debug.LogWarning($"[BotAI] {attacker.PawnData.pawnName} cannot attack. Cooldown: {attackHandler.currentCooldown.Value}, Stun: {attacker.HasStun()}");
+                if (verboseLog && attackHandler != null) 
+                    Debug.LogWarning($"[BotAI] {attacker.PawnData.pawnName} cannot attack. Cooldown: {attackHandler.currentCooldown.Value}, Stun: {attacker.HasStun()}");
+                else if (verboseLog)
+                    Debug.LogWarning($"[BotAI] {attacker.PawnData?.pawnName} cannot attack (Missing AttackHandler).");
+                    
                 return (null, float.NegativeInfinity);
             }
 
@@ -702,27 +773,29 @@ namespace AlperKocasalih.Chess.Grid
             {
                 Vector2Int targetCoords = origin + offset;
                 if (!gridLookup.TryGetValue(targetCoords, out HexCell cell)) continue;
-
-                Pawn occupant = FindPawnOnCell(cell);
-                if (occupant == null || occupant.PlayerID == attacker.PlayerID) continue;
-
-                // AGGRESSIVE SCORING:
-                // Base attack score is MASSIVE to absolutely guarantee it beats move scores.
-                float score = 10000f - occupant.currentHealth.Value;
-                
-                // Extra priority if we can kill it
-                if (occupant.currentHealth.Value <= attacker.damage.Value)
-                    score += 5000f;
-
-                if (verboseLog)
+                if (cell.IsOccupied)
                 {
-                    Debug.Log($"[BotAI] FindBestAttackTarget: Found enemy {occupant.PawnData.pawnName} at {cell.Coordinates}. Score: {score}");
-                }
+                    cellPawnMap.TryGetValue(cell, out Pawn occupant);
+                    if (occupant == null || occupant.PlayerID == attacker.PlayerID) continue;
 
-                if (score > bestScore)
-                {
-                    bestScore = score;
-                    bestCell  = cell;
+                    // AGGRESSIVE SCORING:
+                    // Base attack score is MASSIVE to absolutely guarantee it beats move scores.
+                    float score = 10000f - occupant.currentHealth.Value;
+                    
+                    // Extra priority if we can kill it
+                    if (occupant.currentHealth.Value <= attacker.damage.Value)
+                        score += 5000f;
+
+                    if (verboseLog)
+                    {
+                        Debug.Log($"[BotAI] FindBestAttackTarget: Found enemy {occupant.PawnData.pawnName} at {cell.Coordinates}. Score: {score}");
+                    }
+
+                    if (score > bestScore)
+                    {
+                        bestScore = score;
+                        bestCell  = cell;
+                    }
                 }
             }
 
@@ -730,18 +803,19 @@ namespace AlperKocasalih.Chess.Grid
         }
 
         /// <summary>
-        /// Finds the best movement target — prefers cells that get the pawn closer to enemies.
+        /// Finds the best move target cell using the pawn's move pattern.
+        /// Returns (TargetCell, Score).
         /// </summary>
-        private (HexCell, float) FindBestMoveTarget(Pawn pawn, MovementPattern pattern, List<Pawn> enemies)
+        private (HexCell, float) FindBestMoveTarget(Pawn pawn, MovementPattern movePattern, List<Pawn> enemies, Dictionary<HexCell, Pawn> cellPawnMap)
         {
-            if (pawn == null || pattern == null || pawn.OccupiedCell == null)
+            if (pawn == null || movePattern == null || pawn.OccupiedCell == null)
                 return (null, float.NegativeInfinity);
 
             Vector2Int origin = pawn.OccupiedCell.Coordinates;
             bool isP2 = pawn.PlayerID == 2;
 
             int rangeMod = pawn.GetMovementRangeModifier();
-            List<Vector2Int> offsets = pattern.GetValidOffsets(origin, isP2, rangeMod);
+            List<Vector2Int> offsets = movePattern.GetValidOffsets(origin, isP2, rangeMod);
 
             HexCell bestCell  = null;
             float   bestScore = float.NegativeInfinity;

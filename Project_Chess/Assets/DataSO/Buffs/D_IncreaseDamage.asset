@@ -16,7 +16,7 @@ MonoBehaviour:
   effectType: 4
   effectDescription: "2 tur boyunca al\u0131nan t\xFCm hasarlar\u0131 %30 art\u0131r\u0131r."
   amount: 30
-  isPercentage: 0
+  isPercentage: 1
   durationTurns: 2
   neutralizationTag: 
   isPositiveEffect: 0

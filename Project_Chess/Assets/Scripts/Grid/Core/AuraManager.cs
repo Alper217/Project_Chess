@@ -40,11 +40,18 @@ public class AuraManager : NetworkBehaviour
         }
         foreach (Pawn pawn in allPawns) pawn.ResetSynergyServer();
 
+        // CACHE ALL PAWNS IN O(1) DICTIONARY TO PREVENT FREEZE
+        Dictionary<HexCell, Pawn> cellPawnMap = new Dictionary<HexCell, Pawn>();
+        foreach (var p in allPawns)
+        {
+            if (p.OccupiedCell != null) cellPawnMap[p.OccupiedCell] = p;
+        }
+
         foreach (var auraPawn in allPawns)
         {
             if (auraPawn.PawnData.hasAura)
             {
-                ApplyAuraEffect(auraPawn, lookup);
+                ApplyAuraEffect(auraPawn, lookup, cellPawnMap);
             }
         }
     }
@@ -71,7 +78,7 @@ public class AuraManager : NetworkBehaviour
         return gridLookup.Count > 0;
     }
 
-    private void ApplyAuraEffect(Pawn pawn, Dictionary<Vector2Int, HexCell> gridLookup)
+    private void ApplyAuraEffect(Pawn pawn, Dictionary<Vector2Int, HexCell> gridLookup, Dictionary<HexCell, Pawn> cellPawnMap)
     {
         if (pawn == null)
         {
@@ -99,7 +106,7 @@ public class AuraManager : NetworkBehaviour
             if (gridLookup.TryGetValue(hexPos, out var cell))
             {
                 matchedCells++;
-                Pawn targetPawn = FindPawnOnCell(cell);
+                cellPawnMap.TryGetValue(cell, out Pawn targetPawn);
 
                 if (targetPawn != null && targetPawn != pawn && targetPawn.PlayerID == pawn.PlayerID)
                 {

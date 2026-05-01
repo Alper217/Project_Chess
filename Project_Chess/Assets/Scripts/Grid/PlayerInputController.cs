@@ -301,13 +301,25 @@ namespace AlperKocasalih.Chess.Grid
                 {
                     if (selectedPawn != null && enemy.PlayerID == selectedPawn.PlayerID)
                     {
-                        Debug.LogWarning("PlayerInputController: Friendly pawn selected as target. Move ignored.");
-                        return;
+                        if (!selectedPawn.PawnData.isHealer)
+                        {
+                            Debug.LogWarning("PlayerInputController: Friendly pawn selected as target but not a healer. Move ignored.");
+                            return;
+                        }
                     }
-                    AttackHandler attackHandler = selectedPawn != null ? selectedPawn.GetComponent<AttackHandler>() : null;
-                    if (attackHandler != null && !attackHandler.CanAttack())
+                    else if (selectedPawn != null && enemy.PlayerID != selectedPawn.PlayerID)
                     {
-                        Debug.Log("PlayerInputController: Attack on cooldown. Action ignored.");
+                        if (selectedPawn.PawnData.isHealer)
+                        {
+                            Debug.LogWarning("PlayerInputController: Healers cannot target enemies. Move ignored.");
+                            return;
+                        }
+                    }
+
+                    AttackHandler attackHandler = selectedPawn != null ? selectedPawn.GetComponent<AttackHandler>() : null;
+                    if (attackHandler == null || !attackHandler.CanAttack())
+                    {
+                        Debug.Log("PlayerInputController: Attack on cooldown or missing AttackHandler. Action ignored.");
                         return;
                     }
                     if (Core.PawnActionExecutor.Instance != null)
