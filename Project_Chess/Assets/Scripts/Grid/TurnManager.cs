@@ -171,7 +171,8 @@ namespace AlperKocasalih.Chess.Grid
                 }
 
                 bool isMyTurn = localPlayerID == activePlayerID.Value;
-                turnInfoText.text = isMyTurn ?  "Senin Sıran" : "Rakibin Sırası";
+                turnInfoText.text = $"Turn: Player {activePlayerID.Value}";
+                turnInfoText.color = isMyTurn ? Color.green : Color.gray;
                 turnInfoText.transform.DOPunchScale(Vector3.one * 0.2f, 0.3f);
             }
         }

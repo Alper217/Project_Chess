@@ -185,11 +185,13 @@ namespace AlperKocasalih.Chess.Grid
 
             if (localPlayerID == playerID)
             {
-                turnStatusText.text  = "Senin Sıran";
+                turnStatusText.text  = "Senin Sıran - Kart Seç";
+                turnStatusText.color = Color.green;
             }
             else
             {
-                turnStatusText.text  = "Rakibin Sırası";
+                turnStatusText.text  = "Rakibin Sırası...";
+                turnStatusText.color = Color.gray;
             }
         }
 
@@ -392,7 +394,7 @@ namespace AlperKocasalih.Chess.Grid
             if (turnStatusText != null && isBurnBlockingDraft)
             {
                 turnStatusText.text  = $"Kart yak: {burnCount}";
-                //turnStatusText.color = Color.red;
+                turnStatusText.color = Color.red;
             }
 
             if (!isBurnBlockingDraft)
