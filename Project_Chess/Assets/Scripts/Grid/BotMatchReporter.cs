@@ -206,6 +206,11 @@ namespace AlperKocasalih.Chess.Grid
                     if (pd == null) continue;
                     float powerScore = pd.damage * 2f + pd.maxHealth;
 
+                    if (pd.type == Type.Archer || pd.type == Type.Cannon || pd.type == Type.Cheriff)
+                    {
+                        powerScore += 10f;
+                    }
+
                     writer.WriteStartElement("Pawn");
                     writer.WriteAttributeString("name",       pd.pawnName);
                     writer.WriteAttributeString("type",       pd.type.ToString());

@@ -321,6 +321,13 @@ namespace AlperKocasalih.Chess.Grid
                 {
                     if (allDatas[i] == null || result.Contains(i)) continue;
                     float score = allDatas[i].damage * damageWeight + allDatas[i].maxHealth * healthWeight;
+
+                    // Ranged units get a bonus 10 points to match the power score of melee units
+                    if (allDatas[i].type == Type.Archer || allDatas[i].type == Type.Cannon || allDatas[i].type == Type.Cheriff)
+                    {
+                        score += 10f;
+                    }
+
                     scored.Add((i, score));
                 }
 
