@@ -54,6 +54,8 @@ namespace AlperKocasalih.Chess.Grid
 
         // Track total moves for the XML report
         public int TotalMoves { get; private set; }
+        public int TotalAttacksInitiated { get; private set; }
+        public int TotalCardsUsed { get; private set; }
         public List<PawnData> SelectedPawnDatas { get; private set; } = new List<PawnData>();
 
         private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
@@ -121,6 +123,9 @@ namespace AlperKocasalih.Chess.Grid
             switch (newState)
             {
                 case GameState.Setup:
+                    TotalMoves = 0;
+                    TotalAttacksInitiated = 0;
+                    TotalCardsUsed = 0;
                     StartCoroutine(BotSetupRoutine());
                     break;
                 case GameState.ActionPhase:
@@ -675,6 +680,7 @@ namespace AlperKocasalih.Chess.Grid
 
                 if (isAttack)
                 {
+                    TotalAttacksInitiated++;
                     if (verboseLog) Debug.Log($"[BotAI] Executing ATTACK action! Target: {bestTarget.Coordinates}");
                     // Find the enemy pawn on that cell
                     cellPawnMap.TryGetValue(bestTarget, out Pawn enemy);
@@ -697,6 +703,7 @@ namespace AlperKocasalih.Chess.Grid
                 }
 
                 DraftManager.Instance.RemoveCardFromHand(botPlayerID, bestCard);
+                TotalCardsUsed++;
                 TotalMoves++;
 
                 if (verboseLog)

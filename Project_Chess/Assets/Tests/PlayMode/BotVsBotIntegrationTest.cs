@@ -147,11 +147,13 @@ namespace Tests.PlayMode
             // 4. Speed up time to run the test very fast
             Time.timeScale = 10f;
 
-            // Wait for Game to finish
-            float maxRealTime = 120f; // 120 seconds real time limit to ensure long matches finish
+            // Wait for Game to finish 10 times
+            float maxRealTime = 600f; // 600 seconds real time limit for 10 fast matches
             float timer = 0;
 
-            while (GameManager.Instance.CurrentState != GameState.EndGame && timer < maxRealTime)
+            SetPrivateField(reporter, "targetAutoTestCount", 10);
+
+            while ((int)GetPrivateField(reporter, "currentMatchCount") < 10 && timer < maxRealTime)
             {
                 timer += Time.unscaledDeltaTime;
                 
@@ -180,15 +182,15 @@ namespace Tests.PlayMode
 
             Time.timeScale = _originalTimeScale;
 
-            if (GameManager.Instance.CurrentState != GameState.EndGame)
+            int completedMatches = (int)GetPrivateField(reporter, "currentMatchCount");
+            if (completedMatches < 10)
             {
-                Assert.Fail("Test timed out! The game did not reach EndGame state within the allowed time.");
+                Assert.Fail($"Test timed out! Only completed {completedMatches} out of 10 matches.");
             }
             else
             {
-                Debug.Log($"--- TEST FINISHED SUCCESSFULLY! ---");
-                Debug.Log($"Final Scores - P1: {GameManager.Instance.player1Score.Value}, P2: {GameManager.Instance.player2Score.Value}");
-                Assert.Pass("Bot vs Bot match completed and generated the XML report.");
+                Debug.Log($"--- 10 AUTO BOT VS BOT MATCHES FINISHED SUCCESSFULLY! ---");
+                Assert.Pass("Bot vs Bot matches completed and generated 10 XML reports.");
             }
         }
 

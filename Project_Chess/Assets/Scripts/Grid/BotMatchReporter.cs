@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -31,9 +32,14 @@ namespace AlperKocasalih.Chess.Grid
         [Tooltip("Folder name inside Application.persistentDataPath for reports.")]
         [SerializeField] private string reportFolder = "BotVsBotReports";
 
+        [Tooltip("Number of consecutive automated tests to run. Game will restart automatically.")]
+        [SerializeField] private int targetAutoTestCount = 10;
+
         [SerializeField] private bool verboseLog = true;
 
         // ───────────────────── Runtime ─────────────────────
+
+        private int currentMatchCount = 0;
 
         // Set by external code (e.g. GameManager) before EndGame is called.
         private WinConditionType pendingWinCondition = WinConditionType.AllEnemyPawnsEliminated;
@@ -133,6 +139,9 @@ namespace AlperKocasalih.Chess.Grid
                     writer.WriteElementString("GameID",    gameID);
                     writer.WriteElementString("Timestamp", timestamp);
                     writer.WriteElementString("TotalTurns", turnCount.ToString());
+                    
+                    TimeSpan estimatedTime = TimeSpan.FromSeconds(turnCount * 30);
+                    writer.WriteElementString("EstimatedPlaytime", $"{(int)estimatedTime.TotalMinutes}m {estimatedTime.Seconds}s");
 
                     // ── Player 1 ──
                     WritePlayerSection(writer, 1, bot1);
@@ -160,6 +169,26 @@ namespace AlperKocasalih.Chess.Grid
             catch (Exception ex)
             {
                 Debug.LogError($"[BotMatchReporter] Failed to generate report: {ex.Message}");
+            }
+
+            currentMatchCount++;
+            if (currentMatchCount < targetAutoTestCount)
+            {
+                Debug.Log($"[BotMatchReporter] Auto-test {currentMatchCount}/{targetAutoTestCount} completed. Restarting in 3 seconds...");
+                StartCoroutine(AutoRestartRoutine());
+            }
+            else
+            {
+                Debug.Log($"[BotMatchReporter] Auto-test series finished ({targetAutoTestCount} matches).");
+            }
+        }
+
+        private IEnumerator AutoRestartRoutine()
+        {
+            yield return new WaitForSeconds(3f);
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.RestartGame();
             }
         }
 
@@ -215,6 +244,20 @@ namespace AlperKocasalih.Chess.Grid
             // Move count
             int totalMoves = bot != null ? bot.TotalMoves : 0;
             writer.WriteElementString("TotalMoves", totalMoves.ToString());
+
+            int totalAttacks = bot != null ? bot.TotalAttacksInitiated : 0;
+            writer.WriteElementString("TotalAttacks", totalAttacks.ToString());
+
+            int totalCards = bot != null ? bot.TotalCardsUsed : 0;
+            writer.WriteElementString("TotalCardsUsed", totalCards.ToString());
+
+            string tactics = "Balanced";
+            if (totalMoves > 0)
+            {
+                if (totalAttacks > totalMoves * 0.4f) tactics = "Aggressive";
+                else if (totalAttacks < totalMoves * 0.15f) tactics = "Defensive";
+            }
+            writer.WriteElementString("AppliedTactics", tactics);
 
             writer.WriteEndElement(); // Player
         }
