@@ -172,6 +172,10 @@ namespace AlperKocasalih.Chess.Grid
 
                 bool isMyTurn = localPlayerID == activePlayerID.Value;
                 turnInfoText.text = isMyTurn ?  "Senin Sıran" : "Rakibin Sırası";
+                
+                // Reset scale and kill previous tweens to prevent cumulative scaling (UI growing)
+                turnInfoText.transform.DOKill(true);
+                turnInfoText.transform.localScale = Vector3.one;
                 turnInfoText.transform.DOPunchScale(Vector3.one * 0.2f, 0.3f);
             }
         }

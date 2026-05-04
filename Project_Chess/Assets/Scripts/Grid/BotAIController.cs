@@ -761,12 +761,11 @@ namespace AlperKocasalih.Chess.Grid
 
             Vector2Int origin = attacker.OccupiedCell.Coordinates;
             bool isP2 = attacker.PlayerID == 2;
-            int rangeMod = attacker.GetMovementRangeModifier();
-            
+            // Use 0 for rangeMod in attacks so MovementRangeModifier only affects movement, not attack range
             List<Vector2Int> offsets;
             if (attackPattern != null)
             {
-                offsets = attackPattern.GetValidOffsets(origin, isP2, rangeMod);
+                offsets = attackPattern.GetValidOffsets(origin, isP2, 0);
             }
             else
             {

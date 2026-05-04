@@ -544,8 +544,8 @@ namespace AlperKocasalih.Chess.Grid
             MovementPattern attackPattern = pawn.PawnData.attackPattern;
             if (attackPattern == null) return;
 
-            int rangeMod = pawn.GetMovementRangeModifier();
-            List<Vector2Int> attackOffsets = attackPattern.GetValidOffsets(currentCoords, pawn.PlayerID == 2, rangeMod);
+            // Use 0 for rangeMod in attacks so MovementRangeModifier only affects movement, not attack range
+            List<Vector2Int> attackOffsets = attackPattern.GetValidOffsets(currentCoords, pawn.PlayerID == 2, 0);
             if (attackOffsets == null || attackOffsets.Count == 0) return;
 
             foreach (var offset in attackOffsets)

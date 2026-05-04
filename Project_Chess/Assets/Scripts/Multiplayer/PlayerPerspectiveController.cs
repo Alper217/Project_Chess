@@ -52,10 +52,21 @@ namespace AlperKocasalih.Chess.Multiplayer
                     
                     // We copy player1Camera's transform to player2Camera, then rotate it 180 degrees.
                     // This guarantees the client has the exact opposite perspective.
-                    if (Grid.GameManager.Instance.player1Camera != null)
+                    if (p2Cam != null)
                     {
                         p2Cam.position = Grid.GameManager.Instance.player1Camera.transform.position;
                         p2Cam.rotation = Grid.GameManager.Instance.player1Camera.transform.rotation;
+                        p2Cam.localScale = Grid.GameManager.Instance.player1Camera.transform.localScale;
+
+                        // Also sync FOV/Orthographic settings to ensure UI scale parity
+                        Camera c1 = Grid.GameManager.Instance.player1Camera.GetComponent<Camera>();
+                        Camera c2 = Grid.GameManager.Instance.player2Camera.GetComponent<Camera>();
+                        if (c1 != null && c2 != null)
+                        {
+                            c2.fieldOfView = c1.fieldOfView;
+                            c2.orthographic = c1.orthographic;
+                            c2.orthographicSize = c1.orthographicSize;
+                        }
                     }
 
                     p2Cam.RotateAround(center, Vector3.up, 180f);

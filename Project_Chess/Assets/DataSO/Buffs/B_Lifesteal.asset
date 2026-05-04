@@ -18,5 +18,5 @@ MonoBehaviour:
   amount: 15
   isPercentage: 1
   durationTurns: 1
-  neutralizationTag: 
+  neutralizationTag: CanCalma
   isPositiveEffect: 1
