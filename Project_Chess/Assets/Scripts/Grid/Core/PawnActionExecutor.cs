@@ -65,6 +65,11 @@ namespace AlperKocasalih.Chess.Grid.Core
                 pawn.transform.DOMove(targetCell.transform.position + pawnVisualOffset, moveDuration)
                     .SetEase(Ease.OutQuad);
             }
+
+            if (pawn.PawnData != null && pawn.PawnData.moveSound != null)
+            {
+                AudioManager.instance.PlaySfx(pawn.PawnData.moveSound);
+            }
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
@@ -72,6 +77,8 @@ namespace AlperKocasalih.Chess.Grid.Core
         {
             NetworkObject attackerObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[attackerID];
             NetworkObject defenderObj = NetworkManager.Singleton.SpawnManager.SpawnedObjects[defenderID];
+            
+            Pawn pawn = attackerObj.GetComponent<Pawn>();
 
             if (attackerObj != null && defenderObj != null)
             {
@@ -93,6 +100,7 @@ namespace AlperKocasalih.Chess.Grid.Core
                     if (attackHandler != null && attackHandler.CanAttack())
                     {
                         attackHandler.ExecuteAttack(defender.OccupiedCell.Coordinates, gridLookup);
+                        AudioManager.instance.PlaySfx(pawn.PawnData.attackSound);
                     }
                     else
                     {

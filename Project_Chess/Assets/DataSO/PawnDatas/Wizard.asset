@@ -20,6 +20,7 @@ MonoBehaviour:
   currentHealth: 60
   pointValue: 5
   attackPattern: {fileID: 0}
+  startWithForceAttackPattern: 0
   attackCooldown: 0
   isAoE: 0
   AoERadius: 0
@@ -30,3 +31,5 @@ MonoBehaviour:
   healthbuff: 0
   isHealer: 1
   healAmount: 10
+  moveSound: {fileID: 8300000, guid: 3f3632c3720b1304cab3a3798c80b55e, type: 3}
+  attackSound: {fileID: 8300000, guid: 44119372095ef3c4e840f96a288e8847, type: 3}

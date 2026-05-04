@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 477bbf3039d40744281fa7a4c9529d8f, type: 3}
+  m_Name: Card_MovementB 1
+  m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.CardData
+  cardName: Cannon
+  cardSprite: {fileID: 0}
+  cardDesign: {fileID: -159036006, guid: 256d0a29150b9f04f874290089ba00c3, type: 3}
+  pattern: {fileID: 11400000, guid: d2120fb50aee0714681bcff7538753aa, type: 2}
+  healthToAdd: 5
+  damageToAdd: 5
+  runtimeBuffs: []
+  pawnClass: 2
+  mismatchPattern: {fileID: 11400000, guid: f89b8aecbb9d59a4d830f85ac7019303, type: 2}
+  isObstacleCard: 0
+  obstaclePattern: {fileID: 0}
+  description: 

@@ -45,6 +45,10 @@ public class PawnData: ScriptableObject
     [Header("Heal Effects")] 
     public bool isHealer;
     public int healAmount;
+    
+    [Header("Audio Settings")]
+    public AudioClip moveSound;
+    public AudioClip attackSound;
 
 
 }

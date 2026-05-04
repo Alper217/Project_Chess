@@ -6,12 +6,22 @@
   <component name="ChangeListManager">
     <list default="true" id="3d9e23b9-49f8-4e62-afbc-c164cc147016" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/HandCardPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/HandCardPrefab.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/HorsemanMovement1.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/HorsemanMovement1.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Archer.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Archer.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cannon.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cannon.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cheriff.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cheriff.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Commander.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Commander.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Horsemen.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Horsemen.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Knight.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Knight.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Ninja.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Ninja.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Queen.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Queen.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Wizard.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Wizard.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Archer.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Archer.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/TurnManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/TurnManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -158,6 +168,7 @@
       <workItem from="1777401296722" duration="5737000" />
       <workItem from="1777560923166" duration="6845000" />
       <workItem from="1777631640457" duration="5836000" />
+      <workItem from="1777907254663" duration="3486000" />
     </task>
     <servers />
   </component>

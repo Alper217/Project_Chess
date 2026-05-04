@@ -197,6 +197,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         Vector3 spawnPos = this.transform.position + new Vector3(randomX, 1.5f, Random.Range(-0.2f, 0.2f));
         
         targetPlayer.PlayFeedbacks(spawnPos);
+        
     }
 
     [ClientRpc]

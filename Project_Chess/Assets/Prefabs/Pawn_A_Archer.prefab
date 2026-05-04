@@ -399,7 +399,7 @@ MonoBehaviour:
         DebugActive: 0
         Intensity: 1
         Value: 100
-        UseIntensityAsValue: 1
+        UseIntensityAsValue: 0
         RoundingMethod: 0
         ForceColor: 0
         AnimateColorGradient:

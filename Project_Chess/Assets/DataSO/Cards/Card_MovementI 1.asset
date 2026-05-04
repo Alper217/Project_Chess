@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 477bbf3039d40744281fa7a4c9529d8f, type: 3}
+  m_Name: Card_MovementI 1
+  m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.CardData
+  cardName: Wizard
+  cardSprite: {fileID: 0}
+  cardDesign: {fileID: -671229064, guid: fe91d13a2de78be449fb7555264cbf3a, type: 3}
+  pattern: {fileID: 11400000, guid: 2fb005db605799346965593147d04087, type: 2}
+  healthToAdd: 5
+  damageToAdd: 5
+  runtimeBuffs: []
+  pawnClass: 9
+  mismatchPattern: {fileID: 11400000, guid: f89b8aecbb9d59a4d830f85ac7019303, type: 2}
+  isObstacleCard: 0
+  obstaclePattern: {fileID: 0}
+  description: 

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 477bbf3039d40744281fa7a4c9529d8f, type: 3}
+  m_Name: Card_MovementA 1
+  m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.CardData
+  cardName: Archer
+  cardSprite: {fileID: 10907, guid: 0000000000000000f000000000000000, type: 0}
+  cardDesign: {fileID: 1329281437, guid: 771ca8f6619ad4f4caed20401ef271d7, type: 3}
+  pattern: {fileID: 11400000, guid: 637e8274e5ba8c04bb26072b3641a140, type: 2}
+  healthToAdd: 5
+  damageToAdd: 5
+  runtimeBuffs: []
+  pawnClass: 1
+  mismatchPattern: {fileID: 11400000, guid: f89b8aecbb9d59a4d830f85ac7019303, type: 2}
+  isObstacleCard: 0
+  obstaclePattern: {fileID: 11400000, guid: b45bf2a6d6e0bff49bd33909148ee9be, type: 2}
+  description: 

@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 477bbf3039d40744281fa7a4c9529d8f, type: 3}
+  m_Name: Card_MovementF 1
+  m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.CardData
+  cardName: Commander
+  cardSprite: {fileID: 0}
+  cardDesign: {fileID: -435592039, guid: 0e9e68884f10beb42a59c4d8dd5280d9, type: 3}
+  pattern: {fileID: 11400000, guid: de8d20e67ccc102459cbf8d7f9c7d8b9, type: 2}
+  healthToAdd: 5
+  damageToAdd: 5
+  runtimeBuffs: []
+  pawnClass: 6
+  mismatchPattern: {fileID: 11400000, guid: f89b8aecbb9d59a4d830f85ac7019303, type: 2}
+  isObstacleCard: 0
+  obstaclePattern: {fileID: 0}
+  description: 
