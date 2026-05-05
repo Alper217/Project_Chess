@@ -1696,6 +1696,51 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1073170830}
   m_CullTransparentMesh: 1
+--- !u!1 &1386100975
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1386100977}
+  - component: {fileID: 1386100976}
+  m_Layer: 0
+  m_Name: SteamManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1386100976
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1386100975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c3d8f3fe3966550458161341204569b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameCore::AlperKocasalih.Chess.Multiplayer.SteamManager
+  appId: 480
+--- !u!4 &1386100977
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1386100975}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1821.4873, y: 1038.9967, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1530357004
 GameObject:
   m_ObjectHideFlags: 0
@@ -1732,6 +1777,7 @@ MonoBehaviour:
   codeInputField: {fileID: 919881518}
   relayCodeText: {fileID: 862634819}
   gameSceneName: GameScene
+  lobbySceneName: LobbyScene
 --- !u!4 &1530357006
 Transform:
   m_ObjectHideFlags: 0
@@ -2075,3 +2121,4 @@ SceneRoots:
   - {fileID: 1668755100}
   - {fileID: 1620857692}
   - {fileID: 1530357006}
+  - {fileID: 1386100977}

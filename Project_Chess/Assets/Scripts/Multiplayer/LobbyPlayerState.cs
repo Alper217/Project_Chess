@@ -12,13 +12,24 @@ namespace AlperKocasalih.Chess.Multiplayer
         public NetworkVariable<bool> IsReady = new NetworkVariable<bool>(
             false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
 
+        public NetworkVariable<ulong> PlayerSteamId = new NetworkVariable<ulong>(
+            0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+
         public override void OnNetworkSpawn()
         {
             if (IsOwner)
             {
-                // İleride Steam entegrasyonu geldiğinde buradan isim çekilecek.
-                string defaultName = IsHost ? "Host Player" : "Client Player";
-                PlayerName.Value = defaultName;
+                // Steam açıksa gerçek ismi çek, değilse varsayılan ata
+                string finalName = (SteamManager.Instance != null && SteamManager.Instance.IsSteamRunning) 
+                    ? SteamManager.Instance.PlayerName 
+                    : (IsHost ? "Host Player" : "Client Player");
+                
+                PlayerName.Value = finalName;
+
+                if (SteamManager.Instance != null && SteamManager.Instance.IsSteamRunning)
+                {
+                    PlayerSteamId.Value = SteamManager.Instance.PlayerSteamId;
+                }
             }
             
             // Lobi UI'sını güncellemek için LobbyManager'a haber ver

@@ -14,54 +14,57 @@ namespace AlperKocasalih.Chess.Multiplayer
 {
     public class NetworkBootstrap : MonoBehaviour
     {
+        public static NetworkBootstrap Instance { get; private set; }
+
         [SerializeField] private GameObject bootstrapUI;
         [SerializeField] private Button hostButton;
         [SerializeField] private Button clientButton;
-        [SerializeField] private Button playVsBotButton;        // ← Yeni: Bot Modu butonu
-        [SerializeField] private TMP_InputField codeInputField; // Artık IP değil, Relay Kodu girişi
-        [SerializeField] private TextMeshProUGUI relayCodeText; // Host olduğumuzda kodu göstereceğimiz text
+        [SerializeField] private Button playVsBotButton;
+        [SerializeField] private TMP_InputField codeInputField;
+        [SerializeField] private TextMeshProUGUI relayCodeText;
         [SerializeField] private string gameSceneName = "GameScene";
         [SerializeField] private string lobbySceneName = "LobbyScene";
         public static string JoinCode { get; private set; }
 
+        private void Awake()
+        {
+            if (Instance == null) Instance = this;
+            else Destroy(gameObject);
+        }
+
         private async void Start()
         {
-            // Unity Services'i başlat ve anonim giriş yap (Relay için zorunlu)
             await UnityServices.InitializeAsync();
             if (!AuthenticationService.Instance.IsSignedIn)
             {
                 await AuthenticationService.Instance.SignInAnonymouslyAsync();
-                Debug.Log($"Signed in to Unity Services. Player ID: {AuthenticationService.Instance.PlayerId}");
             }
         }
 
         public async void StartHost()
         {
-            if (NetworkManager.Singleton == null)
-            {
-                Debug.LogError("NetworkManager.Singleton is null! Is there a NetworkManager in the scene?");
-                return;
-            }
+            if (NetworkManager.Singleton == null) return;
 
-            // If already running, shut it down first
-            if (NetworkManager.Singleton.IsListening)
-            {
-                NetworkManager.Singleton.Shutdown();
-            }
+            if (NetworkManager.Singleton.IsListening) NetworkManager.Singleton.Shutdown();
+            
             PlayerPrefs.DeleteKey("BotMode");
             PlayerPrefs.Save();
 
-            // Relay Kurulumu (Host) - Max 1 bağlantı (2 kişilik satranç oyunu için: 1 Host + 1 Client)
             try
             {
                 Allocation allocation = await RelayService.Instance.CreateAllocationAsync(1);
                 JoinCode = await RelayService.Instance.GetJoinCodeAsync(allocation.AllocationId);
-                Debug.Log($"Relay Host Created. Join Code: {JoinCode}");
                 
                 if (relayCodeText != null)
                 {
                     relayCodeText.text = $"Room Code: {JoinCode}";
                     relayCodeText.gameObject.SetActive(true);
+                }
+
+                // Steam Lobi Entegrasyonu
+                if (SteamManager.Instance != null && SteamManager.Instance.IsSteamRunning)
+                {
+                    SteamManager.Instance.CreateSteamLobby(JoinCode);
                 }
 
                 var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
@@ -75,15 +78,10 @@ namespace AlperKocasalih.Chess.Multiplayer
 
                 if (NetworkManager.Singleton.StartHost())
                 {
-                    Debug.Log("Host started successfully via Relay, loading lobby scene...");
                     NetworkManager.Singleton.SceneManager.LoadScene(lobbySceneName, LoadSceneMode.Single);
                 }
-                else
-                {
-                    Debug.LogError("Failed to start Host!");
-                }
             }
-            catch (RelayServiceException e)
+            catch (System.Exception e)
             {
                 Debug.LogError($"Relay Host Error: {e.Message}");
             }
@@ -91,33 +89,22 @@ namespace AlperKocasalih.Chess.Multiplayer
 
         public async void StartClient()
         {
-            if (NetworkManager.Singleton == null)
-            {
-                Debug.LogError("NetworkManager.Singleton is null! Is there a NetworkManager in the scene?");
-                return;
-            }
-
             string joinCode = codeInputField != null ? codeInputField.text : "";
-            if (string.IsNullOrEmpty(joinCode))
-            {
-                Debug.LogError("Please enter a valid Join Code!");
-                return;
-            }
+            JoinWithCode(joinCode);
+        }
 
-            // If already running, shut it down first
-            if (NetworkManager.Singleton.IsListening)
-            {
-                NetworkManager.Singleton.Shutdown();
-            }
+        public async void JoinWithCode(string joinCode)
+        {
+            if (string.IsNullOrEmpty(joinCode)) return;
+
+            if (NetworkManager.Singleton.IsListening) NetworkManager.Singleton.Shutdown();
+            
             PlayerPrefs.DeleteKey("BotMode");
             PlayerPrefs.Save();
 
-            // Relay Bağlantısı (Client)
             try
             {
                 JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
-                Debug.Log("Relay Client Joined.");
-
                 var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
                 transport.SetClientRelayData(
                     joinAllocation.RelayServer.IpV4,
@@ -130,54 +117,26 @@ namespace AlperKocasalih.Chess.Multiplayer
 
                 if (NetworkManager.Singleton.StartClient())
                 {
-                    Debug.Log("Client started successfully via Relay, waiting for connection...");
                     HideUI();
                 }
-                else
-                {
-                    Debug.LogError("Failed to start Client!");
-                }
             }
-            catch (RelayServiceException e)
+            catch (System.Exception e)
             {
                 Debug.LogError($"Relay Client Error: {e.Message}");
             }
         }
 
-        /// <summary>
-        /// Bot modunu başlatır: Relay gerektirmez, local host olarak oyunu yükler.
-        /// GameScene yüklendiğinde BotSpawner, BotSession.IsActive'i kontrol ederek
-        /// BotAIController'ı otomatik spawn eder.
-        /// </summary>
         public void StartVsBot()
         {
-            if (NetworkManager.Singleton == null)
-            {
-                Debug.LogError("NetworkManager.Singleton is null!");
-                return;
-            }
+            if (NetworkManager.Singleton.IsListening) NetworkManager.Singleton.Shutdown();
 
-            if (NetworkManager.Singleton.IsListening)
-                NetworkManager.Singleton.Shutdown();
-
-            // UnityTransport, Relay kurulmadığında default olarak 127.0.0.1:7777 kullanır.
-            // SetConnectionData() çağrısı Unity.Networking.Transport assembly'si gerektirdiği için kullanılmıyor.
-
-            // Bot modunu PlayerPrefs ile işaretle (namespace/assembly bağımlılığı yok)
             PlayerPrefs.SetInt("BotMode", 1);
             PlayerPrefs.Save();
             JoinCode = "BOT";
 
             if (NetworkManager.Singleton.StartHost())
             {
-                Debug.Log("[VsBot] Host başlatıldı (local). Sahne yükleniyor...");
                 NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
-            }
-            else
-            {
-                Debug.LogError("[VsBot] Host başlatılamadı!");
-                PlayerPrefs.DeleteKey("BotMode");
-                PlayerPrefs.Save();
             }
         }
 
@@ -187,4 +146,3 @@ namespace AlperKocasalih.Chess.Multiplayer
         }
     }
 }
-
