@@ -5105,6 +5105,15 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 4ac89b2644219dd47b50828ebe65c1ab, type: 2}
   - {fileID: 11400000, guid: e823818435dd3164887550ef5269a929, type: 2}
   - {fileID: 11400000, guid: b19fc645a24b4c34dad7e47266454a82, type: 2}
+  - {fileID: 11400000, guid: 7e492de4736dc33429cf18caaaf97e91, type: 2}
+  - {fileID: 11400000, guid: 639fd2bee23d2c64cb5e7a5ff23b72f4, type: 2}
+  - {fileID: 11400000, guid: 327c5620cc7bc014ca3b1ae6733dcf76, type: 2}
+  - {fileID: 11400000, guid: fe31614a8fafaaf4ab18c43d1cf1de63, type: 2}
+  - {fileID: 11400000, guid: 12a56875bd52592489433053a6085897, type: 2}
+  - {fileID: 11400000, guid: 7b2c16947117e784195fad6d59adc35b, type: 2}
+  - {fileID: 11400000, guid: e362f2e1b09f0f44bb8fa260061cb918, type: 2}
+  - {fileID: 11400000, guid: 013b82cb806a5dc42af73e991e37a095, type: 2}
+  - {fileID: 11400000, guid: c5eb4d73f86fb26488bda897a51475da, type: 2}
   initialDeckSize: 120
   allPawnDatas:
   - {fileID: 11400000, guid: 94a340785c9894843b024a16412618a5, type: 2}
