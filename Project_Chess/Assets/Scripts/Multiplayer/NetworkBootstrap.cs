@@ -21,6 +21,7 @@ namespace AlperKocasalih.Chess.Multiplayer
         [SerializeField] private TMP_InputField codeInputField; // Artık IP değil, Relay Kodu girişi
         [SerializeField] private TextMeshProUGUI relayCodeText; // Host olduğumuzda kodu göstereceğimiz text
         [SerializeField] private string gameSceneName = "GameScene";
+        [SerializeField] private string lobbySceneName = "LobbyScene";
         public static string JoinCode { get; private set; }
 
         private async void Start()
@@ -47,6 +48,8 @@ namespace AlperKocasalih.Chess.Multiplayer
             {
                 NetworkManager.Singleton.Shutdown();
             }
+            PlayerPrefs.DeleteKey("BotMode");
+            PlayerPrefs.Save();
 
             // Relay Kurulumu (Host) - Max 1 bağlantı (2 kişilik satranç oyunu için: 1 Host + 1 Client)
             try
@@ -72,8 +75,8 @@ namespace AlperKocasalih.Chess.Multiplayer
 
                 if (NetworkManager.Singleton.StartHost())
                 {
-                    Debug.Log("Host started successfully via Relay, loading game scene...");
-                    NetworkManager.Singleton.SceneManager.LoadScene(gameSceneName, LoadSceneMode.Single);
+                    Debug.Log("Host started successfully via Relay, loading lobby scene...");
+                    NetworkManager.Singleton.SceneManager.LoadScene(lobbySceneName, LoadSceneMode.Single);
                 }
                 else
                 {
@@ -106,6 +109,8 @@ namespace AlperKocasalih.Chess.Multiplayer
             {
                 NetworkManager.Singleton.Shutdown();
             }
+            PlayerPrefs.DeleteKey("BotMode");
+            PlayerPrefs.Save();
 
             // Relay Bağlantısı (Client)
             try
@@ -176,7 +181,7 @@ namespace AlperKocasalih.Chess.Multiplayer
             }
         }
 
-        private void HideUI()
+        public void HideUI()
         {
             if (bootstrapUI != null) bootstrapUI.SetActive(false);
         }
