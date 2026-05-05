@@ -46,6 +46,11 @@ namespace AlperKocasalih.Chess.Grid
                 UpdateTurnInfoUI();
                 OnTurnChanged?.Invoke(newValue);
             };
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.OnStateChanged += (state) => UpdateTurnInfoUI();
+            }
             
             UpdateTurnInfoUI();
         }
@@ -164,14 +169,21 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (turnInfoText != null)
             {
-                int localPlayerID = 1;
-                if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+                if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Setup)
                 {
-                    localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                    turnInfoText.text = "Yerleşim Aşaması";
                 }
+                else
+                {
+                    int localPlayerID = 1;
+                    if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+                    {
+                        localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                    }
 
-                bool isMyTurn = localPlayerID == activePlayerID.Value;
-                turnInfoText.text = isMyTurn ?  "Senin Sıran" : "Rakibin Sırası";
+                    bool isMyTurn = localPlayerID == activePlayerID.Value;
+                    turnInfoText.text = isMyTurn ? "Senin Sıran" : "Rakibin Sırası";
+                }
                 
                 // Reset scale and kill previous tweens to prevent cumulative scaling (UI growing)
                 turnInfoText.transform.DOKill(true);

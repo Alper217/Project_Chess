@@ -23,7 +23,6 @@ namespace AlperKocasalih.Chess.Grid
 
         [Header("Game State")]
         [SerializeField, ReadOnly] private NetworkVariable<GameState> currentState = new NetworkVariable<GameState>(GameState.Setup, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-        [SerializeField] private TextMeshProUGUI gameCode;
 
         [Header("Restart Readiness")]
         [SerializeField, ReadOnly] private NetworkVariable<bool> hostWantsRestart = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
@@ -39,7 +38,9 @@ namespace AlperKocasalih.Chess.Grid
 
         [Header("Score UI")]
         [SerializeField] private TextMeshProUGUI player1ScoreText;
+        [SerializeField] private GameObject player1UI;
         [SerializeField] private TextMeshProUGUI player2ScoreText;
+        [SerializeField] private GameObject player2UI;
 
 
         #endregion
@@ -70,6 +71,7 @@ namespace AlperKocasalih.Chess.Grid
             currentState.OnValueChanged += (oldValue, newValue) => {
                 Debug.Log($"GameManager: State changed from {oldValue} to {newValue}");
                 HandleStateChange(newValue);
+                UpdateScoreUI(); // State değiştiğinde puan tablosunu güncelle
                 OnStateChanged?.Invoke(newValue);
             };
             
@@ -95,16 +97,20 @@ namespace AlperKocasalih.Chess.Grid
                 localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
             }
 
+            bool shouldShow = currentState.Value != GameState.Setup;
+
             if (player1ScoreText != null) 
             {
                 player1ScoreText.text = $"My Score: {player1Score.Value}";
-                player1ScoreText.gameObject.SetActive(localPlayerID == 1);
+                player1ScoreText.gameObject.SetActive(shouldShow && localPlayerID == 1);
+                player1UI.SetActive(shouldShow);
             }
 
             if (player2ScoreText != null) 
             {
                 player2ScoreText.text = $"My Score: {player2Score.Value}";
-                player2ScoreText.gameObject.SetActive(localPlayerID == 2);
+                player2ScoreText.gameObject.SetActive(shouldShow && localPlayerID == 2);
+                player2UI.SetActive(shouldShow);
             }
         }
 
@@ -114,8 +120,6 @@ namespace AlperKocasalih.Chess.Grid
             {
                 ChangeState(GameState.Setup);
             }
-            string code = NetworkBootstrap.JoinCode;
-            if (gameCode != null) gameCode.text = $"Game Code : {code}";
             
         }
 
