@@ -62,6 +62,7 @@ namespace AlperKocasalih.Chess.Grid
 
         private void Awake()
         {
+            Application.targetFrameRate = -1;
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
         }

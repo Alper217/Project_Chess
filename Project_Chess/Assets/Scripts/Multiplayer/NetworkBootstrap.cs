@@ -34,6 +34,7 @@ namespace AlperKocasalih.Chess.Multiplayer
 
         private async void Start()
         {
+            Application.targetFrameRate = 60;
             await UnityServices.InitializeAsync();
             if (!AuthenticationService.Instance.IsSignedIn)
             {
