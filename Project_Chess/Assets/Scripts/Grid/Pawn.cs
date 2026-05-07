@@ -313,7 +313,7 @@ namespace AlperKocasalih.Chess.Grid
             RefreshActiveBuffSummaries();
         }
 
-        public void ApplyRuntimeBuffsServer(System.Collections.Generic.List<BuffData> buffs)
+        public void ApplyRuntimeBuffsServer(System.Collections.Generic.List<BuffData> buffs, float effectiveness = 1f)
         {
             if (!IsServer) return;
             if (buffs == null) return;
@@ -335,6 +335,7 @@ namespace AlperKocasalih.Chess.Grid
                 {
                     // Instant effects
                     float multiplier = (!buff.isPositiveEffect && isAmplified) ? 2f : 1f;
+                    multiplier *= effectiveness;
 
                     if (buff.effectType == EffectType.CurrentHealth)
                     {
@@ -353,13 +354,13 @@ namespace AlperKocasalih.Chess.Grid
                     }
                     else
                     {
-                        // Other permanent effects (like Damage -5) should be added to active buffs
-                        activeBuffs.Add(new ServerActiveBuff(buff));
+                        // Other permanent effects should be added to active buffs
+                        activeBuffs.Add(new ServerActiveBuff(buff, effectiveness));
                     }
                 }
                 else
                 {
-                    activeBuffs.Add(new ServerActiveBuff(buff));
+                    activeBuffs.Add(new ServerActiveBuff(buff, effectiveness));
                 }
             }
 
@@ -406,6 +407,7 @@ namespace AlperKocasalih.Chess.Grid
                 if (buff.buffData.effectType == EffectType.OutgoingDamageModifier)
                 {
                     float val = buff.buffData.isPercentage ? buff.buffData.amount / 100f : buff.buffData.amount;
+                    val *= buff.effectiveness;
                     if (!buff.buffData.isPositiveEffect && isAmplified) val *= 2f;
                     multiplier += val;
                 }
@@ -424,6 +426,7 @@ namespace AlperKocasalih.Chess.Grid
                     // Remember: For IncomingDamageModifier, decreasing incoming damage is a Buff (isPositiveEffect = true, negative amount)
                     // So increasing incoming damage is a Debuff (isPositiveEffect = false, positive amount).
                     float val = buff.buffData.isPercentage ? buff.buffData.amount / 100f : buff.buffData.amount;
+                    val *= buff.effectiveness;
                     if (!buff.buffData.isPositiveEffect && isAmplified) val *= 2f;
                     multiplier += val;
                 }
@@ -439,6 +442,7 @@ namespace AlperKocasalih.Chess.Grid
                 if (buff.buffData.effectType == EffectType.Lifesteal)
                 {
                     float val = buff.buffData.isPercentage ? buff.buffData.amount / 100f : buff.buffData.amount;
+                    val *= buff.effectiveness;
                     lifesteal += val;
                 }
             }
@@ -453,6 +457,7 @@ namespace AlperKocasalih.Chess.Grid
                 if (buff.buffData.effectType == EffectType.Recoil)
                 {
                     float val = buff.buffData.isPercentage ? buff.buffData.amount / 100f : buff.buffData.amount;
+                    val *= buff.effectiveness;
                     recoil += val;
                 }
             }
@@ -514,6 +519,7 @@ namespace AlperKocasalih.Chess.Grid
                 if (buff.buffData.effectType == EffectType.MovementRangeModifier)
                 {
                     float val = buff.buffData.amount;
+                    val *= buff.effectiveness;
                     if (!buff.buffData.isPositiveEffect && isAmplified) val *= 2f;
                     modifier += (int)val;
                 }

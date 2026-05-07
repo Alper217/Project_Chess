@@ -11,8 +11,8 @@ namespace AlperKocasalih.Chess.Grid
     /// for one bot player. Attach one instance per bot player in the scene.
     ///
     /// BUFF/DEBUFF AWARENESS:
-    ///   - Buffs  → only apply when card.pawnClass matches the pawn's Type (class-specific).
-    ///   - Debuffs → always apply regardless of pawn class.
+    ///   - Buffs  → apply %100 when card.pawnClass matches, else apply %50 (mismatch).
+    ///   - Debuffs → always apply %100 regardless of pawn class.
     /// The bot evaluates every card with this rule to make Keep/Give/Burn decisions.
     /// </summary>
     public class BotAIController : NetworkBehaviour
@@ -457,9 +457,9 @@ namespace AlperKocasalih.Chess.Grid
 
                     if (buff.isPositiveEffect)
                     {
-                        // Buff: only useful if class matches
+                        // Buff: apply fully if match, else apply 50%
                         if (classMatch) score += val;
-                        // else: bot knows it won't receive this buff → score += 0
+                        else score += val * 0.5f;
                     }
                     else
                     {
@@ -470,10 +470,18 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             // Legacy stat contributions
-            if (card.healthToAdd > 0 && classMatch) score += card.healthToAdd * 0.5f;
+            if (card.healthToAdd > 0)
+            {
+                if (classMatch) score += card.healthToAdd * 0.5f;
+                else score += (card.healthToAdd * 0.5f) * 0.5f; // Half of what match gives
+            }
             else if (card.healthToAdd < 0) score += card.healthToAdd * 0.5f;
 
-            if (card.damageToAdd > 0 && classMatch) score += card.damageToAdd;
+            if (card.damageToAdd > 0)
+            {
+                if (classMatch) score += card.damageToAdd;
+                else score += card.damageToAdd * 0.5f;
+            }
             else if (card.damageToAdd < 0) score += card.damageToAdd;
 
             return score;
@@ -502,10 +510,11 @@ namespace AlperKocasalih.Chess.Grid
                         // Debuff always hits opponent → positive for bot
                         debuffPenaltyOnOpponent += Mathf.Abs(val);
                     }
-                    // Buff on opponent: we don't know their classes exactly but assume 50% chance
+                    // Buff on opponent: we don't know their classes but they get at least 50%, maybe 100%.
+                    // Weighted average assuming 50% chance of match: 0.5*100% + 0.5*50% = 75%
                     else
                     {
-                        debuffPenaltyOnOpponent -= val * 0.5f;
+                        debuffPenaltyOnOpponent -= val * 0.75f;
                     }
                 }
             }

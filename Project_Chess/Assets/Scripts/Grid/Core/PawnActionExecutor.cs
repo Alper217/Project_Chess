@@ -139,13 +139,15 @@ namespace AlperKocasalih.Chess.Grid.Core
             int finalH = 0;
             int finalD = 0;
 
-            // Health: Apply debuff always, buff only if match
+            // Health: Apply debuff always, buff fully if match, else 50%
             if (card.healthToAdd < 0) finalH = card.healthToAdd;
             else if (isMatch) finalH = card.healthToAdd;
+            else finalH = Mathf.RoundToInt(card.healthToAdd * 0.5f);
 
-            // Damage: Apply debuff always, buff only if match
+            // Damage: Apply debuff always, buff fully if match, else 50%
             if (card.damageToAdd < 0) finalD = card.damageToAdd;
             else if (isMatch) finalD = card.damageToAdd;
+            else finalD = Mathf.RoundToInt(card.damageToAdd * 0.5f);
 
             if (finalH != 0 || finalD != 0)
             {
@@ -155,22 +157,39 @@ namespace AlperKocasalih.Chess.Grid.Core
             // 2. Handle Runtime Buffs
             if (card.runtimeBuffs != null && card.runtimeBuffs.Count > 0)
             {
-                List<BuffData> buffsToApply = new List<BuffData>();
+                List<BuffData> fullBuffs = new List<BuffData>();
+                List<BuffData> halfBuffs = new List<BuffData>();
+
                 foreach (var b in card.runtimeBuffs)
                 {
                     if (b == null) continue;
+
+                    // SPECIAL: Double Use only applies if it's a match
+                    if (b.effectType == EffectType.DoubleUse)
+                    {
+                        if (isMatch) fullBuffs.Add(b);
+                        continue;
+                    }
                     
-                    // Apply debuffs (negative effects) always. 
-                    // Apply buffs (positive effects) only if the pawn class matches.
+                    // Apply debuffs (negative effects) always fully. 
+                    // Apply buffs (positive effects) fully if match, else 50%.
                     if (!b.isPositiveEffect || isMatch)
                     {
-                        buffsToApply.Add(b);
+                        fullBuffs.Add(b);
+                    }
+                    else
+                    {
+                        halfBuffs.Add(b);
                     }
                 }
 
-                if (buffsToApply.Count > 0)
+                if (fullBuffs.Count > 0)
                 {
-                    pawn.ApplyRuntimeBuffsServer(buffsToApply);
+                    pawn.ApplyRuntimeBuffsServer(fullBuffs, 1.0f);
+                }
+                if (halfBuffs.Count > 0)
+                {
+                    pawn.ApplyRuntimeBuffsServer(halfBuffs, 0.5f);
                 }
             }
         }

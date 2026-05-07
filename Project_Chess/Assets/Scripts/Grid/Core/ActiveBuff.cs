@@ -11,11 +11,13 @@ namespace AlperKocasalih.Chess.Grid
     {
         public BuffData buffData;
         public int remainingTurns;
+        public float effectiveness = 1f;
 
-        public ServerActiveBuff(BuffData data)
+        public ServerActiveBuff(BuffData data, float effectiveness = 1f)
         {
             buffData = data;
             remainingTurns = data.durationTurns;
+            this.effectiveness = effectiveness;
         }
     }
 }
