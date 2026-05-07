@@ -226,6 +226,35 @@ namespace AlperKocasalih.Chess.Grid
             return null;
         }
 
+        public CardData GenerateCardForType(Type type, int seed)
+        {
+            // Sync random state for this generation
+            Random.State oldState = Random.state;
+            Random.InitState(seed);
+
+            // Find templates that match this type (or any if none match)
+            List<CardData> candidates = new List<CardData>();
+            foreach (var template in allAvailableCards)
+            {
+                if (template.pawnClass == type) candidates.Add(template);
+            }
+
+            if (candidates.Count == 0) candidates = allAvailableCards;
+
+            CardData templatePick = candidates[Random.Range(0, candidates.Count)];
+            CardData cardInstance = Instantiate(templatePick);
+            cardInstance.name = templatePick.name;
+
+            ApplyRandomBuffs(cardInstance);
+
+            masterRuntimeCardList.Add(cardInstance);
+            
+            // Restore random state
+            Random.state = oldState;
+
+            return cardInstance;
+        }
+
         #endregion
     }
 }

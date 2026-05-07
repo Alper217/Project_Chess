@@ -309,6 +309,11 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             int points = _pawn.PawnData.pointValue;
             Debug.Log($"PawnHealthController: Pawn of Player {loserID} died. Awarding {points} points to Player {opponentID}.");
             GameManager.Instance.AddScore(opponentID, points);
+
+            if (DraftManager.Instance != null)
+            {
+                DraftManager.Instance.AddReRollsServer(opponentID, DraftManager.Instance.ReRollsPerKill);
+            }
         }
 
         if (pawn != null)

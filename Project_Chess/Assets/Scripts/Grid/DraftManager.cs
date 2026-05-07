@@ -41,6 +41,21 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, ReadOnly] private List<int> p1BurnLockUntilRound = new List<int>();
         [SerializeField, ReadOnly] private List<int> p2BurnLockUntilRound = new List<int>();
         [SerializeField, ReadOnly] private bool pendingAdvanceAfterBurn = false;
+        
+        [Header("System Toggles")]
+        [SerializeField] private bool enableReRollSystem = true;
+        [SerializeField] private bool enableFusionSystem = true;
+        public bool EnableReRollSystem => enableReRollSystem;
+        public bool EnableFusionSystem => enableFusionSystem;
+
+        [Header("Re-Roll Settings")]
+        [SerializeField] private int startingReRolls = 5;
+        [SerializeField] private int reRollsPerKill = 3;
+        public int ReRollsPerKill => reRollsPerKill;
+
+        [Header("Re-Roll State (Server Managed)")]
+        private NetworkVariable<int> p1ReRolls = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+        private NetworkVariable<int> p2ReRolls = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         private List<CardData> currentChoices = new List<CardData>();
         private HashSet<DraftAction> usedActionsThisRound = new HashSet<DraftAction>();
@@ -111,6 +126,9 @@ namespace AlperKocasalih.Chess.Grid
             roundCount = 1;
             draftingPlayerID = TurnManager.Instance.ActivePlayerID;
             startingDraftPlayerID = draftingPlayerID;
+
+            p1ReRolls.Value = startingReRolls;
+            p2ReRolls.Value = startingReRolls;
             
             p1Hand.Clear();
             p2Hand.Clear();
@@ -275,13 +293,39 @@ namespace AlperKocasalih.Chess.Grid
             else
             {
                 // UI should probably refresh to show remaining cards
-                int[] remainingIndices = new int[currentChoices.Count];
-                for(int i = 0; i < currentChoices.Count; ++i)
-                {
-                    remainingIndices[i] = DeckManager.Instance.GetCardIndex(currentChoices[i]);
-                }
-                NotifyCardsDrawnClientRpc(remainingIndices, draftingPlayerID);
+                NotifyCurrentChoicesToClients();
             }
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void ReRollDraftCardServerRpc(int cardIndex, RpcParams rpcParams = default)
+        {
+            if (!IsServer || !enableReRollSystem) return;
+            if (!isDraftingActive || currentChoices.Count <= cardIndex) return;
+            
+            int playerID = GetPlayerIdFromClientId(rpcParams.Receive.SenderClientId);
+            if (playerID != draftingPlayerID) return;
+
+            if (TrySpendReRollServer(playerID))
+            {
+                // Replace the card at the given index
+                CardData newCard = DeckManager.Instance.DrawCards(1)[0];
+                currentChoices[cardIndex] = newCard;
+                
+                Debug.Log($"DraftManager: Player {playerID} re-rolled card at index {cardIndex}. New card: {newCard.cardName}");
+                
+                NotifyCurrentChoicesToClients();
+            }
+        }
+
+        private void NotifyCurrentChoicesToClients()
+        {
+            int[] indices = new int[currentChoices.Count];
+            for (int i = 0; i < currentChoices.Count; ++i)
+            {
+                indices[i] = DeckManager.Instance.GetCardIndex(currentChoices[i]);
+            }
+            NotifyCardsDrawnClientRpc(indices, draftingPlayerID);
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
@@ -448,6 +492,92 @@ namespace AlperKocasalih.Chess.Grid
             OnDraftFinished?.Invoke();
         }
 
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void PerformFusionServerRpc(int playerID, int[] handIndices, RpcParams rpcParams = default)
+        {
+            if (!IsServer || !enableFusionSystem) return;
+            if (handIndices.Length != 3) return;
+
+            List<CardData> hand = GetHand(playerID);
+            // Verify indices
+            foreach (int idx in handIndices)
+            {
+                if (idx < 0 || idx >= hand.Count) return;
+            }
+
+            // Select random active pawn
+            Pawn[] allPawns = FindObjectsByType<Pawn>(FindObjectsSortMode.None);
+            List<Pawn> myPawns = new List<Pawn>();
+            foreach (var p in allPawns)
+            {
+                if (p.PlayerID == playerID && p.currentHealth.Value > 0) myPawns.Add(p);
+            }
+
+            if (myPawns.Count == 0) return; // No pawns to buff
+
+            Pawn targetPawn = myPawns[UnityEngine.Random.Range(0, myPawns.Count)];
+            int generationSeed = UnityEngine.Random.Range(1000, 999999);
+            CardData resultCard = DeckManager.Instance.GenerateCardForType(targetPawn.PawnData.type, generationSeed);
+
+            // Remove cards from hand
+            // Sort indices descending to avoid index shifts during removal
+            int[] sortedIndices = (int[])handIndices.Clone();
+            Array.Sort(sortedIndices);
+            Array.Reverse(sortedIndices);
+
+            foreach (int idx in sortedIndices)
+            {
+                CardData removed = hand[idx];
+                hand.RemoveAt(idx);
+                GetBurnLockList(playerID).RemoveAt(idx);
+                NotifyHandUpdatedClientRpc(playerID, DeckManager.Instance.GetCardIndex(removed), false, idx, 0);
+            }
+
+            // Notify clients about the fusion result
+            NotifyFusionResultClientRpc(playerID, targetPawn.NetworkObjectId, targetPawn.PawnData.type, generationSeed);
+        }
+
+        [ClientRpc]
+        private void NotifyFusionResultClientRpc(int playerID, ulong pawnNetID, Type pawnType, int seed)
+        {
+            // Both server and client generate the same card to keep masterRuntimeCardList in sync
+            CardData card = DeckManager.Instance.GenerateCardForType(pawnType, seed);
+            
+            // Show Fusion UI result
+            FusionUI.Instance?.ShowResult(playerID, pawnNetID, card);
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void ReRollFusionServerRpc(int playerID, RpcParams rpcParams = default)
+        {
+            if (!IsServer) return;
+            if (TrySpendReRollServer(playerID))
+            {
+                // Re-select pawn and card
+                Pawn[] allPawns = FindObjectsByType<Pawn>(FindObjectsSortMode.None);
+                List<Pawn> myPawns = new List<Pawn>();
+                foreach (var p in allPawns)
+                {
+                    if (p.PlayerID == playerID && p.currentHealth.Value > 0) myPawns.Add(p);
+                }
+
+                if (myPawns.Count == 0) return;
+
+                Pawn targetPawn = myPawns[UnityEngine.Random.Range(0, myPawns.Count)];
+                int generationSeed = UnityEngine.Random.Range(1000, 999999);
+                
+                NotifyFusionResultClientRpc(playerID, targetPawn.NetworkObjectId, targetPawn.PawnData.type, generationSeed);
+            }
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void AcceptFusionResultServerRpc(int playerID, int cardIndex)
+        {
+            if (!IsServer) return;
+            CardData card = DeckManager.Instance.GetCardByIndex(cardIndex);
+            AddCardToHandOrQueue(playerID, card);
+        }
+
         [ClientRpc]
         private void NotifyUsedActionsClientRpc(DraftAction[] actions)
         {
@@ -468,6 +598,36 @@ namespace AlperKocasalih.Chess.Grid
         public int DraftingPlayerID => draftingPlayerID;
         public bool IsActionDraftActive => isActionDraftActive;
         public bool IsDrawAllowed => !IsDrawLocked();
+        public int GetReRolls(int playerID) => playerID == 1 ? p1ReRolls.Value : p2ReRolls.Value;
+
+        public void AddReRollsServer(int playerID, int count)
+        {
+            if (!IsServer) return;
+            if (playerID == 1) p1ReRolls.Value += count;
+            else if (playerID == 2) p2ReRolls.Value += count;
+        }
+
+        public bool TrySpendReRollServer(int playerID)
+        {
+            if (!IsServer) return false;
+            if (playerID == 1)
+            {
+                if (p1ReRolls.Value > 0)
+                {
+                    p1ReRolls.Value--;
+                    return true;
+                }
+            }
+            else if (playerID == 2)
+            {
+                if (p2ReRolls.Value > 0)
+                {
+                    p2ReRolls.Value--;
+                    return true;
+                }
+            }
+            return false;
+        }
 
         public List<CardData> GetCurrentChoices()
         {

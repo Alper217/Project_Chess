@@ -49,6 +49,8 @@ namespace AlperKocasalih.Chess.Grid
         private int pendingBurnCount = 0;
         private bool isHandVisible = true;
         private bool isHandExpanded = false;
+        private bool isFusionSelectionActive = false;
+        private List<HandCard> selectedFusionCards = new List<HandCard>();
         private float currentYOffset;
 
         #endregion
@@ -115,6 +117,12 @@ namespace AlperKocasalih.Chess.Grid
             if (isBurnSelectionActive)
             {
                 TryBurnSelectedCard(card);
+                return;
+            }
+
+            if (isFusionSelectionActive)
+            {
+                ToggleFusionSelection(card);
                 return;
             }
 
@@ -320,6 +328,55 @@ namespace AlperKocasalih.Chess.Grid
                 DraftManager.Instance.BurnOverflowCardAtIndexServerRpc(localPlayerID, card.HandIndex);
                 isBurnSelectionActive = false; 
             }
+        }
+
+        public void StartFusionSelection()
+        {
+            if (DraftManager.Instance != null && !DraftManager.Instance.EnableFusionSystem) return;
+
+            isFusionSelectionActive = true;
+            selectedFusionCards.Clear();
+            foreach (var card in spawnedCards) card.SetSelected(false);
+            
+            // Show some UI message maybe?
+            Debug.Log("Fusion Selection Active: Select 3 cards to burn.");
+        }
+
+        private void ToggleFusionSelection(HandCard card)
+        {
+            if (selectedFusionCards.Contains(card))
+            {
+                selectedFusionCards.Remove(card);
+                card.SetSelected(false);
+            }
+            else
+            {
+                if (selectedFusionCards.Count < 3)
+                {
+                    selectedFusionCards.Add(card);
+                    card.SetSelected(true);
+                }
+            }
+
+            if (selectedFusionCards.Count == 3)
+            {
+                if (FusionUI.Instance == null)
+                {
+                    Debug.LogError("HATA: Sahne üzerinde FusionUI scriptine sahip bir obje bulunamadı veya kapalı (Inactive)! FusionUI objesi sahnede aktif olmalı, sadece içindeki paneller kapalı durmalı.");
+                }
+                else
+                {
+                    // Trigger Fusion Confirmation UI
+                    FusionUI.Instance.ShowConfirmation(selectedFusionCards);
+                }
+            }
+        }
+
+        public void CancelFusionSelection()
+        {
+            isFusionSelectionActive = false;
+            foreach (var card in selectedFusionCards) card.SetSelected(false);
+            selectedFusionCards.Clear();
         }
     }
 }

@@ -21,6 +21,8 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private Image[] cardImages;
         [SerializeField] private Transform opponentCardSlot;
         [SerializeField] private Transform playerCardSlot;
+        [SerializeField] private GameObject[] reRollButtons;
+        [SerializeField] private TextMeshProUGUI[] reRollButtonTexts;
 
         // Cached initial transforms (set once in Start)
         private Vector3[]     slotInitialPositions;
@@ -124,7 +126,22 @@ namespace AlperKocasalih.Chess.Grid
             int  localPlayerID = GetLocalPlayerID();
             bool isMyTurn      = (localPlayerID == playerID);
 
+            int rolls = DraftManager.Instance.GetReRolls(localPlayerID);
+
             foreach (var slot in cardSlots) slot.SetActive(false);
+            
+            for (int i = 0; i < reRollButtons.Length; i++)
+            {
+                if (reRollButtons[i] != null)
+                {
+                    bool show = isMyTurn && i < cards.Count && DraftManager.Instance.EnableReRollSystem;
+                    reRollButtons[i].SetActive(show);
+                    if (reRollButtonTexts.Length > i && reRollButtonTexts[i] != null)
+                    {
+                        reRollButtonTexts[i].text = rolls.ToString();
+                    }
+                }
+            }
 
             if (!isMyTurn) { if (choicePanel != null) choicePanel.SetActive(false); return; }
 
@@ -175,6 +192,14 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             if (choicePanel != null) choicePanel.SetActive(false);
+        }
+
+        public void OnReRollClicked(int index)
+        {
+            if (DraftManager.Instance != null)
+            {
+                DraftManager.Instance.ReRollDraftCardServerRpc(index);
+            }
         }
 
         private void UpdateTurnStatus(int playerID)
