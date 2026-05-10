@@ -6,22 +6,34 @@
   <component name="ChangeListManager">
     <list default="true" id="3d9e23b9-49f8-4e62-afbc-c164cc147016" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/HorsemanMovement1.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/MovementPatterns/HorsemanMovement1.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Archer.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Archer.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cannon.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cannon.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cheriff.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cheriff.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Commander.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Commander.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Horsemen.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Horsemen.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Knight.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Knight.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Ninja.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Ninja.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Queen.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Queen.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Wizard.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Wizard.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Archer.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Archer.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_Damage.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_Damage.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_DamageBlock.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_DamageBlock.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_DecreaseDamage.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_DecreaseDamage.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_Health.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_Health.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_Immunity.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_Immunity.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_Lifesteal.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_Lifesteal.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_MovementBuff.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_MovementBuff.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_Range.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/B_Range.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/D_Damage.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/D_Damage.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/D_IncreaseDamage.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/D_IncreaseDamage.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/D_IncreaseDebuffs.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/D_IncreaseDebuffs.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/D_Range.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/D_Range.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/D_Recoil.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/D_Recoil.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/Buffs/D_Stun.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/Buffs/D_Stun.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/HandCardPrefab.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/HandCardPrefab.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/BuffData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/BuffData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/CardData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/CardData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/TurnManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/TurnManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/FusionUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/FusionUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/HandCard.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/HandCard.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnSelectionUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnSelectionUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/TooltipManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/TooltipManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/TMP Settings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/TMP Settings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -169,6 +181,10 @@
       <workItem from="1777560923166" duration="6845000" />
       <workItem from="1777631640457" duration="5836000" />
       <workItem from="1777907254663" duration="3486000" />
+      <workItem from="1778074451122" duration="2082000" />
+      <workItem from="1778076708467" duration="571000" />
+      <workItem from="1778336935273" duration="3220000" />
+      <workItem from="1778423665697" duration="18497000" />
     </task>
     <servers />
   </component>

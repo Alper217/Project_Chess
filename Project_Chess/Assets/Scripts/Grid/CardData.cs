@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace AlperKocasalih.Chess.Grid
 {
@@ -51,9 +51,8 @@ namespace AlperKocasalih.Chess.Grid
                 if (buff == null) continue;
                 string sign = buff.amount > 0 ? "+" : "";
                 string percent = buff.isPercentage ? "%" : "";
-                string color = buff.isPositiveEffect ? "#0b6d0eff" : "#c90000ff"; // Green for buff, Red for debuff
+                string color = buff.isPositiveEffect ? "#0b6d0eff" : "#c90000ff";
                 
-                // Use description if available, else fallback to enum name
                 string displayName = !string.IsNullOrEmpty(buff.effectDescription) ? buff.effectDescription : buff.effectType.ToString();
                 
                 if (desc != "") desc += "\n";
@@ -63,3 +62,4 @@ namespace AlperKocasalih.Chess.Grid
         }
     }
 }
+

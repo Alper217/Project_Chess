@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: 
   effectType: 5
+  effectIcon: {fileID: 21300000, guid: 0f505781be647994cb2242b3b8623aa8, type: 3}
   effectDescription: "Piyonun bir sonraki hareket menzilini -1 kare d\xFC\u015F\xFCr\xFCr."
   amount: -1
   isPercentage: 0

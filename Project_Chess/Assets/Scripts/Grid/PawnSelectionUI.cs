@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using AlperKocasalih.Chess.Grid;
 using UnityEngine;
 using UnityEngine.UI;
@@ -6,7 +6,7 @@ using UnityEngine.EventSystems;
 
 public class PawnSelectionUI : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler
 {
-    public static  PawnSelectionUI instance;
+    public static PawnSelectionUI instance;
     [Header("PawnSelection")]
     public int pawnTypeIndex;
     
@@ -16,7 +16,7 @@ public class PawnSelectionUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
     
     [Header("UI Visuals")]
     private Image pawnIcon;
-    [SerializeField]private GameObject highlightOutline;
+    [SerializeField] private GameObject highlightOutline;
     private Color disabledColor = Color.grey;
     private Color orgColor = Color.white;
     
@@ -44,44 +44,28 @@ public class PawnSelectionUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
     {
         isPlaced = true;
         SetSelected(false);
-
-        if (pawnIcon != null)
-        {
-            pawnIcon.color = disabledColor;
-            pawnIcon.raycastTarget = false;
-        }
+        if (pawnIcon != null) { pawnIcon.color = disabledColor; pawnIcon.raycastTarget = false; }
     }
 
     public void ResetItem()
     {
         isPlaced = false;
         SetSelected(false);
-        if (pawnIcon != null)
-        {
-            pawnIcon.color = orgColor;
-            Debug.Log("PawnSelectionUI: ResetItem() called");
-            Debug.Log($"IndexNumber: {pawnTypeIndex}");
-            pawnIcon.raycastTarget = true;
-        }
+        if (pawnIcon != null) { pawnIcon.color = orgColor; pawnIcon.raycastTarget = true; }
     }
-
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if (isPlaced)  return;
+        if (isPlaced) return;
         if(TooltipManager.instance != null)
-        {
             TooltipManager.instance.ShowTooltip(pawnName, pawnDescription);
-        }
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        if (isPlaced)  return;
+        if (isPlaced) return;
         if (TooltipManager.instance != null)
-        {
             TooltipManager.instance.HideTooltip();
-        }
     }
 
     public void OnPointerClick(PointerEventData eventData)

@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using UnityEngine;
 using Unity.Netcode;
 
@@ -254,7 +254,7 @@ namespace AlperKocasalih.Chess.Grid
             {
                 int auraBonusMax = maxHealth.Value - pawnData.maxHealth;
                 maxHealth.Value = pawnData.maxHealth;
-                // Only clamp currentHealth to new max, do NOT add back — preserves combat damage
+                // Only clamp currentHealth to new max, do NOT add back â€” preserves combat damage
                 if (currentHealth.Value > maxHealth.Value)
                     currentHealth.Value = maxHealth.Value;
             }
@@ -607,4 +607,6 @@ namespace AlperKocasalih.Chess.Grid
         #endregion
     }
 }
+
+
 
