@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d2e801ee7d4cbe499e0b140df7992c9, type: 3}
   m_Name: B_Lifesteal
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
-  buffName: 
+  buffName: Kan Arzusu
   effectType: 6
   effectDescription: "Verilen hasar\u0131n %15'i kadar can yeniler"
   amount: 15

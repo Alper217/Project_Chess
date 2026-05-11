@@ -113,6 +113,8 @@ namespace AlperKocasalih.Chess.Grid
             if (TurnManager.Instance != null)
                 TurnManager.Instance.RefreshTurnInfoUI();
 
+            ResetCardScales();
+
             if (draftPanel != null)
                 draftPanel.DOFade(0f, 0.4f).SetEase(Ease.InCubic)
                           .OnComplete(() => draftPanel.gameObject.SetActive(false));
@@ -144,6 +146,8 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             if (!isMyTurn) { if (choicePanel != null) choicePanel.SetActive(false); return; }
+
+            ResetCardScales();
 
             for (int i = 0; i < cards.Count; i++)
             {
@@ -223,18 +227,30 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (isBurnBlockingDraft) return;
 
+            // Reset previous selection scales
+            ResetCardScales();
+
+            currentPendingCardIndex = index;
             Transform t = cardSlots[index].transform;
             t.DOKill();
 
-            // Quick click-pop feedback
-            Vector3 baseScale = slotInitialScales[index];
-            Sequence clickSeq = DOTween.Sequence();
-            clickSeq.Append(t.DOScale(baseScale * 1.12f, 0.08f).SetEase(Ease.OutQuad));
-            clickSeq.Append(t.DOScale(baseScale,         0.12f).SetEase(Ease.OutCubic));
-            clickSeq.Play();
+            // Highlight selection with a 10% scale up and "OutBack" spring feel
+            Vector3 targetScale = slotInitialScales[index] * 1.1f;
+            t.DOScale(targetScale, 0.25f).SetEase(Ease.OutBack);
 
-            currentPendingCardIndex = index;
             if (choicePanel != null) choicePanel.SetActive(true);
+        }
+
+        private void ResetCardScales()
+        {
+            for (int i = 0; i < cardSlots.Length; i++)
+            {
+                if (cardSlots[i] != null && cardSlots[i].activeSelf)
+                {
+                    cardSlots[i].transform.DOKill();
+                    cardSlots[i].transform.DOScale(slotInitialScales[i], 0.2f).SetEase(Ease.OutCubic);
+                }
+            }
         }
 
         // ── Action buttons ────────────────────────────────────────────────────────

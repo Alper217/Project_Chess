@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d2e801ee7d4cbe499e0b140df7992c9, type: 3}
   m_Name: B_Range
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
-  buffName: 
+  buffName: "R\xFCzgar \u0130zni"
   effectType: 5
   effectDescription: "Bu tur yap\u0131lan hareketin menzilini +1 kare art\u0131r\u0131r."
   amount: 1

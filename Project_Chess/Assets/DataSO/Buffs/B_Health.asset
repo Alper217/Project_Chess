@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d2e801ee7d4cbe499e0b140df7992c9, type: 3}
   m_Name: B_Health
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
-  buffName: 
+  buffName: "Ya\u015Fam K\u0131v\u0131lc\u0131m\u0131"
   effectType: 2
   effectDescription: "%5 Can ilavesi sa\u011Flar"
   amount: 5

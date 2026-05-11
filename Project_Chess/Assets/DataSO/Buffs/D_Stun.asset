@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d2e801ee7d4cbe499e0b140df7992c9, type: 3}
   m_Name: D_Stun
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
-  buffName: 
+  buffName: "Ayak Ba\u011F\u0131"
   effectType: 10
   effectDescription: "Piyon hareketini ger\xE7ekle\u015Ftirdikten sonra 2 tur boyunca
     hareket edemez ve sald\u0131ramaz."

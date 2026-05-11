@@ -53,11 +53,11 @@ namespace AlperKocasalih.Chess.Grid
                 string percent = buff.isPercentage ? "%" : "";
                 string color = buff.isPositiveEffect ? "#0b6d0eff" : "#c90000ff"; // Green for buff, Red for debuff
                 
-                // Use description if available, else fallback to enum name
-                string displayName = !string.IsNullOrEmpty(buff.effectDescription) ? buff.effectDescription : buff.effectType.ToString();
+                // Use buffName for a cleaner, name-only display (TFT style)
+                string displayName = !string.IsNullOrEmpty(buff.buffName) ? buff.buffName : buff.effectType.ToString();
                 
                 if (desc != "") desc += "\n";
-                desc += $"<color={color}><size=80%>{displayName}</size></color>";
+                desc += $"<color={color}><size=90%>{displayName}</size></color>";
             }
             return desc;
         }

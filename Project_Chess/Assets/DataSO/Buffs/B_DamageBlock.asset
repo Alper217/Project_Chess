@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d2e801ee7d4cbe499e0b140df7992c9, type: 3}
   m_Name: B_DamageBlock
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
-  buffName: 
+  buffName: "K\u0131r\u0131lmaz irade"
   effectType: 8
   effectDescription: "Rakibinden 2 tur i\xE7erisinde gelebilecek sald\u0131r\u0131y\u0131
     engeller."

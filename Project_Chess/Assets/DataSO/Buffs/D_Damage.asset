@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d2e801ee7d4cbe499e0b140df7992c9, type: 3}
   m_Name: D_Damage
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
-  buffName: 
+  buffName: "K\xF6rl\xFCk"
   effectType: 3
   effectDescription: "Piyonun verece\u011Fi hasar\u0131 %30 azalt\u0131r"
   amount: -30

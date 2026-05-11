@@ -87,16 +87,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             return;
         }
 
-        string buffsText = $"Damage: {_pawn.HoverDamagePreview}";
-        if (_pawn.forceAttackPattern.Value)
-        {
-            buffsText += " <color=yellow>(Pattern Only Attack)</color>";
-        }
-
-        if (!string.IsNullOrWhiteSpace(_pawn.BuffSummary))
-        {
-            buffsText = $"{buffsText}\n{_pawn.BuffSummary}";
-        }
+        string buffsText = _pawn.BuffSummary;
 
         HealthUIManager.Instance.ShowHealthBar(
             transform,

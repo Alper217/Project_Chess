@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d2e801ee7d4cbe499e0b140df7992c9, type: 3}
   m_Name: D_IncreaseDebuffs
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
-  buffName: 
+  buffName: Suskukluk
   effectType: 12
   effectDescription: "Piyonun sahip oldu\u011Fu debufflar 2x olarak uygulan\u0131r."
   amount: 0
