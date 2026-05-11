@@ -14,6 +14,7 @@ public class HealthUIManager : MonoBehaviour
     public float heightOffsetMultiplier = 2f;
     public float zOffset = 10f;
     public TextMeshProUGUI healthText;
+    public TextMeshProUGUI pawnNameText;
 
     private Transform currentTarget;
 
@@ -37,9 +38,14 @@ public class HealthUIManager : MonoBehaviour
         }
     }
 
-    public void ShowHealthBar(Transform target, int current, int max, string buffs = "", string debuffs = "")
+    public void ShowHealthBar(Transform target, int current, int max, string pawnName, string buffs = "", string debuffs = "")
     {
         currentTarget = target;
+
+        if (pawnNameText != null)
+        {
+            pawnNameText.text = pawnName;
+        }
 
         if (healthSlider != null)
         {

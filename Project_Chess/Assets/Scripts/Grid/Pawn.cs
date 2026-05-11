@@ -34,8 +34,8 @@ namespace AlperKocasalih.Chess.Grid
         [Header("Visuals")]
         [SerializeField] private MeshRenderer meshRenderer;
         [SerializeField, Min(0)] private int highlightMaterialIndex = 0;
-        [SerializeField] private Color player1Color = Color.white;
-        [SerializeField] private Color player2Color = Color.black;
+        [SerializeField] private Color player1Color = new Color(0.96f, 0.96f, 0.86f); // Ivory/Bone White
+        [SerializeField] private Color player2Color = new Color(0.6f, 0.1f, 0.1f);   // Deep Crimson/Burgundy
         private Material[] originalMaterials;
         private bool isInitialized = false;
         [SerializeField] private bool debugBuffs = true;

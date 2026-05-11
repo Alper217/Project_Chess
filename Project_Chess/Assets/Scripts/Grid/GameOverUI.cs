@@ -57,7 +57,7 @@ namespace AlperKocasalih.Chess.Grid
             if (winnerText != null)
             {
                 winnerText.text = $"Player {winnerID} Wins!";
-                winnerText.color = winnerID == 1 ? Color.cyan : new Color(1f, 0.5f, 0f);
+                winnerText.color = winnerID == 1 ? new Color(0.96f, 0.96f, 0.86f) : new Color(0.6f, 0.1f, 0.1f);
             }
 
             gameOverPanel.gameObject.SetActive(true);

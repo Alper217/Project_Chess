@@ -102,6 +102,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             transform,
             currentHealth,
             _pawn.maxHealth.Value,
+            _pawn.PawnData.pawnName,
             buffsText,
             _pawn.DebuffSummary);
     }
