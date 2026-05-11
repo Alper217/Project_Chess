@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: "Kalkan Duvar\u0131"
   effectType: 4
-  effectIcon: {fileID: 21300000, guid: e0078e926e482f942a73a74f65a80199, type: 3}
   effectDescription: "Al\u0131nan hasar\u0131 %20 azalt\u0131r"
   amount: -20
   isPercentage: 1

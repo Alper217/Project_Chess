@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using AlperKocasalih.Chess.Grid;
 using AlperKocasalih.Chess.Grid.Utils;
 using Unity.Netcode;
@@ -18,6 +18,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     private void Awake()
     {
         _pawn = GetComponent<Pawn>();
+        
     }
 
     public override void OnNetworkSpawn()
@@ -86,12 +87,23 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             return;
         }
 
-        // Artik metin gondermek yerine dogrudan pawn uzerindeki activeBuffs listesini gonderiyoruz
+        string buffsText = $"Damage: {_pawn.HoverDamagePreview}";
+        if (_pawn.forceAttackPattern.Value)
+        {
+            buffsText += " <color=yellow>(Pattern Only Attack)</color>";
+        }
+
+        if (!string.IsNullOrWhiteSpace(_pawn.BuffSummary))
+        {
+            buffsText = $"{buffsText}\n{_pawn.BuffSummary}";
+        }
+
         HealthUIManager.Instance.ShowHealthBar(
             transform,
             currentHealth,
             _pawn.maxHealth.Value,
-            _pawn.activeBuffs);
+            buffsText,
+            _pawn.DebuffSummary);
     }
 
     void Update()
@@ -101,6 +113,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             ShowPawnHoverUI(_pawn.currentHealth.Value);
         }
 
+        // Toggle Force Attack Pattern with 'T' key when hovered (only for own pawns)
         if (Input.GetKeyDown(KeyCode.T) && isHovered && _pawn != null)
         {
             int localPlayerID = 1;
@@ -114,51 +127,91 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
                 _pawn.ToggleForceAttackPattern();
             }
         }
+
+        // Removed debug click-to-damage logic
+        /*
+        if (Input.GetMouseButtonDown(0) && isHovered)
+        {
+            TakeDamageServer(_pawn.damage.Value);
+        }
+        */
     }
 
     public void TakeDamageServer(int damageAmount)
     {
         if (!IsServer) return;
+
         _pawn.currentHealth.Value -= damageAmount;
+        
+        // Trigger damage feedback on all clients
         ShowDamageFeedbackClientRpc(damageAmount, false);
-        if (_pawn.currentHealth.Value <= 0) Die();
+        
+        if (_pawn.currentHealth.Value <= 0)
+        {
+            Die();
+        }
     }
 
     public void HealServer(int amount)
     {
         if (!IsServer) return;
+
         _pawn.currentHealth.Value += amount;
-        if (_pawn.currentHealth.Value > _pawn.maxHealth.Value) _pawn.currentHealth.Value = _pawn.maxHealth.Value;
+
+        if (_pawn.currentHealth.Value > _pawn.maxHealth.Value)
+        {
+            _pawn.currentHealth.Value = _pawn.maxHealth.Value;
+        }
+
+        // Trigger healing feedback on all clients
         ShowDamageFeedbackClientRpc(amount, true);
+
+        Debug.Log($"{_pawn.PawnData.pawnName} healed. New health: {_pawn.currentHealth.Value}");
     }
 
     [ClientRpc]
     private void ShowDamageFeedbackClientRpc(int amount, bool isHeal)
     {
         if (targetPlayer == null) return;
-        targetPlayer.transform.localScale = Vector3.one;
+
         MMF_FloatingText floatingTextFeedback = targetPlayer.GetFeedbackOfType<MMF_FloatingText>();
         if (floatingTextFeedback != null)
         {
-            string colorName = isHeal ? "green" : "red"; 
+            // Simplified: Just set the color. Outline should be handled in the TMP Material settings.
+            string color = isHeal ? "#00FF00" : "#FF0000"; 
             string prefix = isHeal ? "+" : "-";
-            floatingTextFeedback.Value = amount == 0 && !isHeal ? "<color=white>0</color>" : $"<color={colorName}>{prefix}{amount}</color>";
+            
+            if (amount == 0 && !isHeal)
+            {
+                floatingTextFeedback.Value = "<color=#FFFFFF>0</color>";
+            }
+            else
+            {
+                floatingTextFeedback.Value = $"<color={color}>{prefix}{amount}</color>";
+            }
         }
+
+        // Professional Movement: A slight arc movement instead of straight up
+        // Randomized X offset for a "burst" feel
         float randomX = Random.Range(-0.4f, 0.4f);
         Vector3 spawnPos = this.transform.position + new Vector3(randomX, 1.5f, Random.Range(-0.2f, 0.2f));
-        targetPlayer.PlayFeedbacks(spawnPos, 1f);
+        
+        targetPlayer.PlayFeedbacks(spawnPos);
+        
     }
 
     [ClientRpc]
     public void ShowBlockedFeedbackClientRpc()
     {
         if (targetPlayer == null) return;
-        targetPlayer.transform.localScale = Vector3.one;
         MMF_FloatingText floatingTextFeedback = targetPlayer.GetFeedbackOfType<MMF_FloatingText>();
-        if (floatingTextFeedback != null) floatingTextFeedback.Value = "<color=lightblue>BLOCKED</color>";
+        if (floatingTextFeedback != null)
+        {
+            floatingTextFeedback.Value = "<color=#00CCFF>BLOCKED</color>";
+        }
         float randomX = Random.Range(-0.3f, 0.3f);
         Vector3 spawnPos = this.transform.position + new Vector3(randomX, 1.8f, 0);
-        targetPlayer.PlayFeedbacks(spawnPos, 1f);
+        targetPlayer.PlayFeedbacks(spawnPos);
     }
 
     private void ShowAttackRange()
@@ -168,60 +221,121 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         if (pattern == null) return;
         if (_pawn.OccupiedCell == null) return;
         if (!EnsureGridLookup()) return;
+
         ClearAttackRange();
+
         Vector2Int currentPos = _pawn.OccupiedCell.Coordinates;
         List<Vector2Int> offsets = pattern.GetValidOffsets(currentPos, _pawn.PlayerID == 2);
         if (offsets == null || offsets.Count == 0) return;
+
         Vector3Int startCube = HexGridMath.OffsetToCube(currentPos);
+
         foreach (var offset in offsets)
         {
             Vector2Int targetCoords = currentPos + offset;
+
             bool isBlocked = false;
             Vector3Int targetCube = HexGridMath.OffsetToCube(targetCoords);
             int dist = HexGridMath.CubeDistance(startCube, targetCube);
+
             for (int i = 1; i <= dist; i++)
             {
                 Vector3 cubeFloat = HexGridMath.CubeLerp(startCube, targetCube, 1f / dist * i);
                 Vector3Int cubePoint = HexGridMath.CubeRound(cubeFloat);
                 Vector2Int pathCoord = HexGridMath.CubeToOffset(cubePoint);
-                if (gridLookup.TryGetValue(pathCoord, out HexCell pathCell)) { if (pathCell.IsObstacle) { isBlocked = true; break; } }
-                else { isBlocked = true; break; }
+
+                if (gridLookup.TryGetValue(pathCoord, out HexCell pathCell))
+                {
+                    if (pathCell.IsObstacle)
+                    {
+                        isBlocked = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    isBlocked = true;
+                    break;
+                }
             }
+
             if (isBlocked) continue;
-            if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell)) { highlightedCells.Add(targetCell); targetCell.Highlight(attackHighlightColor); }
+
+            if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
+            {
+                highlightedCells.Add(targetCell);
+                targetCell.Highlight(attackHighlightColor);
+            }
         }
     }
 
-    private void ClearAttackRange() { foreach (var cell in highlightedCells) if (cell != null) cell.ResetHighlight(); highlightedCells.Clear(); }
+    private void ClearAttackRange()
+    {
+        foreach (var cell in highlightedCells)
+        {
+            if (cell != null) cell.ResetHighlight();
+        }
+        highlightedCells.Clear();
+    }
 
     private bool EnsureGridLookup()
     {
         if (gridLookup != null && gridLookup.Count > 0) return true;
         if (GridGenerator.Instance == null) return false;
+
         gridLookup.Clear();
         foreach (var hex in GridGenerator.Instance.SpawnedHexes)
         {
             if (hex == null) continue;
             HexCell cell = hex.GetComponent<HexCell>();
-            if (cell != null) gridLookup[cell.Coordinates] = cell;
+            if (cell != null)
+            {
+                gridLookup[cell.Coordinates] = cell;
+            }
         }
+
         return gridLookup.Count > 0;
     }
 
     private void Die()
     {
         if (!IsServer) return;
+
         int loserID = _pawn.PlayerID;
+
         if (_pawn != null && _pawn.PawnData != null && GameManager.Instance != null)
         {
             int opponentID = loserID == 1 ? 2 : 1;
             int points = _pawn.PawnData.pointValue;
+            Debug.Log($"PawnHealthController: Pawn of Player {loserID} died. Awarding {points} points to Player {opponentID}.");
             GameManager.Instance.AddScore(opponentID, points);
-            if (DraftManager.Instance != null) DraftManager.Instance.AddReRollsServer(opponentID, DraftManager.Instance.ReRollsPerKill);
+
+            if (DraftManager.Instance != null)
+            {
+                DraftManager.Instance.AddReRollsServer(opponentID, DraftManager.Instance.ReRollsPerKill);
+            }
         }
-        if (pawn != null) { NetworkObject pawnNetworkObject = pawn.GetComponent<NetworkObject>(); if (pawnNetworkObject != null && pawnNetworkObject.IsSpawned) pawnNetworkObject.Despawn(); }
-        else if (NetworkObject.IsSpawned) NetworkObject.Despawn();
-        else Destroy(gameObject);
-        if (GameManager.Instance != null) GameManager.Instance.CheckWinCondition(loserID);
+
+        if (pawn != null)
+        {
+            NetworkObject pawnNetworkObject = pawn.GetComponent<NetworkObject>();
+            if (pawnNetworkObject != null && pawnNetworkObject.IsSpawned)
+            {
+                pawnNetworkObject.Despawn();
+            }
+        }
+        else if (NetworkObject.IsSpawned)
+        {
+            NetworkObject.Despawn();
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.CheckWinCondition(loserID);
+        }
     }
 }

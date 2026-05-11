@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: 
   effectType: 10
-  effectIcon: {fileID: 21300000, guid: 520439b6e4c20ab44981a1b4a84c49ed, type: 3}
   effectDescription: "Piyon hareketini ger\xE7ekle\u015Ftirdikten sonra 2 tur boyunca
     hareket edemez ve sald\u0131ramaz."
   amount: 0

@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: 
   effectType: 3
-  effectIcon: {fileID: 21300000, guid: a3809a71aacb0f24c9ead47b641a4c9b, type: 3}
   effectDescription: "Piyonun verece\u011Fi hasar\u0131 %30 azalt\u0131r"
   amount: -30
   isPercentage: 1

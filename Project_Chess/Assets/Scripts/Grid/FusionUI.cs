@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -24,9 +24,6 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private GameObject resultPanel;
         [SerializeField] private Image resultCardImage;
         [SerializeField] private TextMeshProUGUI resultCardBuffs;
-        [SerializeField] private Transform resultIconContainer;
-        [SerializeField] private Transform[] confirmationIconContainers;
-        [SerializeField] private GameObject iconPrefab;
         [SerializeField] private Button acceptButton;
         [SerializeField] private Button reRollButton;
         [SerializeField] private TextMeshProUGUI reRollCountText;
@@ -198,4 +195,3 @@ namespace AlperKocasalih.Chess.Grid
         }
     }
 }
-

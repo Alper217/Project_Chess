@@ -14,7 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: 
   effectType: 7
-  effectIcon: {fileID: 21300000, guid: fcae2e88a8e52a84482ca1f4d64a78ff, type: 3}
   effectDescription: "Piyon sald\u0131r\u0131 yapt\u0131\u011F\u0131nda verdi\u011Fi
     hasar\u0131n %15'ini kendi yer."
   amount: 15
