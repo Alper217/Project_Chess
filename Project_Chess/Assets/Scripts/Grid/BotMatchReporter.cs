@@ -16,6 +16,7 @@ namespace AlperKocasalih.Chess.Grid
     {
         AllEnemyPawnsEliminated,
         PointAdvantage,
+        Timeout,
         Draw
     }
 

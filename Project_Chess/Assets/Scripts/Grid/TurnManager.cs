@@ -16,6 +16,7 @@ namespace AlperKocasalih.Chess.Grid
 
         [Header("UI References")]
         [SerializeField] private TextMeshProUGUI turnInfoText;
+        [SerializeField] private TextMeshProUGUI timerText;
         [SerializeField] private TextMeshProUGUI diceResultText;
         [SerializeField] private CanvasGroup diceUI;
 
@@ -23,12 +24,22 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, ReadOnly] private NetworkVariable<int> activePlayerID = new NetworkVariable<int>(1);
         [SerializeField, ReadOnly] private NetworkVariable<int> turnCount = new NetworkVariable<int>(1);
 
+        [Header("Turn Timer")]
+        [SerializeField] private float turnDurationSeconds = 180f;
+        [SerializeField] private int maxAfkCount = 3;
+        [SerializeField, ReadOnly] private NetworkVariable<float> remainingTurnTime = new NetworkVariable<float>(180f);
+        [SerializeField, ReadOnly] private NetworkVariable<int> player1AfkCount = new NetworkVariable<int>(0);
+        [SerializeField, ReadOnly] private NetworkVariable<int> player2AfkCount = new NetworkVariable<int>(0);
+
         #endregion
 
         #region Properties
 
         public int ActivePlayerID => activePlayerID.Value;
         public int TurnCount => turnCount.Value;
+        public float RemainingTurnTime => remainingTurnTime.Value;
+        public int Player1AfkCount => player1AfkCount.Value;
+        public int Player2AfkCount => player2AfkCount.Value;
 
         #endregion
 
@@ -44,15 +55,41 @@ namespace AlperKocasalih.Chess.Grid
         {
             activePlayerID.OnValueChanged += (oldValue, newValue) => {
                 UpdateTurnInfoUI();
+                UpdateTimerUI();
                 OnTurnChanged?.Invoke(newValue);
             };
 
+            remainingTurnTime.OnValueChanged += (oldValue, newValue) => UpdateTimerUI();
+            player1AfkCount.OnValueChanged += (oldValue, newValue) => UpdateTimerUI();
+            player2AfkCount.OnValueChanged += (oldValue, newValue) => UpdateTimerUI();
+
             if (GameManager.Instance != null)
             {
-                GameManager.Instance.OnStateChanged += (state) => UpdateTurnInfoUI();
+                GameManager.Instance.OnStateChanged += (state) => {
+                    UpdateTurnInfoUI();
+                    UpdateTimerUI();
+                    if (IsServer && state == GameState.ActionPhase)
+                    {
+                        ResetTurnTimer();
+                    }
+                };
             }
             
             UpdateTurnInfoUI();
+            UpdateTimerUI();
+        }
+
+        private void Update()
+        {
+            if (!IsServer) return;
+            if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.ActionPhase) return;
+            if (remainingTurnTime.Value <= 0f) return;
+
+            remainingTurnTime.Value = Mathf.Max(0f, remainingTurnTime.Value - Time.deltaTime);
+            if (remainingTurnTime.Value <= 0f)
+            {
+                HandleTurnTimeout();
+            }
         }
 
         #endregion
@@ -139,6 +176,7 @@ namespace AlperKocasalih.Chess.Grid
 
             activePlayerID.Value = activePlayerID.Value == 1 ? 2 : 1;
             turnCount.Value++;
+            ResetTurnTimer();
             
             // Safe Aura Refresh
             if (AuraManager.instance == null)
@@ -157,6 +195,45 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             Debug.Log($"TurnManager: Player {activePlayerID.Value}'s turn.");
+        }
+
+        private void HandleTurnTimeout()
+        {
+            int timedOutPlayerID = activePlayerID.Value;
+            int newAfkCount = IncrementAfkCount(timedOutPlayerID);
+
+            Debug.Log($"TurnManager: Player {timedOutPlayerID} timed out. AFK count: {newAfkCount}/{maxAfkCount}");
+
+            if (newAfkCount >= maxAfkCount)
+            {
+                int winnerID = timedOutPlayerID == 1 ? 2 : 1;
+                if (BotMatchReporter.Instance != null)
+                {
+                    BotMatchReporter.Instance.SetWinCondition(WinConditionType.Timeout);
+                }
+
+                GameManager.Instance.EndGame(winnerID);
+                return;
+            }
+
+            NextTurn();
+        }
+
+        private int IncrementAfkCount(int playerID)
+        {
+            if (playerID == 1)
+            {
+                player1AfkCount.Value++;
+                return player1AfkCount.Value;
+            }
+
+            player2AfkCount.Value++;
+            return player2AfkCount.Value;
+        }
+
+        private void ResetTurnTimer()
+        {
+            remainingTurnTime.Value = turnDurationSeconds;
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
@@ -192,9 +269,30 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        private void UpdateTimerUI()
+        {
+            if (timerText == null) return;
+
+            if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.ActionPhase)
+            {
+                timerText.gameObject.SetActive(false);
+                return;
+            }
+
+            timerText.gameObject.SetActive(true);
+
+            int secondsLeft = Mathf.CeilToInt(remainingTurnTime.Value);
+            int minutes = secondsLeft / 60;
+            int seconds = secondsLeft % 60;
+            int afkCount = activePlayerID.Value == 1 ? player1AfkCount.Value : player2AfkCount.Value;
+
+            timerText.text = $"{minutes:00}:{seconds:00} | AFK {afkCount}/{maxAfkCount}";
+        }
+
         public void RefreshTurnInfoUI()
         {
             UpdateTurnInfoUI();
+            UpdateTimerUI();
         }
 
         public void ResetManager()
@@ -202,6 +300,9 @@ namespace AlperKocasalih.Chess.Grid
             if (!IsServer) return;
             activePlayerID.Value = 1;
             turnCount.Value = 1;
+            player1AfkCount.Value = 0;
+            player2AfkCount.Value = 0;
+            ResetTurnTimer();
         }
 
         #endregion
