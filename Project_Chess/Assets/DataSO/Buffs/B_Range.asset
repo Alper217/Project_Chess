@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: B_Range
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: "R\xFCzgar \u0130zni"
+  icon: {fileID: 21300000, guid: 5769ecd2340e38e45a851f499c52c527, type: 3}
   effectType: 5
   effectDescription: "Bu tur yap\u0131lan hareketin menzilini +1 kare art\u0131r\u0131r."
   amount: 1

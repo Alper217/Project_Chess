@@ -57,7 +57,9 @@ namespace AlperKocasalih.Chess.Grid
                 string displayName = !string.IsNullOrEmpty(buff.buffName) ? buff.buffName : buff.effectType.ToString();
                 
                 if (desc != "") desc += "\n";
-                desc += $"<color={color}><size=90%>{displayName}</size></color>";
+                
+                string iconTag = buff.icon != null ? $"<sprite name=\"{buff.icon.name}\"> " : "";
+                desc += $"{iconTag}<color={color}><size=90%>{displayName}</size></color>";
             }
             return desc;
         }

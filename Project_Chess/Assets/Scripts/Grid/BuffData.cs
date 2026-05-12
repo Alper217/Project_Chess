@@ -25,6 +25,7 @@ namespace AlperKocasalih.Chess.Grid
     {
         [Header("Buff Identity")]
         public string buffName;
+        public Sprite icon;
         public EffectType effectType;
 
         [Tooltip("Human-readable description of the effect (e.g., 'Outgoing Damage', 'Can Calma').")]

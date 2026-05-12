@@ -578,9 +578,11 @@ namespace AlperKocasalih.Chess.Grid
                 name = activeBuff.buffData.effectType.ToString();
             }
 
+            string iconTag = activeBuff.buffData.icon != null ? $"<sprite name=\"{activeBuff.buffData.icon.name}\"> " : "";
+
             return activeBuff.remainingTurns > 0
-                ? $"{name} ({activeBuff.remainingTurns}T)"
-                : name;
+                ? $"{iconTag}{name} ({activeBuff.remainingTurns}T)"
+                : $"{iconTag}{name}";
         }
 
         [ClientRpc]
