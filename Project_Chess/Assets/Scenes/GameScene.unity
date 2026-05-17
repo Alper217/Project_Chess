@@ -7311,6 +7311,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: e362f2e1b09f0f44bb8fa260061cb918, type: 2}
   - {fileID: 11400000, guid: 013b82cb806a5dc42af73e991e37a095, type: 2}
   - {fileID: 11400000, guid: c5eb4d73f86fb26488bda897a51475da, type: 2}
+  - {fileID: 11400000, guid: b742167a4cc52f04987f4270e830f69f, type: 2}
   initialDeckSize: 120
   allPawnDatas:
   - {fileID: 11400000, guid: 94a340785c9894843b024a16412618a5, type: 2}
@@ -16394,6 +16395,7 @@ MonoBehaviour:
   activeCardRemainingUses: 1
   initialCardUses: 1
   selectedPawn: {fileID: 0}
+  dynamicObstacleCenter: {fileID: 0}
 --- !u!1 &1930345817
 GameObject:
   m_ObjectHideFlags: 0

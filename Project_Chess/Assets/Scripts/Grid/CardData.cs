@@ -35,6 +35,8 @@ namespace AlperKocasalih.Chess.Grid
         public bool isObstacleCard;
         [Tooltip("The shape of the obstacle placed on the grid.")]
         public ObstaclePattern obstaclePattern;
+        [Tooltip("If true, the player can dynamically place 3 obstacles within a 3-unit radius.")]
+        public bool isDynamicObstacle;
 
         [TextArea(2, 5)]
         public string description;

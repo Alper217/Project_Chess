@@ -10,7 +10,7 @@ namespace AlperKocasalih.Chess.Grid
     public class PlayerInputController : NetworkBehaviour
     {
         public static PlayerInputController Instance { get; private set; }
-        public enum SelectionState { None, CardSelected, PawnSelected, ObstacleTargeting }
+        public enum SelectionState { None, CardSelected, PawnSelected, ObstacleTargeting, DynamicObstacleCenterSelection, DynamicObstacleBlockSelection }
 
         #region Fields
 
@@ -30,6 +30,11 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, ReadOnly] private int activeCardRemainingUses = 1;
         [SerializeField, ReadOnly] private int initialCardUses = 1;
         [SerializeField, ReadOnly] private Pawn selectedPawn;
+
+        [Header("Dynamic Obstacle State")]
+        [SerializeField, ReadOnly] private HexCell dynamicObstacleCenter;
+        private readonly List<HexCell> dynamicObstacleValidCells = new List<HexCell>();
+        private readonly List<HexCell> dynamicObstacleSelectedCells = new List<HexCell>();
 
         private readonly List<HexCell> highlightedCells = new List<HexCell>();
         private readonly List<Pawn> highlightedPawns = new List<Pawn>();
@@ -130,14 +135,23 @@ namespace AlperKocasalih.Chess.Grid
 
             if (card.isObstacleCard)
             {
-                if (card.obstaclePattern == null)
+                if (card.isDynamicObstacle)
                 {
-                    Debug.LogWarning($"PlayerInputController: Obstacle Card '{card.cardName}' has no ObstaclePattern assigned.");
-                    CancelSelection();
-                    return;
+                    currentState = SelectionState.DynamicObstacleCenterSelection;
+                    activeCardRemainingUses = 3;
+                    Debug.Log($"PlayerInputController: Dynamic Obstacle Card '{card.cardName}' selected. Click a cell to set the center of the placement zone.");
                 }
-                currentState = SelectionState.ObstacleTargeting;
-                Debug.Log($"PlayerInputController: Obstacle Card '{card.cardName}' selected. Select an empty cell to place the pattern.");
+                else
+                {
+                    if (card.obstaclePattern == null)
+                    {
+                        Debug.LogWarning($"PlayerInputController: Obstacle Card '{card.cardName}' has no ObstaclePattern assigned.");
+                        CancelSelection();
+                        return;
+                    }
+                    currentState = SelectionState.ObstacleTargeting;
+                    Debug.Log($"PlayerInputController: Obstacle Card '{card.cardName}' selected. Select an empty cell to place the pattern.");
+                }
             }
             else
             {
@@ -215,6 +229,14 @@ namespace AlperKocasalih.Chess.Grid
                 else if (currentState == SelectionState.ObstacleTargeting)
                 {
                     HandleObstaclePlacement(cell);
+                }
+                else if (currentState == SelectionState.DynamicObstacleCenterSelection)
+                {
+                    HandleDynamicObstacleCenterSelection(cell);
+                }
+                else if (currentState == SelectionState.DynamicObstacleBlockSelection)
+                {
+                    HandleDynamicObstacleBlockSelection(cell);
                 }
                 else if (currentState == SelectionState.PawnSelected)
                 {
@@ -443,6 +465,101 @@ namespace AlperKocasalih.Chess.Grid
             CancelSelection();
         }
 
+        private void HandleDynamicObstacleCenterSelection(HexCell cell)
+        {
+            if (cell.IsOccupied || cell.IsObstacle)
+            {
+                Debug.Log("PlayerInputController: Cannot select an occupied or obstructed cell as the center.");
+                return;
+            }
+
+            dynamicObstacleCenter = cell;
+            currentState = SelectionState.DynamicObstacleBlockSelection;
+            activeCardRemainingUses = 3;
+            dynamicObstacleSelectedCells.Clear();
+            dynamicObstacleValidCells.Clear();
+
+            // Highlight all cells within a distance of 3 from the center
+            Dictionary<Vector2Int, int> neighbors = HexGridMath.GetHexesWithDistance(dynamicObstacleCenter.Coordinates, 3);
+            
+            // Use a nice semi-transparent light blue/cyan color for the placement range
+            Color rangeHighlightColor = new Color(0.2f, 0.6f, 1f, 0.4f);
+
+            foreach (var pair in neighbors)
+            {
+                if (gridLookup.TryGetValue(pair.Key, out HexCell targetCell))
+                {
+                    if (!targetCell.IsOccupied && !targetCell.IsObstacle)
+                    {
+                        dynamicObstacleValidCells.Add(targetCell);
+                        HighlightCell(targetCell, rangeHighlightColor);
+                    }
+                }
+            }
+
+            // Always highlight the center itself as well if it's valid
+            if (!dynamicObstacleValidCells.Contains(dynamicObstacleCenter))
+            {
+                dynamicObstacleValidCells.Add(dynamicObstacleCenter);
+                HighlightCell(dynamicObstacleCenter, rangeHighlightColor);
+            }
+
+            Debug.Log("PlayerInputController: Center set. Place 3 obstacles within the highlighted region.");
+        }
+
+        private void HandleDynamicObstacleBlockSelection(HexCell cell)
+        {
+            if (!dynamicObstacleValidCells.Contains(cell))
+            {
+                Debug.Log("PlayerInputController: Selected cell is outside the 3-unit placement zone.");
+                return;
+            }
+
+            if (cell.IsOccupied || cell.IsObstacle)
+            {
+                Debug.Log("PlayerInputController: Cannot place an obstacle on an occupied or already obstructed cell.");
+                return;
+            }
+
+            if (dynamicObstacleSelectedCells.Contains(cell))
+            {
+                Debug.Log("PlayerInputController: You have already selected this cell.");
+                return;
+            }
+
+            // Select this cell, highlight it uniquely (e.g. grey / black preview)
+            dynamicObstacleSelectedCells.Add(cell);
+            HighlightCell(cell, Color.grey); // temporary visual indicator for pending obstacle
+
+            activeCardRemainingUses--;
+
+            if (activeCardRemainingUses == 0)
+            {
+                // Gather absolute coordinates
+                Vector2Int[] absoluteCoords = new Vector2Int[dynamicObstacleSelectedCells.Count];
+                for (int i = 0; i < dynamicObstacleSelectedCells.Count; i++)
+                {
+                    absoluteCoords[i] = dynamicObstacleSelectedCells[i].Coordinates;
+                }
+
+                // Send to server via ObstacleManager
+                if (Core.ObstacleManager.Instance != null)
+                {
+                    Core.ObstacleManager.Instance.ExecuteObstaclePlacementServerRpc(absoluteCoords);
+                }
+
+                // Discard card
+                int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                if (activeCardData != null && DraftManager.Instance != null)
+                {
+                    DraftManager.Instance.RemoveCardFromHand(localPlayerID, activeCardData);
+                }
+
+                // Clear temporary lists and reset selection
+                CancelSelection();
+            }
+        }
+
         private void CancelSelection()
         {
             if (IsMultiActionInProgress)
@@ -478,6 +595,9 @@ namespace AlperKocasalih.Chess.Grid
             activeCardData = null;
             initialCardUses = 1;
             activeCardRemainingUses = 1;
+            dynamicObstacleCenter = null;
+            dynamicObstacleValidCells.Clear();
+            dynamicObstacleSelectedCells.Clear();
             currentState = SelectionState.None;
             OnSelectionCancelled?.Invoke();
         }
