@@ -31,6 +31,12 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private int maxPawns = 5;
         [SerializeField] private bool debugAuraRefresh = true;
 
+        [Header("Placement Zone Rows")]
+        [SerializeField] private int p1MinRow = 6;
+        [SerializeField] private int p1MaxRow = 7;
+        [SerializeField] private int p2MinRow = 0;
+        [SerializeField] private int p2MaxRow = 1;
+
         private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
         private HashSet<int> p1SpawnedTypes = new HashSet<int>(); // P1: r 0-2
         private HashSet<int> p2SpawnedTypes = new HashSet<int>(); // P2: r 7-9
@@ -167,8 +173,8 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             int rowCheck = cell.Coordinates.y;
-            bool isP1Region = rowCheck >= 7 && rowCheck <= 9;
-            bool isP2Region = rowCheck >= 0 && rowCheck <= 2;
+            bool isP1Region = rowCheck >= p1MinRow && rowCheck <= p1MaxRow;
+            bool isP2Region = rowCheck >= p2MinRow && rowCheck <= p2MaxRow;
 
             if (!isP1Region && !isP2Region)
             {
@@ -215,8 +221,8 @@ namespace AlperKocasalih.Chess.Grid
         private void SpawnPawnOnServer(HexCell cell, int pawnIndex, int playerID)
         {
             int rowCheck = cell.Coordinates.y;
-            bool isP1Region = rowCheck >= 7 && rowCheck <= 9;
-            bool isP2Region = rowCheck >= 0 && rowCheck <= 2;
+            bool isP1Region = rowCheck >= p1MinRow && rowCheck <= p1MaxRow;
+            bool isP2Region = rowCheck >= p2MinRow && rowCheck <= p2MaxRow;
             int placementCap = GetPlacementCap();
 
             // Network validation reporting mapping

@@ -5481,10 +5481,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 105319666}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 100, y: -66.125}
-  m_SizeDelta: {x: 180, y: 32.63}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!4 &854174311 stripped
 Transform:
@@ -6253,10 +6253,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 105319666}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 100, y: -29.905}
-  m_SizeDelta: {x: 180, y: 39.81}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &965273673
 CanvasRenderer:
@@ -11498,7 +11498,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1652942183
 RectTransform:
   m_ObjectHideFlags: 0
@@ -12214,6 +12214,10 @@ MonoBehaviour:
   pawnVisualOffset: {x: -0.65, y: 0, z: 0}
   maxPawns: 3
   debugAuraRefresh: 1
+  p1MinRow: 5
+  p1MaxRow: 7
+  p2MinRow: 0
+  p2MaxRow: 2
 --- !u!4 &1728194903
 Transform:
   m_ObjectHideFlags: 0
