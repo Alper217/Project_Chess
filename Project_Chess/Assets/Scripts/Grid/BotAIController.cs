@@ -635,6 +635,8 @@ namespace AlperKocasalih.Chess.Grid
             Pawn     bestPawn   = null;
             HexCell  bestTarget = null;
             bool     isAttack   = false;
+            bool     isBotObstacle = false;
+            List<Vector2Int> botObstacleCoords = new List<Vector2Int>();
 
             float bestScore = float.NegativeInfinity;
 
@@ -643,18 +645,167 @@ namespace AlperKocasalih.Chess.Grid
                 if (card == null) continue;
                 bool isObstacle = card.isObstacleCard;
 
-                foreach (Pawn pawn in myPawns)
+                if (isObstacle)
                 {
-                    if (pawn == null || pawn.HasStun()) continue;
-                    if (pawn.OccupiedCell == null) continue;
-
-                    // Resolve pattern
-                    bool classMatch  = pawn.PawnData != null && pawn.PawnData.type == card.pawnClass;
-                    MovementPattern movePattern = classMatch ? card.pattern : card.mismatchPattern;
-
-                    if (!isObstacle)
+                    // Find the closest enemy to our pawns
+                    Pawn closestEnemy = null;
+                    float minEnemyDist = float.MaxValue;
+                    foreach (var e in enemies)
                     {
-                        // Evaluate attack options — independent of movePattern being null
+                        if (e == null || e.OccupiedCell == null) continue;
+                        foreach (var myP in myPawns)
+                        {
+                            if (myP == null || myP.OccupiedCell == null) continue;
+                            float d = Utils.HexGridMath.CubeDistance(
+                                Utils.HexGridMath.OffsetToCube(myP.OccupiedCell.Coordinates),
+                                Utils.HexGridMath.OffsetToCube(e.OccupiedCell.Coordinates)
+                            );
+                            if (d < minEnemyDist)
+                            {
+                                minEnemyDist = d;
+                                closestEnemy = e;
+                            }
+                        }
+                    }
+
+                    if (closestEnemy != null && closestEnemy.OccupiedCell != null)
+                    {
+                        // Score for playing obstacle: if enemies are close, playing obstacle is high priority!
+                        float obstacleScore = 200f; // A solid utility score.
+                        if (minEnemyDist <= 3) obstacleScore += 100f; // higher priority if they are close!
+
+                        if (card.isDynamicObstacle)
+                        {
+                            // Dynamic obstacle: we can place 3 blocks in a 3-unit radius around an empty center near closestEnemy.
+                            HexCell centerCell = null;
+                            var neighborsDict = Utils.HexGridMath.GetHexesWithDistance(closestEnemy.OccupiedCell.Coordinates, 1);
+                            foreach (var coord in neighborsDict.Keys)
+                            {
+                                if (gridLookup.TryGetValue(coord, out HexCell cell) && !cell.IsOccupied && !cell.IsObstacle)
+                                {
+                                    centerCell = cell;
+                                    break;
+                                }
+                            }
+
+                            if (centerCell == null)
+                            {
+                                foreach (var e in enemies)
+                                {
+                                    if (e == null || e.OccupiedCell == null) continue;
+                                    var nd = Utils.HexGridMath.GetHexesWithDistance(e.OccupiedCell.Coordinates, 1);
+                                    foreach (var coord in nd.Keys)
+                                    {
+                                        if (gridLookup.TryGetValue(coord, out HexCell cell) && !cell.IsOccupied && !cell.IsObstacle)
+                                        {
+                                            centerCell = cell;
+                                            break;
+                                        }
+                                    }
+                                    if (centerCell != null) break;
+                                }
+                            }
+
+                            if (centerCell != null)
+                            {
+                                Dictionary<Vector2Int, int> neighbors = Utils.HexGridMath.GetHexesWithDistance(centerCell.Coordinates, 3);
+                                List<(HexCell cell, float score)> candidateCells = new List<(HexCell, float)>();
+
+                                foreach (var pair in neighbors)
+                                {
+                                    if (gridLookup.TryGetValue(pair.Key, out HexCell targetCell))
+                                    {
+                                        if (!targetCell.IsOccupied && !targetCell.IsObstacle)
+                                        {
+                                            float enemyDist = MinDistanceToEnemies(targetCell.Coordinates, enemies);
+                                            float cellScore = 10f - enemyDist;
+                                            candidateCells.Add((targetCell, cellScore));
+                                        }
+                                    }
+                                }
+
+                                if (candidateCells.Count >= 3)
+                                {
+                                    candidateCells.Sort((a, b) => b.score.CompareTo(a.score));
+                                    
+                                    List<Vector2Int> coordsToPlace = new List<Vector2Int>();
+                                    for (int i = 0; i < 3; i++)
+                                    {
+                                        coordsToPlace.Add(candidateCells[i].cell.Coordinates);
+                                    }
+
+                                    if (obstacleScore > bestScore)
+                                    {
+                                        bestScore = obstacleScore;
+                                        bestCard = card;
+                                        bestPawn = null;
+                                        bestTarget = centerCell;
+                                        isAttack = false;
+                                        isBotObstacle = true;
+                                        botObstacleCoords = coordsToPlace;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            if (card.obstaclePattern != null)
+                            {
+                                HexCell centerCell = null;
+                                var neighborsDict = Utils.HexGridMath.GetHexesWithDistance(closestEnemy.OccupiedCell.Coordinates, 1);
+                                foreach (var coord in neighborsDict.Keys)
+                                {
+                                    if (gridLookup.TryGetValue(coord, out HexCell cell) && !cell.IsOccupied && !cell.IsObstacle)
+                                    {
+                                        centerCell = cell;
+                                        break;
+                                    }
+                                }
+
+                                if (centerCell != null)
+                                {
+                                    List<Vector2Int> localOffsets = card.obstaclePattern.GetObstacleOffsets(centerCell.Coordinates.x);
+                                    bool rotate180 = (botPlayerID == 2);
+                                    List<Vector2Int> absoluteWorldOffsets = Utils.HexGridMath.GenerateAccurateWorldOffsetsFromPattern(centerCell.Coordinates, localOffsets, rotate180);
+
+                                    bool hasValidCoord = false;
+                                    foreach (var coord in absoluteWorldOffsets)
+                                    {
+                                        if (gridLookup.TryGetValue(coord, out HexCell cell) && !cell.IsOccupied && !cell.IsObstacle)
+                                        {
+                                            hasValidCoord = true;
+                                            break;
+                                        }
+                                    }
+
+                                    if (hasValidCoord)
+                                    {
+                                        if (obstacleScore > bestScore)
+                                        {
+                                            bestScore = obstacleScore;
+                                            bestCard = card;
+                                            bestPawn = null;
+                                            bestTarget = centerCell;
+                                            isAttack = false;
+                                            isBotObstacle = true;
+                                            botObstacleCoords = absoluteWorldOffsets;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (Pawn pawn in myPawns)
+                    {
+                        if (pawn == null || pawn.HasStun()) continue;
+                        if (pawn.OccupiedCell == null) continue;
+
+                        bool classMatch  = pawn.PawnData != null && pawn.PawnData.type == card.pawnClass;
+                        MovementPattern movePattern = classMatch ? card.pattern : card.mismatchPattern;
+
                         (HexCell attackCell, float attackScore) = FindBestAttackTarget(pawn, pawn.PawnData?.attackPattern, enemies, cellPawnMap);
                         if (attackCell != null && attackScore > bestScore)
                         {
@@ -664,9 +815,9 @@ namespace AlperKocasalih.Chess.Grid
                             bestPawn   = pawn;
                             bestTarget = attackCell;
                             isAttack   = true;
+                            isBotObstacle = false;
                         }
 
-                        // Evaluate move options — only if a valid movement pattern exists
                         if (movePattern != null)
                         {
                             (HexCell moveCell, float moveScore) = FindBestMoveTarget(pawn, movePattern, enemies, cellPawnMap);
@@ -678,6 +829,7 @@ namespace AlperKocasalih.Chess.Grid
                                 bestPawn   = pawn;
                                 bestTarget = moveCell;
                                 isAttack   = false;
+                                isBotObstacle = false;
                             }
                         }
                     }
@@ -685,48 +837,67 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             // Execute the best found action
-            if (bestCard != null && bestPawn != null && bestTarget != null)
+            if (bestCard != null)
             {
-                int cardIndex = DeckManager.Instance != null
-                    ? DeckManager.Instance.GetCardIndex(bestCard)
-                    : -1;
-
-                if (cardIndex >= 0)
-                    Core.PawnActionExecutor.Instance.ApplyCardEffectServerRpc(bestPawn.NetworkObjectId, cardIndex);
-
-                if (isAttack)
+                if (isBotObstacle)
                 {
-                    TotalAttacksInitiated++;
-                    if (verboseLog) Debug.Log($"[BotAI] Executing ATTACK action! Target: {bestTarget.Coordinates}");
-                    // Find the enemy pawn on that cell
-                    cellPawnMap.TryGetValue(bestTarget, out Pawn enemy);
-                    if (enemy != null)
+                    if (verboseLog) Debug.Log($"[BotAI P{botPlayerID}] Executing OBSTACLE action! Center: {bestTarget.Coordinates}, Placement count: {botObstacleCoords.Count}");
+                    
+                    if (Core.ObstacleManager.Instance != null)
                     {
-                        Core.PawnActionExecutor.Instance.ExecuteCombatServerRpc(
-                            bestPawn.NetworkObjectId, enemy.NetworkObjectId, bestTarget.Coordinates, true);
+                        Core.ObstacleManager.Instance.ExecuteObstaclePlacementServerRpc(botObstacleCoords.ToArray());
                     }
                     else
                     {
-                        Debug.LogError("[BotAI] isAttack was true but enemy was null on target cell!");
                         if (TurnManager.Instance != null) TurnManager.Instance.NextTurn();
                     }
-                }
-                else
-                {
-                    if (verboseLog) Debug.Log($"[BotAI] Executing MOVE action for Pawn {bestPawn.NetworkObjectId} to {bestTarget.Coordinates}");
-                    Core.PawnActionExecutor.Instance.ExecuteMoveServerRpc(
-                        bestPawn.NetworkObjectId, bestTarget.Coordinates, true);
-                }
 
-                DraftManager.Instance.RemoveCardFromHand(botPlayerID, bestCard);
-                TotalCardsUsed++;
-                TotalMoves++;
-
-                if (verboseLog)
+                    DraftManager.Instance.RemoveCardFromHand(botPlayerID, bestCard);
+                    TotalCardsUsed++;
+                    TotalMoves++;
+                }
+                else if (bestPawn != null && bestTarget != null)
                 {
-                    string actionDesc = isAttack ? "ATTACK" : "MOVE";
-                    Debug.Log($"[BotAI P{botPlayerID}] Action: {actionDesc} with '{bestCard.cardName}' " +
-                              $"| Pawn: {bestPawn.PawnData?.pawnName} → {bestTarget.Coordinates}");
+                    int cardIndex = DeckManager.Instance != null
+                        ? DeckManager.Instance.GetCardIndex(bestCard)
+                        : -1;
+
+                    if (cardIndex >= 0)
+                        Core.PawnActionExecutor.Instance.ApplyCardEffectServerRpc(bestPawn.NetworkObjectId, cardIndex);
+
+                    if (isAttack)
+                    {
+                        TotalAttacksInitiated++;
+                        if (verboseLog) Debug.Log($"[BotAI] Executing ATTACK action! Target: {bestTarget.Coordinates}");
+                        cellPawnMap.TryGetValue(bestTarget, out Pawn enemy);
+                        if (enemy != null)
+                        {
+                            Core.PawnActionExecutor.Instance.ExecuteCombatServerRpc(
+                                bestPawn.NetworkObjectId, enemy.NetworkObjectId, bestTarget.Coordinates, true);
+                        }
+                        else
+                        {
+                            Debug.LogError("[BotAI] isAttack was true but enemy was null on target cell!");
+                            if (TurnManager.Instance != null) TurnManager.Instance.NextTurn();
+                        }
+                    }
+                    else
+                    {
+                        if (verboseLog) Debug.Log($"[BotAI] Executing MOVE action for Pawn {bestPawn.NetworkObjectId} to {bestTarget.Coordinates}");
+                        Core.PawnActionExecutor.Instance.ExecuteMoveServerRpc(
+                            bestPawn.NetworkObjectId, bestTarget.Coordinates, true);
+                    }
+
+                    DraftManager.Instance.RemoveCardFromHand(botPlayerID, bestCard);
+                    TotalCardsUsed++;
+                    TotalMoves++;
+
+                    if (verboseLog)
+                    {
+                        string actionDesc = isAttack ? "ATTACK" : "MOVE";
+                        Debug.Log($"[BotAI P{botPlayerID}] Action: {actionDesc} with '{bestCard.cardName}' " +
+                                  $"| Pawn: {bestPawn.PawnData?.pawnName} → {bestTarget.Coordinates}");
+                    }
                 }
             }
             else

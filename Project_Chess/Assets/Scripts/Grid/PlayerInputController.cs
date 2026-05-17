@@ -36,6 +36,10 @@ namespace AlperKocasalih.Chess.Grid
         private readonly List<HexCell> dynamicObstacleValidCells = new List<HexCell>();
         private readonly List<HexCell> dynamicObstacleSelectedCells = new List<HexCell>();
 
+        [Header("Hover Preview State")]
+        private HexCell lastHoveredCell;
+        private readonly List<HexCell> hoverHighlightedCells = new List<HexCell>();
+
         private readonly List<HexCell> highlightedCells = new List<HexCell>();
         private readonly List<Pawn> highlightedPawns = new List<Pawn>();
         private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
@@ -74,6 +78,11 @@ namespace AlperKocasalih.Chess.Grid
             {
                 int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
                 if (TurnManager.Instance.ActivePlayerID != localPlayerID) return;
+            }
+
+            if (currentState == SelectionState.ObstacleTargeting || currentState == SelectionState.DynamicObstacleCenterSelection)
+            {
+                HandleHoverPreview();
             }
 
             if (Input.GetMouseButtonDown(0))
@@ -201,6 +210,9 @@ namespace AlperKocasalih.Chess.Grid
 
         private void HandleSelection()
         {
+            ClearHoverHighlights();
+            lastHoveredCell = null;
+
             if (GameManager.Instance != null && GameManager.Instance.CurrentState != GameState.ActionPhase)
                 return;
 
@@ -560,8 +572,125 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        private void HandleHoverPreview()
+        {
+            if (Camera.main == null) return;
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            
+            // Check UI blocks
+            if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject())
+            {
+                if (lastHoveredCell != null)
+                {
+                    ClearHoverHighlights();
+                    lastHoveredCell = null;
+                }
+                return;
+            }
+
+            HexCell currentCell = null;
+            if (Physics.Raycast(ray, out RaycastHit hit, 100f, cellLayer))
+            {
+                currentCell = hit.collider.GetComponent<HexCell>();
+            }
+
+            if (currentCell != lastHoveredCell)
+            {
+                ClearHoverHighlights();
+                lastHoveredCell = currentCell;
+
+                if (currentCell != null)
+                {
+                    if (currentState == SelectionState.ObstacleTargeting)
+                    {
+                        // Static obstacle card preview
+                        if (activeCardData != null && activeCardData.obstaclePattern != null)
+                        {
+                            int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+                            bool rotate180 = (localPlayerID == 2);
+                            
+                            List<Vector2Int> localOffsets = activeCardData.obstaclePattern.GetObstacleOffsets(currentCell.Coordinates.x);
+                            List<Vector2Int> absoluteWorldOffsets = Utils.HexGridMath.GenerateAccurateWorldOffsetsFromPattern(currentCell.Coordinates, localOffsets, rotate180);
+
+                            Color previewColor = new Color(1f, 0.6f, 0f, 0.5f); // Soft orange preview
+
+                            foreach (var coord in absoluteWorldOffsets)
+                            {
+                                if (gridLookup.TryGetValue(coord, out HexCell targetCell))
+                                {
+                                    if (!targetCell.IsOccupied && !targetCell.IsObstacle)
+                                    {
+                                        targetCell.Highlight(previewColor);
+                                        hoverHighlightedCells.Add(targetCell);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if (currentState == SelectionState.DynamicObstacleCenterSelection)
+                    {
+                        // Dynamic obstacle center preview (range of 3 units)
+                        if (!currentCell.IsOccupied && !currentCell.IsObstacle)
+                        {
+                            Dictionary<Vector2Int, int> neighbors = Utils.HexGridMath.GetHexesWithDistance(currentCell.Coordinates, 3);
+                            Color rangeHighlightColor = new Color(0.2f, 0.6f, 1f, 0.3f); // soft cyan
+
+                            foreach (var pair in neighbors)
+                            {
+                                if (gridLookup.TryGetValue(pair.Key, out HexCell targetCell))
+                                {
+                                    if (!targetCell.IsOccupied && !targetCell.IsObstacle)
+                                    {
+                                        targetCell.Highlight(rangeHighlightColor);
+                                        hoverHighlightedCells.Add(targetCell);
+                                    }
+                                }
+                            }
+
+                            // Center cell highlight
+                            currentCell.Highlight(new Color(0f, 0.8f, 1f, 0.6f));
+                            hoverHighlightedCells.Add(currentCell);
+                        }
+                    }
+                }
+            }
+        }
+
+        private void ClearHoverHighlights()
+        {
+            foreach (var cell in hoverHighlightedCells)
+            {
+                if (cell != null)
+                {
+                    if (currentState == SelectionState.DynamicObstacleBlockSelection)
+                    {
+                        if (dynamicObstacleSelectedCells.Contains(cell))
+                        {
+                            cell.Highlight(Color.grey);
+                        }
+                        else if (dynamicObstacleValidCells.Contains(cell))
+                        {
+                            cell.Highlight(new Color(0.2f, 0.6f, 1f, 0.4f));
+                        }
+                        else
+                        {
+                            cell.ResetHighlight();
+                        }
+                    }
+                    else
+                    {
+                        cell.ResetHighlight();
+                    }
+                }
+            }
+            hoverHighlightedCells.Clear();
+        }
+
         private void CancelSelection()
         {
+            ClearHoverHighlights();
+            lastHoveredCell = null;
+
             if (IsMultiActionInProgress)
             {
                 // During multi-action, Escape only clears the pawn selection, not the card
