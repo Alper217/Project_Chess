@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: D_Range
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: "R\xFCzgar"
-  icon: {fileID: 21300000, guid: 0f505781be647994cb2242b3b8623aa8, type: 3}
+  icon: {fileID: 21300000, guid: 8f6057b446f96024d804928f2b590e53, type: 3}
   effectType: 5
   effectDescription: "Piyonun bir sonraki hareket menzilini -1 kare d\xFC\u015F\xFCr\xFCr."
   amount: -1

@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 using AlperKocasalih.Chess.Grid.Core;
@@ -27,3 +28,5 @@ public class EditorAddObstacleManager : MonoBehaviour
         }
     }
 }
+#endif
+

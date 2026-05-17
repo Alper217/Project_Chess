@@ -13,4 +13,6 @@ MonoBehaviour:
   m_Name: SampleObstacle
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.ObstaclePattern
   patternName: 
+  cardName: 
+  cardSprite: {fileID: 0}
   gridData: 00000000000000000000000000000000000000000000000101010000000000000000000000000000000000000000000000

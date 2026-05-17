@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: B_Immunity
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: "K\xF6yl\xFC \u0130nad\u0131"
-  icon: {fileID: 21300000, guid: 9807ddcd95770dc4e8e7c9a0cfa0f590, type: 3}
+  icon: {fileID: 21300000, guid: 1efdd01e40419594bbb0a943800469a6, type: 3}
   effectType: 9
   effectDescription: "Piyon 2 tur boyunca hi\xE7bir \"Debuff\"tan etkilenmez."
   amount: 0

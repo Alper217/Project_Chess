@@ -59,15 +59,15 @@ MonoBehaviour:
     m_FaceIndex: 0
     m_FamilyName: 
     m_StyleName: 
-    m_PointSize: 220.45
+    m_PointSize: 218.5
     m_Scale: 1.48
     m_UnitsPerEM: 0
     m_LineHeight: 0
-    m_AscentLine: 235.7
+    m_AscentLine: 197.01
     m_CapLine: 0
     m_MeanLine: 0
-    m_Baseline: 0
-    m_DescentLine: -51
+    m_Baseline: -23.3
+    m_DescentLine: -84.5
     m_SuperscriptOffset: 0
     m_SuperscriptSize: 0
     m_SubscriptOffset: 0

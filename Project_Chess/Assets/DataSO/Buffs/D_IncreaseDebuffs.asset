@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: D_IncreaseDebuffs
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.BuffData
   buffName: Suskukluk
-  icon: {fileID: 21300000, guid: 988902a3f903b9e4389fbfdfcd5a6b88, type: 3}
+  icon: {fileID: 21300000, guid: 4144123939c9a2d4ab9291d6569e4fb6, type: 3}
   effectType: 12
   effectDescription: "Piyonun sahip oldu\u011Fu debufflar 2x olarak uygulan\u0131r."
   amount: 0

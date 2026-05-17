@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using UnityEditor;
 using UnityEngine;
 
@@ -27,8 +28,8 @@ namespace AlperKocasalih.Chess.Grid.Editor
             pattern.patternName = EditorGUILayout.TextField("Pattern Name", pattern.patternName);
 
             EditorGUILayout.Space();
-            EditorGUILayout.LabelField("Obstacle Shape (Click to toggle)", EditorStyles.boldLabel);
-            EditorGUILayout.HelpBox("Center (3,3) is the target cell you click on the map.", MessageType.Info);
+            EditorGUILayout.LabelField("Obstacle Placement (Click to toggle)", EditorStyles.boldLabel);
+            EditorGUILayout.HelpBox("Center (3,3) is the pawn position.", MessageType.Info);
             
             DrawHexGrid();
 
@@ -41,7 +42,6 @@ namespace AlperKocasalih.Chess.Grid.Editor
 
         private void DrawHexGrid()
         {
-            // Center GUI layout
             GUILayout.BeginHorizontal();
             GUILayout.FlexibleSpace();
             
@@ -49,44 +49,34 @@ namespace AlperKocasalih.Chess.Grid.Editor
             if (Event.current.type == EventType.Repaint || Event.current.type == EventType.MouseDown)
             {
                 float xSpacing = HEX_SIZE * 0.9f;
-                float ySpacing = HEX_SIZE * 1.0f; // vertical spacing
+                float ySpacing = HEX_SIZE * 1.0f;
                 
                 for (int x = 0; x < GRID_SIZE; x++)
                 {
                     for (int y = 0; y < GRID_SIZE; y++)
                     {
                         int index = y * GRID_SIZE + x;
-                        
-                        // Flat top odd-q style stagger
                         float xPos = rect.x + x * xSpacing;
                         float yPos = rect.y + y * ySpacing;
                         
-                        // Offset odd columns downwards
                         if (x % 2 != 0)
                         {
-                            yPos += ySpacing * 0.5f;
+                            yPos -= ySpacing * 0.5f;
                         }
 
                         Rect hexRect = new Rect(xPos, yPos, HEX_SIZE, HEX_SIZE);
-
-                        // Colors
                         bool isCenter = (x == 3 && y == 3);
                         bool isObstacle = pattern.gridData[index];
 
                         Color drawColor = Color.white;
-                        if (isCenter && !isObstacle) drawColor = new Color(0.7f, 1f, 0.7f); // Light green center
-                        if (isObstacle) drawColor = isCenter ? new Color(0f, 0.5f, 0f) : Color.black; // Dark center if obstacle, black if regular obstacle
+                        if (isCenter && !isObstacle) drawColor = new Color(0.7f, 0.7f, 1f);
+                        if (isObstacle) drawColor = isCenter ? new Color(0.7f, 0f, 0f) : new Color(0.5f, 0.2f, 0.2f);
 
-                        // Draw simplistic Hex shape via GUI color
                         Color oldColor = GUI.color;
                         GUI.color = drawColor;
-                        
-                        // Using Box style for ease, though we could draw a custom poly.
                         GUI.Box(hexRect, isCenter ? "C" : "", EditorStyles.helpBox);
-                        
                         GUI.color = oldColor;
 
-                        // Click handle
                         if (Event.current.type == EventType.MouseDown && hexRect.Contains(Event.current.mousePosition))
                         {
                             pattern.gridData[index] = !pattern.gridData[index];
@@ -102,3 +92,4 @@ namespace AlperKocasalih.Chess.Grid.Editor
         }
     }
 }
+#endif
