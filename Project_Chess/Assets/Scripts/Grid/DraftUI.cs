@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -45,8 +45,17 @@ namespace AlperKocasalih.Chess.Grid
         [Tooltip("Arc height when throwing a card to a slot")]
         [SerializeField] private float arcJumpPower      = 100f;
 
+        [Header("Audio")]
+        [SerializeField] private AudioClip drawSound;
+        [SerializeField] private AudioClip selectSound;
+        [SerializeField] private AudioClip burnSound;
+
         private int  currentPendingCardIndex = -1;
         private bool isBurnBlockingDraft     = false;
+
+        private float lastActionTime = 0f;
+        private const float ACTION_DEBOUNCE = 0.15f;
+        private int lastChoicesCount = 0;
 
         // ─────────────────────────────────────────────────────────────────────────
         #region Unity Methods
@@ -114,6 +123,7 @@ namespace AlperKocasalih.Chess.Grid
                 TurnManager.Instance.RefreshTurnInfoUI();
 
             ResetCardScales();
+            lastChoicesCount = 0; // Reset for next round
 
             if (draftPanel != null)
                 draftPanel.DOFade(0f, 0.4f).SetEase(Ease.InCubic)
@@ -148,6 +158,14 @@ namespace AlperKocasalih.Chess.Grid
             if (!isMyTurn) { if (choicePanel != null) choicePanel.SetActive(false); return; }
 
             ResetCardScales();
+
+            // ONLY play draw sound if we have MORE cards than before (new turn/round)
+            // If count decreased, it means we just made a choice and the UI is refreshing.
+            if (cards.Count > lastChoicesCount && drawSound != null && AudioManager.instance != null)
+            {
+                AudioManager.instance.PlaySfx(drawSound);
+            }
+            lastChoicesCount = cards.Count;
 
             for (int i = 0; i < cards.Count; i++)
             {
@@ -257,6 +275,8 @@ namespace AlperKocasalih.Chess.Grid
         public void SelectAction(int actionInt)
         {
             if (isBurnBlockingDraft) return;
+            if (Time.time - lastActionTime < ACTION_DEBOUNCE) return;
+            lastActionTime = Time.time;
 
             DraftAction action = (DraftAction)actionInt;
 
@@ -264,6 +284,18 @@ namespace AlperKocasalih.Chess.Grid
             {
                 Debug.LogWarning("DraftUI: SelectAction called with invalid card index.");
                 return;
+            }
+
+            // Play appropriate sound
+            if (action == DraftAction.Burn)
+            {
+                if (burnSound != null && AudioManager.instance != null)
+                    AudioManager.instance.PlaySfx(burnSound);
+            }
+            else
+            {
+                if (selectSound != null && AudioManager.instance != null)
+                    AudioManager.instance.PlaySfx(selectSound);
             }
 
             int         capturedIndex = currentPendingCardIndex;

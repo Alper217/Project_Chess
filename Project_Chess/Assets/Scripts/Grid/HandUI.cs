@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
@@ -44,6 +44,11 @@ namespace AlperKocasalih.Chess.Grid
         public float GlobalSelectedScale = 1.3f; // NEW: Scaling when selected
         public float GlobalSelectedMoveY = 80f;  // NEW: Lift when selected
 
+        [Header("Audio")]
+        [SerializeField] private AudioClip drawSound;
+        [SerializeField] private AudioClip selectSound;
+        [SerializeField] private AudioClip burnSound;
+
         private List<HandCard> spawnedCards = new List<HandCard>();
         private bool isBurnSelectionActive = false;
         private int pendingBurnCount = 0;
@@ -52,6 +57,10 @@ namespace AlperKocasalih.Chess.Grid
         private bool isFusionSelectionActive = false;
         private List<HandCard> selectedFusionCards = new List<HandCard>();
         private float currentYOffset;
+
+        private float lastClickTime = 0f;
+        private const float CLICK_DEBOUNCE = 0.1f;
+        private int lastCardCount = 0;
 
         #endregion
 
@@ -73,6 +82,10 @@ namespace AlperKocasalih.Chess.Grid
             {
                 DraftManager.Instance.OnHandUpdated += OnHandUpdated;
                 DraftManager.Instance.OnOverflowBurnRequested += OnOverflowBurnRequested;
+
+                // Sync initial count to prevent sound on first refresh if already has cards
+                int localID = GetLocalPlayerID();
+                lastCardCount = DraftManager.Instance.GetHand(localID).Count;
             }
 
             // Sync with PlayerInputController to hide hand during targeting
@@ -91,13 +104,16 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
+        private int GetLocalPlayerID()
+        {
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+                return NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            return 1;
+        }
+
         private void OnHandUpdated(int playerID, List<CardData> hand)
         {
-            int localPlayerID = 1;
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
-            {
-                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-            }
+            int localPlayerID = GetLocalPlayerID();
 
             Debug.Log($"[HandUI TETİKLENDİ] Yenileme İstenen ID: {playerID} | Benim ID: {localPlayerID}");
             if (playerID == localPlayerID)
@@ -108,6 +124,9 @@ namespace AlperKocasalih.Chess.Grid
 
         public void OnCardClicked(HandCard card)
         {
+            if (Time.time - lastClickTime < CLICK_DEBOUNCE) return;
+            lastClickTime = Time.time;
+
             if (PlayerInputController.Instance != null && PlayerInputController.Instance.IsMultiActionInProgress)
             {
                 Debug.Log("HandUI: Cannot change card during a multi-action sequence.");
@@ -136,6 +155,11 @@ namespace AlperKocasalih.Chess.Grid
 
             if (PlayerInputController.Instance != null)
             {
+                if (selectSound != null && AudioManager.instance != null)
+                {
+                    AudioManager.instance.PlaySfx(selectSound);
+                }
+
                 // Reset all other selections first
                 foreach (var c in spawnedCards) c.SetSelected(false);
                 card.SetSelected(true); // Mark current card as selected
@@ -234,6 +258,19 @@ namespace AlperKocasalih.Chess.Grid
             spawnedCards.Clear();
 
             int count = hand.Count;
+
+            // --- ÇAKIŞMA ÖNLEME ---
+            // Sadece şu durumlarda ses çal:
+            // 1. Kart sayısı arttıysa VE Draft (Seçim) aşamasında değilsek.
+            // (Draft aşamasında 'Keep' sesi zaten SelectSound olarak çalıyor, HandUI susturulmalı.)
+            bool isDrafting = DraftManager.Instance != null && DraftManager.Instance.IsDraftingActive;
+            
+            if (count > lastCardCount && !isDrafting && drawSound != null && AudioManager.instance != null)
+            {
+                AudioManager.instance.PlaySfx(drawSound);
+            }
+            lastCardCount = count;
+
             float startAngle = -(count - 1) * angleStep / 2f;
 
             // Reset parent position before spawning so pop positions are correct
@@ -254,11 +291,7 @@ namespace AlperKocasalih.Chess.Grid
 
                 handCard.SetHandIndex(i);
                 
-                int localPlayerID = 1;
-                if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
-                {
-                    localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-                }
+                int localPlayerID = GetLocalPlayerID();
                 bool isLocked = DraftManager.Instance != null && DraftManager.Instance.IsBurnLocked(localPlayerID, i);
                 handCard.SetBurnLockedUI(isBurnSelectionActive && isLocked);
                 
@@ -288,11 +321,7 @@ namespace AlperKocasalih.Chess.Grid
 
         private void OnOverflowBurnRequested(int playerID, int burnCount)
         {
-            int localPlayerID = 1;
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
-            {
-                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-            }
+            int localPlayerID = GetLocalPlayerID();
 
             if (playerID != localPlayerID) return;
 
@@ -311,11 +340,7 @@ namespace AlperKocasalih.Chess.Grid
 
         private void TryBurnSelectedCard(HandCard card)
         {
-            int localPlayerID = 1;
-            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
-            {
-                localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-            }
+            int localPlayerID = GetLocalPlayerID();
 
             if (DraftManager.Instance != null)
             {
@@ -323,6 +348,12 @@ namespace AlperKocasalih.Chess.Grid
                 {
                     card.transform.DOShakePosition(0.2f, 10f, 20, 90f, false, true);
                     return;
+                }
+
+                // Play Burn Sound
+                if (burnSound != null && AudioManager.instance != null)
+                {
+                    AudioManager.instance.PlaySfx(burnSound);
                 }
 
                 DraftManager.Instance.BurnOverflowCardAtIndexServerRpc(localPlayerID, card.HandIndex);
@@ -355,6 +386,8 @@ namespace AlperKocasalih.Chess.Grid
                 {
                     selectedFusionCards.Add(card);
                     card.SetSelected(true);
+                    
+                    // Optional: Play a selection or small burn sound for fusion pick
                 }
             }
 

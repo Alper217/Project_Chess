@@ -5,18 +5,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3d9e23b9-49f8-4e62-afbc-c164cc147016" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_ObstacleA 1.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_ObstacleA 1.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_ObstacleA 2.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/Card_ObstacleA 2.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/SampleObstacle 1.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/SampleObstacle 1.asset.meta" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/SampleObstacle 2.asset" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Assets/DataSO/Cards/SampleObstacle 2.asset.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Archer.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Archer.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cannon.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cannon.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cheriff.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cheriff.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Commander.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Commander.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Horsemen.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Horsemen.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Knight.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Knight.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Ninja.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Ninja.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Queen.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Queen.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Wizard.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Wizard.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/InputSystem_Actions.inputactions" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/InputSystem_Actions.inputactions" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials/Outline_Material.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/Outline_Material.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Materials/Outline_Selectable_Material.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Materials/Outline_Selectable_Material.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Archer.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Archer.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/BotMatchReporter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/BotMatchReporter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/TurnManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/TurnManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/MainMenu.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/MainMenu.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/AudioManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/AudioManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/DraftUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/HandUI.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/HandUI.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/PC_Renderer.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/PC_Renderer.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/UI/BuffsIcons/Buffs.spriteatlas" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/UI/BuffsIcons/Buffs.spriteatlas" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,6 +40,7 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/AudioManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/CardData.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" root0="FORCE_HIGHLIGHTING" />
@@ -165,6 +179,7 @@
       <workItem from="1777631640457" duration="5836000" />
       <workItem from="1777907254663" duration="3486000" />
       <workItem from="1778520529041" duration="4075000" />
+      <workItem from="1779098900036" duration="9045000" />
     </task>
     <servers />
   </component>

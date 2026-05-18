@@ -49,6 +49,7 @@ public class PawnData: ScriptableObject
     [Header("Audio Settings")]
     public AudioClip moveSound;
     public AudioClip attackSound;
+    public AudioClip deathSound;
 
 
 }

@@ -31,5 +31,6 @@ MonoBehaviour:
   healthbuff: 0
   isHealer: 0
   healAmount: 0
-  moveSound: {fileID: 8300000, guid: 6b62bebe3f9ec8f4dbbcf1099d2a4021, type: 3}
-  attackSound: {fileID: 8300000, guid: 5c8da7ad55469024b96574ebabd4336f, type: 3}
+  moveSound: {fileID: 8300000, guid: b4365a848e0d2ca4f9f3e943495ec3ad, type: 3}
+  attackSound: {fileID: 8300000, guid: df6c73d8e1eafce4baee2696743b5955, type: 3}
+  deathSound: {fileID: 8300000, guid: 850bc836385be714b81d024e962dd842, type: 3}

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AlperKocasalih.Chess.Grid;
 using AlperKocasalih.Chess.Grid.Utils;
 using Unity.Netcode;
@@ -206,6 +206,15 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         targetPlayer.PlayFeedbacks(spawnPos);
     }
 
+    [ClientRpc]
+    private void PlayDeathSoundClientRpc()
+    {
+        if (_pawn != null && _pawn.PawnData != null && _pawn.PawnData.deathSound != null && AudioManager.instance != null)
+        {
+            AudioManager.instance.PlaySfx(_pawn.PawnData.deathSound);
+        }
+    }
+
     private void ShowAttackRange()
     {
         if (_pawn == null || _pawn.PawnData == null) return;
@@ -294,6 +303,9 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         if (!IsServer) return;
 
         int loserID = _pawn.PlayerID;
+
+        // Play death sound on all clients before despawning
+        PlayDeathSoundClientRpc();
 
         if (_pawn != null && _pawn.PawnData != null && GameManager.Instance != null)
         {
