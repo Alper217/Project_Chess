@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AlperKocasalih.Chess.Grid.CardData
   cardName: 
   cardSprite: {fileID: 0}
-  cardDesign: {fileID: 0}
+  cardDesign: {fileID: 21300000, guid: cbbd7695d2398384381936d28f48c7cb, type: 3}
   pattern: {fileID: 0}
   healthToAdd: 0
   damageToAdd: 0
@@ -23,4 +23,5 @@ MonoBehaviour:
   mismatchPattern: {fileID: 0}
   isObstacleCard: 1
   obstaclePattern: {fileID: 11400000, guid: 329c71c8b00ac954fae593844746ed0b, type: 2}
+  isDynamicObstacle: 0
   description: 
