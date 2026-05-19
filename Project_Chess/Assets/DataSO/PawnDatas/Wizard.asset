@@ -19,7 +19,7 @@ MonoBehaviour:
   maxHealth: 60
   currentHealth: 60
   pointValue: 5
-  attackPattern: {fileID: 0}
+  attackPattern: {fileID: 11400000, guid: 2ff93deb6c7502b44a73a35d1a2600e7, type: 2}
   startWithForceAttackPattern: 0
   attackCooldown: 0
   isAoE: 0
@@ -32,5 +32,6 @@ MonoBehaviour:
   isHealer: 1
   healAmount: 10
   moveSound: {fileID: 8300000, guid: b4365a848e0d2ca4f9f3e943495ec3ad, type: 3}
-  attackSound: {fileID: 8300000, guid: 7aa94182577a47241993faa767e64225, type: 3}
+  attackSound: {fileID: 8300000, guid: 3b3a2e38e3028d54989a24e939bbc685, type: 3}
   deathSound: {fileID: 8300000, guid: de584bcbcda6b6341aada11fd8e32504, type: 3}
+  healSound: {fileID: 8300000, guid: c176f54a74d0e7c43801355d9540939e, type: 3}

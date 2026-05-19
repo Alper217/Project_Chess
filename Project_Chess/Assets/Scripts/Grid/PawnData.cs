@@ -1,4 +1,4 @@
-using AlperKocasalih.Chess.Grid;
+﻿using AlperKocasalih.Chess.Grid;
 using UnityEngine;
 public enum Type
 {
@@ -50,6 +50,7 @@ public class PawnData: ScriptableObject
     public AudioClip moveSound;
     public AudioClip attackSound;
     public AudioClip deathSound;
+    public AudioClip healSound;
 
 
 }

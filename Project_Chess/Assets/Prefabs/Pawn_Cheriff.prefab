@@ -346,7 +346,7 @@ MonoBehaviour:
           SetPlayCountToZeroOnReset: 0
           MMFeedbacksDirectionCondition: 0
           PlayDirection: 0
-          ConstantIntensity: 0
+          ConstantIntensity: 1
           UseIntensityInterval: 0
           IntensityIntervalMin: 0
           IntensityIntervalMax: 0

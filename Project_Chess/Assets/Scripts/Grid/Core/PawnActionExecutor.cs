@@ -86,13 +86,10 @@ namespace AlperKocasalih.Chess.Grid.Core
                 Pawn defender = defenderObj.GetComponent<Pawn>();
                 if (attacker == null || defender == null) return;
                 
-                if (attacker.PlayerID == defender.PlayerID && !attacker.PawnData.isHealer)
+                bool isFriendly = (attacker.PlayerID == defender.PlayerID);
+                if (isFriendly && !attacker.PawnData.isHealer)
                 {
                     Debug.LogWarning("PawnActionExecutor: Friendly fire attempt blocked on server.");
-                }
-                else if (attacker.PlayerID != defender.PlayerID && attacker.PawnData.isHealer)
-                {
-                    Debug.LogWarning("Şifacılar düşman birimlerini iyileştiremez!");
                 }
                 else
                 {
@@ -100,14 +97,19 @@ namespace AlperKocasalih.Chess.Grid.Core
                     if (attackHandler != null && attackHandler.CanAttack())
                     {
                         attackHandler.ExecuteAttack(defender.OccupiedCell.Coordinates, gridLookup);
-                        AudioManager.instance.PlaySfx(pawn.PawnData.attackSound);
+                        
+                        AudioClip clipToPlay = (isFriendly && attacker.PawnData.isHealer) 
+                            ? attacker.PawnData.healSound 
+                            : attacker.PawnData.attackSound;
+                            
+                        if (clipToPlay != null) AudioManager.instance.PlaySfx(clipToPlay);
                     }
                     else
                     {
                         Debug.LogWarning("Attack blocked on server (cooldown or missing handler).");
                     }
                 }
-            }
+                }
             
             if (endTurn && TurnManager.Instance != null) TurnManager.Instance.NextTurn();
         }
@@ -195,3 +197,4 @@ namespace AlperKocasalih.Chess.Grid.Core
         }
     }
 }
+

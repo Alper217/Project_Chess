@@ -107,7 +107,6 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             ShowPawnHoverUI(_pawn.currentHealth.Value);
         }
 
-        // Toggle Force Attack Pattern with 'T' key when hovered (only for own pawns)
         if (Input.GetKeyDown(KeyCode.T) && isHovered && _pawn != null)
         {
             int localPlayerID = 1;
@@ -121,14 +120,6 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
                 _pawn.ToggleForceAttackPattern();
             }
         }
-
-        // Removed debug click-to-damage logic
-        /*
-        if (Input.GetMouseButtonDown(0) && isHovered)
-        {
-            TakeDamageServer(_pawn.damage.Value);
-        }
-        */
     }
 
     public void TakeDamageServer(int damageAmount)
@@ -137,7 +128,6 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
 
         _pawn.currentHealth.Value -= damageAmount;
         
-        // Trigger damage feedback on all clients
         ShowDamageFeedbackClientRpc(damageAmount, false);
         
         if (_pawn.currentHealth.Value <= 0)
@@ -157,7 +147,6 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             _pawn.currentHealth.Value = _pawn.maxHealth.Value;
         }
 
-        // Trigger healing feedback on all clients
         ShowDamageFeedbackClientRpc(amount, true);
 
         Debug.Log($"{_pawn.PawnData.pawnName} healed. New health: {_pawn.currentHealth.Value}");
@@ -166,6 +155,12 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     [ClientRpc]
     private void ShowDamageFeedbackClientRpc(int amount, bool isHeal)
     {
+        // Play Heal Sound if it's a heal action
+        if (isHeal && _pawn != null && _pawn.PawnData != null && _pawn.PawnData.healSound != null && AudioManager.instance != null)
+        {
+            AudioManager.instance.PlaySfx(_pawn.PawnData.healSound);
+        }
+
         if (targetPlayer == null) return;
 
         // Stop any running feedbacks and restore original scale to prevent cumulative scaling bugs
@@ -173,9 +168,9 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         transform.localScale = _originalScale;
 
         MMF_FloatingText floatingTextFeedback = targetPlayer.GetFeedbackOfType<MMF_FloatingText>();
-        if (floatingTextFeedback != null)
+        if (floatingTextFeedback != null) 
         {
-            // Simplified: Just set the color. Outline should be handled in the TMP Material settings.
+            floatingTextFeedback.Intensity = 1f;
             string color = isHeal ? "#00FF00" : "#FF0000"; 
             string prefix = isHeal ? "+" : "-";
             
@@ -187,10 +182,8 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             {
                 floatingTextFeedback.Value = $"<color={color}>{prefix}{amount}</color>";
             }
-        }
+       }
 
-        // Professional Movement: A slight arc movement instead of straight up
-        // Randomized X offset for a "burst" feel
         float randomX = Random.Range(-0.4f, 0.4f);
         Vector3 spawnPos = this.transform.position + new Vector3(randomX, 1.5f, Random.Range(-0.2f, 0.2f));
         
@@ -322,7 +315,6 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
 
         int loserID = _pawn.PlayerID;
 
-        // Play death sound on all clients before despawning
         PlayDeathSoundClientRpc();
 
         if (_pawn != null && _pawn.PawnData != null && GameManager.Instance != null)

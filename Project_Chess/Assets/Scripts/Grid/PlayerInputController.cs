@@ -341,15 +341,6 @@ namespace AlperKocasalih.Chess.Grid
                             return;
                         }
                     }
-                    else if (selectedPawn != null && enemy.PlayerID != selectedPawn.PlayerID)
-                    {
-                        if (selectedPawn.PawnData.isHealer)
-                        {
-                            Debug.LogWarning("PlayerInputController: Healers cannot target enemies. Move ignored.");
-                            return;
-                        }
-                    }
-
                     AttackHandler attackHandler = selectedPawn != null ? selectedPawn.GetComponent<AttackHandler>() : null;
                     if (attackHandler == null || !attackHandler.CanAttack())
                     {
@@ -457,8 +448,10 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
+            List<Vector2Int> localOffsets = activeCardData.obstaclePattern.GetObstacleOffsets(cell.Coordinates.x);
+            
             bool isPlayer2 = (localPlayerID == 2);
-            List<Vector2Int> absoluteWorldOffsets = activeCardData.obstaclePattern.GetAbsoluteObstacleOffsets(cell.Coordinates, isPlayer2);
+            List<Vector2Int> absoluteWorldOffsets = HexGridMath.GenerateAccurateWorldOffsetsFromPattern(cell.Coordinates, localOffsets, isPlayer2);
 
             // Execute placement over network via ObstacleManager
             if (Core.ObstacleManager.Instance != null)
@@ -607,7 +600,8 @@ namespace AlperKocasalih.Chess.Grid
                             int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
                             bool rotate180 = (localPlayerID == 2);
                             
-                            List<Vector2Int> absoluteWorldOffsets = activeCardData.obstaclePattern.GetAbsoluteObstacleOffsets(currentCell.Coordinates, rotate180);
+                            List<Vector2Int> localOffsets = activeCardData.obstaclePattern.GetObstacleOffsets(currentCell.Coordinates.x);
+                            List<Vector2Int> absoluteWorldOffsets = Utils.HexGridMath.GenerateAccurateWorldOffsetsFromPattern(currentCell.Coordinates, localOffsets, rotate180);
 
                             Color previewColor = new Color(1f, 0.6f, 0f, 0.5f); // Soft orange preview
 
@@ -792,26 +786,28 @@ namespace AlperKocasalih.Chess.Grid
 
             // Use 0 for rangeMod in attacks so MovementRangeModifier only affects movement, not attack range
             List<Vector2Int> attackOffsets = attackPattern.GetValidOffsets(currentCoords, pawn.PlayerID == 2, 0);
+
             if (attackOffsets == null || attackOffsets.Count == 0) return;
-
-            bool canAttackThroughObstacles = pawn.PawnData.type == Type.Archer || 
-                                             pawn.PawnData.type == Type.Cannon || 
-                                             pawn.PawnData.type == Type.Cheriff;
-
             foreach (var offset in attackOffsets)
             {
                 Vector2Int targetCoords = currentCoords + offset;
-                if (!canAttackThroughObstacles && IsPathBlocked(startCube, targetCoords)) continue;
+                if (IsPathBlocked(startCube, targetCoords)) continue;
 
                 if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
                 {
                     Pawn occupant = FindPawnOnCell(targetCell);
-                    if (occupant != null && occupant.PlayerID != pawn.PlayerID)
+                    if (occupant != null)
                     {
-                        // Always force white on the cell, even if already added via movement pass
-                        if (!highlightedCells.Contains(targetCell))
-                            highlightedCells.Add(targetCell);
-                        targetCell.Highlight(Color.white);
+                        bool isEnemy = occupant.PlayerID != pawn.PlayerID;
+                        bool isHealer = pawn.PawnData.isHealer;
+
+                        if (isEnemy || isHealer)
+                        {
+                            if (!highlightedCells.Contains(targetCell))
+                                highlightedCells.Add(targetCell);
+                            
+                            targetCell.Highlight(isEnemy ? Color.white : Color.green);
+                        }
                     }
                 }
             }
@@ -923,4 +919,6 @@ namespace AlperKocasalih.Chess.Grid
         #endregion
     }
 }
+
+
 
