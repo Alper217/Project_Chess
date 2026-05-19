@@ -7334,8 +7334,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -1.4892006, y: 1.0759}
-  m_SizeDelta: {x: 699.2418, y: 352.6154}
+  m_AnchoredPosition: {x: -15.709, y: 1.075901}
+  m_SizeDelta: {x: 423.7334, y: 352.6154}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1053106252
 MonoBehaviour:
@@ -7509,6 +7509,9 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 013b82cb806a5dc42af73e991e37a095, type: 2}
   - {fileID: 11400000, guid: c5eb4d73f86fb26488bda897a51475da, type: 2}
   - {fileID: 11400000, guid: b742167a4cc52f04987f4270e830f69f, type: 2}
+  - {fileID: 11400000, guid: 4444fe951717a0442ac82f74cced862b, type: 2}
+  - {fileID: 11400000, guid: a9981731ca7c88743ab67cca0a98f11d, type: 2}
+  - {fileID: 11400000, guid: 1c3022bf49dd2c74e90a4ec1a70c9765, type: 2}
   initialDeckSize: 120
   allPawnDatas:
   - {fileID: 11400000, guid: 94a340785c9894843b024a16412618a5, type: 2}
