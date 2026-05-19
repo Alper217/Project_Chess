@@ -341,15 +341,6 @@ namespace AlperKocasalih.Chess.Grid
                             return;
                         }
                     }
-                    else if (selectedPawn != null && enemy.PlayerID != selectedPawn.PlayerID)
-                    {
-                        if (selectedPawn.PawnData.isHealer)
-                        {
-                            Debug.LogWarning("PlayerInputController: Healers cannot target enemies. Move ignored.");
-                            return;
-                        }
-                    }
-
                     AttackHandler attackHandler = selectedPawn != null ? selectedPawn.GetComponent<AttackHandler>() : null;
                     if (attackHandler == null || !attackHandler.CanAttack())
                     {
@@ -795,8 +786,8 @@ namespace AlperKocasalih.Chess.Grid
 
             // Use 0 for rangeMod in attacks so MovementRangeModifier only affects movement, not attack range
             List<Vector2Int> attackOffsets = attackPattern.GetValidOffsets(currentCoords, pawn.PlayerID == 2, 0);
-            if (attackOffsets == null || attackOffsets.Count == 0) return;
 
+            if (attackOffsets == null || attackOffsets.Count == 0) return;
             foreach (var offset in attackOffsets)
             {
                 Vector2Int targetCoords = currentCoords + offset;
@@ -805,12 +796,18 @@ namespace AlperKocasalih.Chess.Grid
                 if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
                 {
                     Pawn occupant = FindPawnOnCell(targetCell);
-                    if (occupant != null && occupant.PlayerID != pawn.PlayerID)
+                    if (occupant != null)
                     {
-                        // Always force white on the cell, even if already added via movement pass
-                        if (!highlightedCells.Contains(targetCell))
-                            highlightedCells.Add(targetCell);
-                        targetCell.Highlight(Color.white);
+                        bool isEnemy = occupant.PlayerID != pawn.PlayerID;
+                        bool isHealer = pawn.PawnData.isHealer;
+
+                        if (isEnemy || isHealer)
+                        {
+                            if (!highlightedCells.Contains(targetCell))
+                                highlightedCells.Add(targetCell);
+                            
+                            targetCell.Highlight(isEnemy ? Color.white : Color.green);
+                        }
                     }
                 }
             }
@@ -922,4 +919,6 @@ namespace AlperKocasalih.Chess.Grid
         #endregion
     }
 }
+
+
 

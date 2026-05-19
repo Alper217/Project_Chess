@@ -396,6 +396,7 @@ GameObject:
   - component: {fileID: 156891343}
   - component: {fileID: 156891342}
   - component: {fileID: 156891341}
+  - component: {fileID: 156891344}
   m_Layer: 5
   m_Name: Singleplayer
   m_TagString: Untagged
@@ -518,6 +519,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 156891339}
   m_CullTransparentMesh: 1
+--- !u!114 &156891344
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 156891339}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cecf5d1031bcaa46883c9676a50cf25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameCore::UIButtonSound
 --- !u!1001 &157312402
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3205,6 +3218,7 @@ GameObject:
   - component: {fileID: 934863577}
   - component: {fileID: 934863576}
   - component: {fileID: 934863575}
+  - component: {fileID: 934863578}
   m_Layer: 5
   m_Name: ClientButton
   m_TagString: Untagged
@@ -3327,6 +3341,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 934863573}
   m_CullTransparentMesh: 1
+--- !u!114 &934863578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 934863573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cecf5d1031bcaa46883c9676a50cf25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameCore::UIButtonSound
 --- !u!1 &935765864
 GameObject:
   m_ObjectHideFlags: 0
@@ -13286,6 +13312,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameCore::AudioManager
   sfxSource: {fileID: 1659779537}
   musicSource: {fileID: 1659779535}
+  buttonClickSound: {fileID: 8300000, guid: 8deef6aaf2d01b346b1317c1ad06ebbe, type: 3}
 --- !u!1 &1668755096
 GameObject:
   m_ObjectHideFlags: 0
@@ -13898,6 +13925,7 @@ GameObject:
   - component: {fileID: 1868923445}
   - component: {fileID: 1868923444}
   - component: {fileID: 1868923443}
+  - component: {fileID: 1868923446}
   m_Layer: 5
   m_Name: HostButton
   m_TagString: Untagged
@@ -14020,6 +14048,18 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1868923441}
   m_CullTransparentMesh: 1
+--- !u!114 &1868923446
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1868923441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cecf5d1031bcaa46883c9676a50cf25, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameCore::UIButtonSound
 --- !u!4 &1917051398 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7800046302039599656, guid: 29f4c72f9a1d9d446945740c2819895b, type: 3}
