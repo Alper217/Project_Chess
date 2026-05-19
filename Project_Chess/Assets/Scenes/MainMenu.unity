@@ -13437,6 +13437,7 @@ MonoBehaviour:
   settingsPanel: {fileID: 3865198662723355886, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
   musicSlider: {fileID: 1544130995}
   sfxSlider: {fileID: 426112857}
+  languageDropdown: {fileID: 0}
 --- !u!4 &1672497742 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: da418c0dc845d374ab22102cb35d2478, type: 3}
