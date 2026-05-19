@@ -457,10 +457,8 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-            List<Vector2Int> localOffsets = activeCardData.obstaclePattern.GetObstacleOffsets(cell.Coordinates.x);
-            
             bool isPlayer2 = (localPlayerID == 2);
-            List<Vector2Int> absoluteWorldOffsets = HexGridMath.GenerateAccurateWorldOffsetsFromPattern(cell.Coordinates, localOffsets, isPlayer2);
+            List<Vector2Int> absoluteWorldOffsets = activeCardData.obstaclePattern.GetAbsoluteObstacleOffsets(cell.Coordinates, isPlayer2);
 
             // Execute placement over network via ObstacleManager
             if (Core.ObstacleManager.Instance != null)
@@ -609,8 +607,7 @@ namespace AlperKocasalih.Chess.Grid
                             int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
                             bool rotate180 = (localPlayerID == 2);
                             
-                            List<Vector2Int> localOffsets = activeCardData.obstaclePattern.GetObstacleOffsets(currentCell.Coordinates.x);
-                            List<Vector2Int> absoluteWorldOffsets = Utils.HexGridMath.GenerateAccurateWorldOffsetsFromPattern(currentCell.Coordinates, localOffsets, rotate180);
+                            List<Vector2Int> absoluteWorldOffsets = activeCardData.obstaclePattern.GetAbsoluteObstacleOffsets(currentCell.Coordinates, rotate180);
 
                             Color previewColor = new Color(1f, 0.6f, 0f, 0.5f); // Soft orange preview
 
@@ -797,10 +794,14 @@ namespace AlperKocasalih.Chess.Grid
             List<Vector2Int> attackOffsets = attackPattern.GetValidOffsets(currentCoords, pawn.PlayerID == 2, 0);
             if (attackOffsets == null || attackOffsets.Count == 0) return;
 
+            bool canAttackThroughObstacles = pawn.PawnData.type == Type.Archer || 
+                                             pawn.PawnData.type == Type.Cannon || 
+                                             pawn.PawnData.type == Type.Cheriff;
+
             foreach (var offset in attackOffsets)
             {
                 Vector2Int targetCoords = currentCoords + offset;
-                if (IsPathBlocked(startCube, targetCoords)) continue;
+                if (!canAttackThroughObstacles && IsPathBlocked(startCube, targetCoords)) continue;
 
                 if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
                 {
