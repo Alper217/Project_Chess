@@ -71,7 +71,10 @@ public class PawnSelectionUI : MonoBehaviour, IPointerEnterHandler, IPointerExit
         if (isPlaced)  return;
         if(TooltipManager.instance != null)
         {
-            TooltipManager.instance.ShowTooltip(pawnName, pawnDescription);
+            TooltipManager.instance.ShowTooltip(
+                AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation(pawnName), 
+                AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation(pawnDescription)
+            );
         }
     }
 

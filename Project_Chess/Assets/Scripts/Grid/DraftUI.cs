@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
@@ -52,6 +52,7 @@ namespace AlperKocasalih.Chess.Grid
 
         private int  currentPendingCardIndex = -1;
         private bool isBurnBlockingDraft     = false;
+        private int  lastTurnPlayerID        = -1;
 
         private float lastActionTime = 0f;
         private const float ACTION_DEBOUNCE = 0.15f;
@@ -70,6 +71,8 @@ namespace AlperKocasalih.Chess.Grid
                 DraftManager.Instance.OnDraftFinished        += HideDraftUI;
                 DraftManager.Instance.OnOverflowBurnRequested += HandleOverflowBurnRequested;
             }
+
+            LocalizationManager.OnLanguageChanged += OnLanguageChangedHandler;
 
             // Cache transforms ONCE so they are never altered by a previous animation
             slotInitialPositions = new Vector3[cardSlots.Length];
@@ -94,6 +97,7 @@ namespace AlperKocasalih.Chess.Grid
 
         private void OnDestroy()
         {
+            LocalizationManager.OnLanguageChanged -= OnLanguageChangedHandler;
             if (DraftManager.Instance != null)
             {
                 DraftManager.Instance.OnCardsDrawn           -= UpdateDraftUI;
@@ -101,6 +105,29 @@ namespace AlperKocasalih.Chess.Grid
                 DraftManager.Instance.OnUsedActionsChanged   -= UpdateActionButtons;
                 DraftManager.Instance.OnDraftFinished        -= HideDraftUI;
                 DraftManager.Instance.OnOverflowBurnRequested -= HandleOverflowBurnRequested;
+            }
+        }
+
+        private void OnLanguageChangedHandler()
+        {
+            if (lastTurnPlayerID != -1)
+            {
+                UpdateTurnStatus(lastTurnPlayerID);
+            }
+            
+            if (DraftManager.Instance != null)
+            {
+                var cards = DraftManager.Instance.GetCurrentChoices();
+                if (cards != null)
+                {
+                    for (int i = 0; i < cards.Count; i++)
+                    {
+                        if (cardNameTexts.Length > i && cards[i] != null)
+                        {
+                            cardNameTexts[i].text = cards[i].GetBuffsText();
+                        }
+                    }
+                }
             }
         }
 
@@ -226,17 +253,18 @@ namespace AlperKocasalih.Chess.Grid
 
         private void UpdateTurnStatus(int playerID)
         {
+            lastTurnPlayerID = playerID;
             int localPlayerID = GetLocalPlayerID();
 
             if (turnStatusText == null) return;
 
             if (localPlayerID == playerID)
             {
-                turnStatusText.text  = "Senin Sıran";
+                turnStatusText.text  = LocalizationManager.GetTranslation("Your Turn");
             }
             else
             {
-                turnStatusText.text  = "Rakibin Sırası";
+                turnStatusText.text  = LocalizationManager.GetTranslation("Opponent's Turn");
             }
         }
 
@@ -464,7 +492,7 @@ namespace AlperKocasalih.Chess.Grid
 
             if (turnStatusText != null && isBurnBlockingDraft)
             {
-                turnStatusText.text  = $"Kart yak: {burnCount}";
+                turnStatusText.text  = $"{LocalizationManager.GetTranslation("Burn cards: ")}{burnCount}";
                 //turnStatusText.color = Color.red;
             }
 

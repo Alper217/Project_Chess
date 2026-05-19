@@ -1,0 +1,85 @@
+{
+  "Setup Phase": "Phase de préparation",
+  "Your Turn": "Votre tour",
+  "Opponent's Turn": "Tour de l'adversaire",
+  "Burn cards: ": "Défausser cartes : ",
+  "No buffs": "Aucun bonus",
+  "No debuffs": "Aucun malus",
+  "BLOCKED": "BLOQUÉ",
+
+  "Balyoz": "Masse d'armes",
+  "%15 kadar ek hasar vurur.": "Inflige 15 % de dégâts supplémentaires.",
+
+  "Kırılmaz irade": "Volonté indomptable",
+  "Rakibinden 2 tur içerisinde gelebilecek saldırıyı engeller.": "Bloque les attaques ennemies pendant 2 tours.",
+
+  "Kalkan Duvarı": "Mur de boucliers",
+  "Alınan hasarı %20 azaltır": "Réduit les dégâts reçus de 20 %.",
+
+  "Yaşam Kıvılcımı": "Étincelle de vie",
+  "%5 Can ilavesi sağlar": "Accorde un bonus de +5 % de PV max.",
+
+  "Köylü İnadı": "Résilience paysanne",
+  "Piyon 2 tur boyunca hiçbir \"Debuff\"tan etkilenmez.": "Le pion est immunisé contre tous les malus pendant 2 tours.",
+
+  "Kan Arzusu": "Soif de sang",
+  "Verilen hasarın %15'i kadar can yeniler": "Régénère les PV à hauteur de 15 % des dégâts infligés.",
+
+  "Tanrının Eli": "Main de Dieu",
+  "Aynı kart ile seçilen 2 birim hareket ettirilebilir.": "Permet de déplacer 2 unités sélectionnées avec la même carte.",
+
+  "Rüzgar İzni": "Grâce du vent",
+  "Bu tur yapılan hareketin menzilini +1 kare artırır.": "Augmente la portée de mouvement de +1 case ce tour-ci.",
+
+  "Körlük": "Cécité",
+  "Piyonun vereceği hasarı %30 azaltır": "Réduit les dégâts infligés de 30 %.",
+
+  "Kırılganlık": "Vulnérabilité",
+  "2 tur boyunca alınan tüm hasarları %30 artırır.": "Augmente tous les dégâts reçus de 30 % pendant 2 tours.",
+
+  "Suskukluk": "Silence",
+  "Piyonun sahip olduğu debufflar 2x olarak uygulanır.": "Les malus actifs sur le pion s'appliquent avec un effet doublé (2x).",
+
+  "Rüzgar": "Bourrasque",
+  "Piyonun bir sonraki hareket menzilini -1 kare düşürür.": "Réduit la prochaine portée de mouvement de -1 case.",
+
+  "Çivili Yelek": "Cotte d'épines",
+  "Piyon saldırı yaptığında verdiği hasarın %15'ini kendi yer.": "Renvoie 15 % des dégâts infligés à l'attaquant.",
+
+  "Ayak Bağı": "Entraves",
+  "Piyon hareketini gerçekleştirdikten sonra 2 tur boyunca hareket edemez ve saldıramaz.": "Le pion est enraciné et ne peut ni se déplacer ni attaquer pendant 2 tours après avoir bougé.",
+
+  "Archer": "Archer",
+  "Etrafındaki 2 birimlik alana hasar verebilir. Her tur saldırabilir.": "Peut infliger des dégâts dans un rayon de 2 cases. Peut attaquer à chaque tour.",
+
+  "Cannon": "Canonnier",
+  "Etrafındaki 2 birimlik alana vurabilir. Alan hasarı verir. 3turda bir saldırabilir.": "Peut frapper dans un rayon de 2 cases. Inflige des dégâts de zone. Peut attaquer une fois tous les 3 tours.",
+
+  "Cheriff": "Shérif",
+  "Etrafındaki 2 birimlik alana saldırabilir. 2 turda bir saldırabilir.": "Peut attaquer dans un rayon de 2 cases. Peut attaquer une fois tous les 2 tours.",
+
+  "Horseman": "Cavalier",
+  "Seçilen alana ve arkasındaki bir bloa hasar verir. Her tur saldırabilir.": "Inflige des dégâts à la case ciblée et à la case située derrière. Peut attaquer à chaque tour.",
+
+  "Wizard": "Mage",
+  "Etrafındaki 2 birimlik alandaki seçilen piyona can basabilir. 2 turda bir kullanılabilir.": "Peut soigner un pion ciblé dans un rayon de 2 cases. Peut être utilisé une fois tous les 2 tours.",
+
+  "Ninja": "Ninja",
+  "Seçili alana hasar verir. Engeller ve rakipler hareketini engelleyemez. Her tur saldırabilir.": "Inflige des dégâts à la case ciblée. Le déplacement ne peut pas être bloqué par des obstacles ou des ennemis. Peut attaquer à chaque tour.",
+
+  "Knight": "Chevalier",
+  "Menzilsizdir, yakınındaki seçili alana hasar verir. Her tur saldırabilir.": "Unité de mêlée. Inflige des dégâts à la case adjacente ciblée. Peut attaquer à chaque tour.",
+
+  "Quenn": "Reine",
+  "Etrafındaki 2 birimlik alandaki dost piyonların canını arttırır.": "Augmente les points de vie des pions alliés dans un rayon de 2 cases.",
+
+  "Commander": "Commandant",
+  "Etrafındaki 2 birimlik alandaki dost piyonların hasarını arttırır.": "Augmente les dégâts des pions alliés dans un rayon de 2 cases.",
+
+  "Settings": "Paramètres",
+  "Music": "Musique",
+  "SFX": "SFX",
+  "Language": "Langue",
+  "Music Volume": "Volume Musique",
+  "SFX Volume": "Volume SFX"
+}

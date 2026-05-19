@@ -44,7 +44,7 @@ public class HealthUIManager : MonoBehaviour
 
         if (pawnNameText != null)
         {
-            pawnNameText.text = pawnName;
+            pawnNameText.text = AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation(pawnName);
         }
 
         if (healthSlider != null)
@@ -60,12 +60,18 @@ public class HealthUIManager : MonoBehaviour
 
         if (buffText != null)
         {
-            buffText.text = string.IsNullOrWhiteSpace(buffs) ? "No buffs" : buffs;
+            string localizedBuffs = AlperKocasalih.Chess.Grid.LocalizationManager.LocalizeSummary(buffs);
+            buffText.text = string.IsNullOrWhiteSpace(localizedBuffs) 
+                ? AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("No buffs") 
+                : localizedBuffs;
         }
 
         if (debuffText != null)
         {
-            debuffText.text = string.IsNullOrWhiteSpace(debuffs) ? "No debuffs" : debuffs;
+            string localizedDebuffs = AlperKocasalih.Chess.Grid.LocalizationManager.LocalizeSummary(debuffs);
+            debuffText.text = string.IsNullOrWhiteSpace(localizedDebuffs) 
+                ? AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("No debuffs") 
+                : localizedDebuffs;
         }
 
         if (healthCanvas != null)

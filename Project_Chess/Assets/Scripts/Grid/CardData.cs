@@ -57,6 +57,7 @@ namespace AlperKocasalih.Chess.Grid
                 
                 // Use buffName for a cleaner, name-only display (TFT style)
                 string displayName = !string.IsNullOrEmpty(buff.buffName) ? buff.buffName : buff.effectType.ToString();
+                displayName = LocalizationManager.GetTranslation(displayName);
                 
                 if (desc != "") desc += "\n";
                 

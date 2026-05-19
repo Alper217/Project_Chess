@@ -1,0 +1,85 @@
+{
+  "Setup Phase": "Platzierungsphase",
+  "Your Turn": "Dein Zug",
+  "Opponent's Turn": "Gegnerischer Zug",
+  "Burn cards: ": "Karten verbrennen: ",
+  "No buffs": "Keine Stärkungen",
+  "No debuffs": "Keine Schwächungen",
+  "BLOCKED": "BLOCKIERT",
+
+  "Balyoz": "Vorschlaghammer",
+  "%15 kadar ek hasar vurur.": "Verursacht 15 % zusätzlichen Schaden.",
+
+  "Kırılmaz irade": "Unbeugsamer Wille",
+  "Rakibinden 2 tur içerisinde gelebilecek saldırıyı engeller.": "Blockiert gegnerische Angriffe für 2 Züge.",
+
+  "Kalkan Duvarı": "Schildwall",
+  "Alınan hasarı %20 azaltır": "Verringert erlittenen Schaden um 20 %.",
+
+  "Yaşam Kıvılcımı": "Lebensfunke",
+  "%5 Can ilavesi sağlar": "Gewährt +5 % maximale Gesundheit.",
+
+  "Köylü İnadı": "Bäuerliche Widerstandskraft",
+  "Piyon 2 tur boyunca hiçbir \"Debuff\"tan etkilenmez.": "Die Spielfigur ist 2 Züge lang immun gegen alle Schwächungen.",
+
+  "Kan Arzusu": "Blutrausch",
+  "Verilen hasarın %15'i kadar can yeniler": "Heilt um 15 % des verursachten Schadens.",
+
+  "Tanrının Eli": "Hand Gottes",
+  "Aynı kart ile seçilen 2 birim hareket ettirilebilir.": "Ermöglicht es, 2 ausgewählte Einheiten mit derselben Karte zu bewegen.",
+
+  "Rüzgar İzni": "Gnade des Windes",
+  "Bu tur yapılan hareketin menzilini +1 kare artırır.": "Erhöht die Bewegungsreichweite dieser Runde um +1 Feld.",
+
+  "Körlük": "Blindheit",
+  "Piyonun vereceği hasarı %30 azaltır": "Verringert den ausgehenden Schaden um 30 %.",
+
+  "Kırılganlık": "Verletzlichkeit",
+  "2 tur boyunca alınan tüm hasarları %30 artırır.": "Erhöht allen erlittenen Schaden 2 Züge lang um 30 %.",
+
+  "Suskukluk": "Stille",
+  "Piyonun sahip olduğu debufflar 2x olarak uygulanır.": "Aktive Schwächungen werden doppelt so stark (2x) angewendet.",
+
+  "Rüzgar": "Sturm",
+  "Piyonun bir sonraki hareket menzilini -1 kare düşürür.": "Verringert die nächste Bewegungsreichweite um -1 Feld.",
+
+  "Çivili Yelek": "Dornenweste",
+  "Piyon saldırı yaptığında verdiği hasarın %15'ini kendi yer.": "Wirft 15 % des ausgeteilten Schadens auf den Angreifer zurück.",
+
+  "Ayak Bağı": "Fußfesseln",
+  "Piyon hareketini gerçekleştirdikten sonra 2 tur boyunca hareket edemez ve saldıramaz.": "Die Spielfigur ist nach der Bewegung 2 Züge lang verwurzelt und kann weder ziehen noch angreifen.",
+
+  "Archer": "Bogenschütze",
+  "Etrafındaki 2 birimlik alana hasar verebilir. Her tur saldırabilir.": "Kann Schaden im Umkreis von 2 Feldern verursachen. Kann jede Runde angreifen.",
+
+  "Cannon": "Kanone",
+  "Etrafındaki 2 birimlik alana vurabilir. Alan hasarı verir. 3turda bir saldırabilir.": "Kann im Umkreis von 2 Feldern angreifen. Verursacht Flächenschaden. Kann alle 3 Züge angreifen.",
+
+  "Cheriff": "Sheriff",
+  "Etrafındaki 2 birimlik alana saldırabilir. 2 turda bir saldırabilir.": "Kann im Umkreis von 2 Feldern angreifen. Kann alle 2 Züge angreifen.",
+
+  "Horseman": "Reiter",
+  "Seçilen alana ve arkasındaki bir bloa hasar verir. Her tur saldırabilir.": "Fügt dem gewählten Feld und dem Feld dahinter Schaden zu. Kann jede Runde angreifen.",
+
+  "Wizard": "Magier",
+  "Etrafındaki 2 birimlik alandaki seçilen piyona can basabilir. 2 turda bir kullanılabilir.": "Kann eine gewählte Spielfigur im Umkreis von 2 Feldern heilen. Kann alle 2 Züge verwendet werden.",
+
+  "Ninja": "Ninja",
+  "Seçili alana hasar verir. Engeller ve rakipler hareketini engelleyemez. Her tur saldırabilir.": "Verursacht Schaden auf dem gewählten Feld. Bewegung kann nicht durch Hindernisse oder Gegner blockiert werden. Kann jede Runde angreifen.",
+
+  "Knight": "Ritter",
+  "Menzilsizdir, yakınındaki seçili alana hasar verir. Her tur saldırabilir.": "Nahkampfeinheit. Fügt dem angrenzenden gewählten Feld Schaden zu. Kann jede Runde angreifen.",
+
+  "Quenn": "Königin",
+  "Etrafındaki 2 birimlik alandaki dost piyonların canını arttırır.": "Erhöht das Leben verbündeter Spielfiguren im Umkreis von 2 Feldern.",
+
+  "Commander": "Kommandant",
+  "Etrafındaki 2 birimlik alandaki dost piyonların hasarını arttırır.": "Erhöht den Schaden verbündeter Spielfiguren im Umkreis von 2 Feldern.",
+
+  "Settings": "Einstellungen",
+  "Music": "Musik",
+  "SFX": "SFX",
+  "Language": "Sprache",
+  "Music Volume": "Musiklautstärke",
+  "SFX Volume": "Effektlautstärke"
+}

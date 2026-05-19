@@ -49,6 +49,13 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (Instance == null) Instance = this;
             else Destroy(gameObject);
+
+            LocalizationManager.OnLanguageChanged += UpdateTurnInfoUI;
+        }
+
+        private void OnDestroy()
+        {
+            LocalizationManager.OnLanguageChanged -= UpdateTurnInfoUI;
         }
 
         public override void OnNetworkSpawn()
@@ -248,7 +255,7 @@ namespace AlperKocasalih.Chess.Grid
             {
                 if (GameManager.Instance != null && GameManager.Instance.CurrentState == GameState.Setup)
                 {
-                    turnInfoText.text = "Yerleşim Aşaması";
+                    turnInfoText.text = LocalizationManager.GetTranslation("Setup Phase");
                 }
                 else
                 {
@@ -259,7 +266,7 @@ namespace AlperKocasalih.Chess.Grid
                     }
 
                     bool isMyTurn = localPlayerID == activePlayerID.Value;
-                    turnInfoText.text = isMyTurn ? "Senin Sıran" : "Rakibin Sırası";
+                    turnInfoText.text = isMyTurn ? LocalizationManager.GetTranslation("Your Turn") : LocalizationManager.GetTranslation("Opponent's Turn");
                 }
                 
                 // Reset scale and kill previous tweens to prevent cumulative scaling (UI growing)

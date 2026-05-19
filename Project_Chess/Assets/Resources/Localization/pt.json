@@ -1,0 +1,85 @@
+{
+  "Setup Phase": "Fase de Preparação",
+  "Your Turn": "Seu Turno",
+  "Opponent's Turn": "Turno do Oponente",
+  "Burn cards: ": "Queimar cartas: ",
+  "No buffs": "Sem efeitos positivos",
+  "No debuffs": "Sem efeitos negativos",
+  "BLOCKED": "BLOQUEADO",
+
+  "Balyoz": "Marreta",
+  "%15 kadar ek hasar vurur.": "Causa 15% de dano adicional.",
+
+  "Kırılmaz irade": "Vontade Indomável",
+  "Rakibinden 2 tur içerisinde gelebilecek saldırıyı engeller.": "Bloqueia ataques inimigos por 2 turnos.",
+
+  "Kalkan Duvarı": "Parede de Escudos",
+  "Alınan hasarı %20 azaltır": "Reduz o dano recebido em 20%.",
+
+  "Yaşam Kıvılcımı": "Faísca da Vida",
+  "%5 Can ilavesi sağlar": "Concede +5% de Vida máxima.",
+
+  "Köylü İnadı": "Resiliência Camponesa",
+  "Piyon 2 tur boyunca hiçbir \"Debuff\"tan etkilenmez.": "O peão fica imune a quaisquer penalidades por 2 turnos.",
+
+  "Kan Arzusu": "Desejo de Sangue",
+  "Verilen hasarın %15'i kadar can yeniler": "Regenera vida equivalente a 15% do dano causado.",
+
+  "Tanrının Eli": "Mão de Deus",
+  "Aynı kart ile seçilen 2 birim hareket ettirilebilir.": "Permite mover 2 unidades selecionadas com a mesma carta.",
+
+  "Rüzgar İzni": "Graça do Vento",
+  "Bu tur yapılan hareketin menzilini +1 kare artırır.": "Aumenta o alcance de movimento em +1 casa neste turno.",
+
+  "Körlük": "Cegueira",
+  "Piyonun vereceği hasarı %30 azaltır": "Reduz o dano causado pelo peão em 30%.",
+
+  "Kırılganlık": "Vulnerabilidade",
+  "2 tur boyunca alınan tüm hasarları %30 artırır.": "Aumenta todo o dano recebido em 30% por 2 turnos.",
+
+  "Suskukluk": "Silêncio",
+  "Piyonun sahip olduğu debufflar 2x olarak uygulanır.": "As penalidades ativas no peão são aplicadas com efeito dobrado (2x).",
+
+  "Rüzgar": "Vendaval",
+  "Piyonun bir sonraki hareket menzilini -1 kare düşürür.": "Reduz o próximo alcance de movimento em -1 casa.",
+
+  "Çivili Yelek": "Armadura de Espinhos",
+  "Piyon saldırı yaptığında verdiği hasarın %15'ini kendi yer.": "Reflete 15% do dano causado de volta ao atacante.",
+
+  "Ayak Bağı": "Grilhões",
+  "Piyon hareketini gerçekleştirdikten sonra 2 tur boyunca hareket edemez ve saldıramaz.": "O peão fica enraizado e não pode se mover nem atacar por 2 turnos após se mover.",
+
+  "Archer": "Arqueiro",
+  "Etrafındaki 2 birimlik alana hasar verebilir. Her tur saldırabilir.": "Pode causar dano em um raio de 2 casas. Pode atacar a cada turno.",
+
+  "Cannon": "Canhoneiro",
+  "Etrafındaki 2 birimlik alana vurabilir. Alan hasarı verir. 3turda bir saldırabilir.": "Pode atacar em um raio de 2 casas. Causa dano em área. Pode atacar uma vez a cada 3 turnos.",
+
+  "Cheriff": "Xerife",
+  "Etrafındaki 2 birimlik alana saldırabilir. 2 turda bir saldırabilir.": "Pode atacar em um raio de 2 casas. Pode atacar uma vez a cada 2 turnos.",
+
+  "Horseman": "Cavaleiro",
+  "Seçilen alana ve arkasındaki bir bloa hasar verir. Her tur saldırabilir.": "Causa dano à casa selecionada e à casa atrás dela. Pode atacar a cada turno.",
+
+  "Wizard": "Mago",
+  "Etrafındaki 2 birimlik alandaki seçilen piyona can basabilir. 2 turda bir kullanılabilir.": "Pode curar um peão selecionado em um raio de 2 casas. Pode ser usado uma vez a cada 2 turnos.",
+
+  "Ninja": "Ninja",
+  "Seçili alana hasar verir. Engeller ve rakipler hareketini engelleyemez. Her tur saldırabilir.": "Causa dano à casa selecionada. O movimento não pode ser bloqueado por obstáculos ou inimigos. Pode atacar a cada turno.",
+
+  "Knight": "Guerreiro",
+  "Menzilsizdir, yakınındaki seçili alana hasar verir. Her tur saldırabilir.": "Unidade de curto alcance. Causa dano à casa adjacente selecionada. Pode atacar a cada turno.",
+
+  "Quenn": "Rainha",
+  "Etrafındaki 2 birimlik alandaki dost piyonların canını arttırır.": "Aumenta a vida dos peões aliados em um raio de 2 casas.",
+
+  "Commander": "Comandante",
+  "Etrafındaki 2 birimlik alandaki dost piyonların hasarını arttırır.": "Aumenta o dano dos peões aliados em um raio de 2 casas.",
+
+  "Settings": "Configurações",
+  "Music": "Música",
+  "SFX": "Efeitos Sonoros",
+  "Language": "Idioma",
+  "Music Volume": "Volume Música",
+  "SFX Volume": "Volume Efeitos"
+}

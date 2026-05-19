@@ -1,0 +1,85 @@
+{
+  "Setup Phase": "Setup Phase",
+  "Your Turn": "Your Turn",
+  "Opponent's Turn": "Opponent's Turn",
+  "Burn cards: ": "Burn cards: ",
+  "No buffs": "No buffs",
+  "No debuffs": "No debuffs",
+  "BLOCKED": "BLOCKED",
+
+  "Balyoz": "Sledgehammer",
+  "%15 kadar ek hasar vurur.": "Deals 15% extra damage.",
+
+  "Kırılmaz irade": "Indomitable Will",
+  "Rakibinden 2 tur içerisinde gelebilecek saldırıyı engeller.": "Blocks incoming attacks from the opponent for 2 turns.",
+
+  "Kalkan Duvarı": "Shield Wall",
+  "Alınan hasarı %20 azaltır": "Reduces damage taken by 20%",
+
+  "Yaşam Kıvılcımı": "Spark of Life",
+  "%5 Can ilavesi sağlar": "Provides +5% Max Health",
+
+  "Köylü İnadı": "Peasant Resilience",
+  "Piyon 2 tur boyunca hiçbir \"Debuff\"tan etkilenmez.": "Pawn is immune to any debuffs for 2 turns.",
+
+  "Kan Arzusu": "Bloodlust",
+  "Verilen hasarın %15'i kadar can yeniler": "Heals for 15% of damage dealt",
+
+  "Tanrının Eli": "Hand of God",
+  "Aynı kart ile seçilen 2 birim hareket ettirilebilir.": "Allows moving 2 selected units with the same card.",
+
+  "Rüzgar İzni": "Wind's Grace",
+  "Bu tur yapılan hareketin menzilini +1 kare artırır.": "Increases movement range of this turn's action by +1 tile.",
+
+  "Körlük": "Blindness",
+  "Piyonun vereceği hasarı %30 azaltır": "Reduces pawn's outgoing damage by 30%",
+
+  "Kırılganlık": "Vulnerability",
+  "2 tur boyunca alınan tüm hasarları %30 artırır.": "Increases all damage taken by 30% for 2 turns.",
+
+  "Suskukluk": "Silence",
+  "Piyonun sahip olduğu debufflar 2x olarak uygulanır.": "Active debuffs on the pawn are applied twice as strong (2x).",
+
+  "Rüzgar": "Gale",
+  "Piyonun bir sonraki hareket menzilini -1 kare düşürür.": "Reduces the pawn's next movement range by -1 tile.",
+
+  "Çivili Yelek": "Thornmail",
+  "Piyon saldırı yaptığında verdiği hasarın %15'ini kendi yer.": "Recoils 15% of outgoing damage back to the attacker.",
+
+  "Ayak Bağı": "Shackles",
+  "Piyon hareketini gerçekleştirdikten sonra 2 tur boyunca hareket edemez ve saldıramaz.": "Pawn is rooted and cannot move or attack for 2 turns after moving.",
+
+  "Archer": "Archer",
+  "Etrafındaki 2 birimlik alana hasar verebilir. Her tur saldırabilir.": "Can deal damage within a 2-tile radius. Can attack every turn.",
+
+  "Cannon": "Cannon",
+  "Etrafındaki 2 birimlik alana vurabilir. Alan hasarı verir. 3turda bir saldırabilir.": "Can strike within a 2-tile radius. Deals splash damage. Can attack once every 3 turns.",
+
+  "Cheriff": "Sheriff",
+  "Etrafındaki 2 birimlik alana saldırabilir. 2 turda bir saldırabilir.": "Can attack within a 2-tile radius. Can attack once every 2 turns.",
+
+  "Horseman": "Horseman",
+  "Seçilen alana ve arkasındaki bir bloa hasar verir. Her tur saldırabilir.": "Deals damage to the selected tile and the tile behind it. Can attack every turn.",
+
+  "Wizard": "Wizard",
+  "Etrafındaki 2 birimlik alandaki seçilen piyona can basabilir. 2 turda bir kullanılabilir.": "Can heal a chosen pawn within a 2-tile radius. Can be used once every 2 turns.",
+
+  "Ninja": "Ninja",
+  "Seçili alana hasar verir. Engeller ve rakipler hareketini engelleyemez. Her tur saldırabilir.": "Deals damage to the selected tile. Movement cannot be blocked by obstacles or enemies. Can attack every turn.",
+
+  "Knight": "Knight",
+  "Menzilsizdir, yakınındaki seçili alana hasar verir. Her tur saldırabilir.": "Melee unit. Deals damage to the adjacent selected tile. Can attack every turn.",
+
+  "Quenn": "Queen",
+  "Etrafındaki 2 birimlik alandaki dost piyonların canını arttırır.": "Increases the health of friendly pawns within a 2-tile radius.",
+
+  "Commander": "Commander",
+  "Etrafındaki 2 birimlik alandaki dost piyonların hasarını arttırır.": "Increases the damage of friendly pawns within a 2-tile radius.",
+
+  "Settings": "Settings",
+  "Music": "Music",
+  "SFX": "SFX",
+  "Language": "Language",
+  "Music Volume": "Music Volume",
+  "SFX Volume": "SFX Volume"
+}
