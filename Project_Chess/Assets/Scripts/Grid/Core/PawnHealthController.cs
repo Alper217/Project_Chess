@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using AlperKocasalih.Chess.Grid;
 using AlperKocasalih.Chess.Grid.Utils;
 using Unity.Netcode;
@@ -15,10 +15,12 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
     public MMF_Player targetPlayer;
 
+    private Vector3 _originalScale;
+
     private void Awake()
     {
         _pawn = GetComponent<Pawn>();
-        
+        _originalScale = transform.localScale;
     }
 
     public override void OnNetworkSpawn()
@@ -161,6 +163,10 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
 
         if (targetPlayer == null) return;
 
+        // Stop any running feedbacks and restore original scale to prevent cumulative scaling bugs
+        targetPlayer.StopFeedbacks();
+        transform.localScale = _originalScale;
+
         MMF_FloatingText floatingTextFeedback = targetPlayer.GetFeedbackOfType<MMF_FloatingText>();
         if (floatingTextFeedback != null) 
         {
@@ -188,6 +194,11 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     public void ShowBlockedFeedbackClientRpc()
     {
         if (targetPlayer == null) return;
+
+        // Stop any running feedbacks and restore original scale to prevent cumulative scaling bugs
+        targetPlayer.StopFeedbacks();
+        transform.localScale = _originalScale;
+
         MMF_FloatingText floatingTextFeedback = targetPlayer.GetFeedbackOfType<MMF_FloatingText>();
         if (floatingTextFeedback != null)
         {
@@ -223,32 +234,40 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
 
         Vector3Int startCube = HexGridMath.OffsetToCube(currentPos);
 
+        bool canAttackThroughObstacles = _pawn.PawnData.type == Type.Archer || 
+                                         _pawn.PawnData.type == Type.Cannon || 
+                                         _pawn.PawnData.type == Type.Cheriff;
+
         foreach (var offset in offsets)
         {
             Vector2Int targetCoords = currentPos + offset;
 
             bool isBlocked = false;
-            Vector3Int targetCube = HexGridMath.OffsetToCube(targetCoords);
-            int dist = HexGridMath.CubeDistance(startCube, targetCube);
 
-            for (int i = 1; i <= dist; i++)
+            if (!canAttackThroughObstacles)
             {
-                Vector3 cubeFloat = HexGridMath.CubeLerp(startCube, targetCube, 1f / dist * i);
-                Vector3Int cubePoint = HexGridMath.CubeRound(cubeFloat);
-                Vector2Int pathCoord = HexGridMath.CubeToOffset(cubePoint);
+                Vector3Int targetCube = HexGridMath.OffsetToCube(targetCoords);
+                int dist = HexGridMath.CubeDistance(startCube, targetCube);
 
-                if (gridLookup.TryGetValue(pathCoord, out HexCell pathCell))
+                for (int i = 1; i <= dist; i++)
                 {
-                    if (pathCell.IsObstacle)
+                    Vector3 cubeFloat = HexGridMath.CubeLerp(startCube, targetCube, 1f / dist * i);
+                    Vector3Int cubePoint = HexGridMath.CubeRound(cubeFloat);
+                    Vector2Int pathCoord = HexGridMath.CubeToOffset(cubePoint);
+
+                    if (gridLookup.TryGetValue(pathCoord, out HexCell pathCell))
+                    {
+                        if (pathCell.IsObstacle)
+                        {
+                            isBlocked = true;
+                            break;
+                        }
+                    }
+                    else
                     {
                         isBlocked = true;
                         break;
                     }
-                }
-                else
-                {
-                    isBlocked = true;
-                    break;
                 }
             }
 

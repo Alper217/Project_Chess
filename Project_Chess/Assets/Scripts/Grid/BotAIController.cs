@@ -764,9 +764,8 @@ namespace AlperKocasalih.Chess.Grid
 
                                 if (centerCell != null)
                                 {
-                                    List<Vector2Int> localOffsets = card.obstaclePattern.GetObstacleOffsets(centerCell.Coordinates.x);
                                     bool rotate180 = (botPlayerID == 2);
-                                    List<Vector2Int> absoluteWorldOffsets = Utils.HexGridMath.GenerateAccurateWorldOffsetsFromPattern(centerCell.Coordinates, localOffsets, rotate180);
+                                    List<Vector2Int> absoluteWorldOffsets = card.obstaclePattern.GetAbsoluteObstacleOffsets(centerCell.Coordinates, rotate180);
 
                                     bool hasValidCoord = false;
                                     foreach (var coord in absoluteWorldOffsets)
@@ -959,12 +958,21 @@ namespace AlperKocasalih.Chess.Grid
                 }
             }
 
+            bool canAttackThroughObstacles = attacker.PawnData != null && (
+                attacker.PawnData.type == Type.Archer ||
+                attacker.PawnData.type == Type.Cannon ||
+                attacker.PawnData.type == Type.Cheriff
+            );
+            Vector3Int attackerCube = Utils.HexGridMath.OffsetToCube(origin);
+
             HexCell bestCell  = null;
             float   bestScore = float.NegativeInfinity;
 
             foreach (var offset in offsets)
             {
                 Vector2Int targetCoords = origin + offset;
+                if (!canAttackThroughObstacles && IsPathBlocked(attackerCube, targetCoords)) continue;
+
                 if (!gridLookup.TryGetValue(targetCoords, out HexCell cell)) continue;
                 if (cell.IsOccupied)
                 {
@@ -1016,9 +1024,20 @@ namespace AlperKocasalih.Chess.Grid
             float currentMinDist = MinDistanceToEnemies(origin, enemies);
             MovementPattern attackPattern = pawn.PawnData?.attackPattern;
 
+            bool ignoresObstacles = pawn.PawnData != null && pawn.PawnData.type == Type.Ninja;
+            Vector3Int originCube = Utils.HexGridMath.OffsetToCube(origin);
+
+            bool canAttackThroughObstacles = pawn.PawnData != null && (
+                pawn.PawnData.type == Type.Archer ||
+                pawn.PawnData.type == Type.Cannon ||
+                pawn.PawnData.type == Type.Cheriff
+            );
+
             foreach (var offset in offsets)
             {
                 Vector2Int targetCoords = origin + offset;
+                if (!ignoresObstacles && IsPathBlocked(originCube, targetCoords)) continue;
+
                 if (!gridLookup.TryGetValue(targetCoords, out HexCell cell)) continue;
                 if (cell.IsOccupied || cell.IsObstacle) continue;
 
@@ -1043,9 +1062,13 @@ namespace AlperKocasalih.Chess.Grid
                     }
                 }
 
+                Vector3Int targetCube = Utils.HexGridMath.OffsetToCube(targetCoords);
+
                 foreach (var aOffset in attackOffsets)
                 {
                     Vector2Int potentialAttackCoords = targetCoords + aOffset;
+                    if (!canAttackThroughObstacles && IsPathBlocked(targetCube, potentialAttackCoords)) continue;
+
                     if (gridLookup.TryGetValue(potentialAttackCoords, out HexCell attackCell))
                     {
                         Pawn enemy = FindPawnOnCell(attackCell);
@@ -1145,6 +1168,33 @@ namespace AlperKocasalih.Chess.Grid
                 if (p != null && p.OccupiedCell == cell) return p;
             }
             return null;
+        }
+
+        private bool IsPathBlocked(Vector3Int startCube, Vector2Int targetCoords)
+        {
+            Vector3Int targetCube = Utils.HexGridMath.OffsetToCube(targetCoords);
+            int dist = Utils.HexGridMath.CubeDistance(startCube, targetCube);
+
+            for (int i = 1; i <= dist; i++)
+            {
+                Vector3 cubeFloat = Utils.HexGridMath.CubeLerp(startCube, targetCube, 1f / dist * i);
+                Vector3Int cubePoint = Utils.HexGridMath.CubeRound(cubeFloat);
+                Vector2Int pathCoord = Utils.HexGridMath.CubeToOffset(cubePoint);
+
+                if (gridLookup.TryGetValue(pathCoord, out HexCell pathCell))
+                {
+                    if (pathCell.IsObstacle)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

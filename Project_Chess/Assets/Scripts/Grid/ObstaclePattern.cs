@@ -35,7 +35,7 @@ namespace AlperKocasalih.Chess.Grid
                     {
                         // Calculate offset from center (3,3)
                         int dq = x - centerIdxX;
-                        int dr = -(y - centerIdxY); // Invert Y because array 0,0 is usually top-left, but hex R goes up/down. Let's just use raw distance.
+                        int dr = y - centerIdxY; // Flipped to match 3D screen projection with visual card layout
 
                         activeOffsets.Add(new Vector2Int(dq, dr));
                     }
@@ -45,28 +45,17 @@ namespace AlperKocasalih.Chess.Grid
         }
 
         /// <summary>
-        /// Converts the pattern into movement offsets in world coordinates,
+        /// Converts the pattern into absolute obstacle world coordinates,
         /// accounting for odd-q layout and optional 180-degree rotation.
         /// </summary>
-        public List<Vector2Int> GetMovementOffsets(Vector2Int centerWorldCoords, bool rotate180)
+        public List<Vector2Int> GetAbsoluteObstacleOffsets(Vector2Int centerWorldCoords, bool rotate180)
         {
             List<Vector2Int> localOffsets = GetObstacleOffsets(centerWorldCoords.x);
-            List<Vector2Int> worldCoords = HexGridMath.GenerateAccurateWorldOffsetsFromPattern(
+            return HexGridMath.GenerateAccurateWorldOffsetsFromPattern(
                 centerWorldCoords,
                 localOffsets,
                 rotate180
             );
-
-            List<Vector2Int> movementOffsets = new List<Vector2Int>(worldCoords.Count);
-            foreach (var worldCoord in worldCoords)
-            {
-                Vector2Int offset = worldCoord - centerWorldCoords;
-                if (offset != Vector2Int.zero)
-                {
-                    movementOffsets.Add(offset);
-                }
-            }
-            return movementOffsets;
         }
     }
 }
