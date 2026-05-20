@@ -282,13 +282,14 @@ namespace AlperKocasalih.Chess.Grid
 
                 selectedPawn = pawn;
 
-                // --- NEW: Double Use Class Restriction ---
-                if (activeCardRemainingUses <= 1 && initialCardUses <= 1) // Only set on first selection
+                // --- Double Use Class Restriction ---
+                // Guard: activeCardData can be null when SelectMovementPattern() is used directly
+                if (activeCardData != null && activeCardRemainingUses <= 1 && initialCardUses <= 1)
                 {
                     bool isMatch = (selectedPawn.PawnData.type == activeCardData.pawnClass);
                     if (isMatch && activeCardData.runtimeBuffs != null)
                     {
-                        foreach(var buff in activeCardData.runtimeBuffs)
+                        foreach (var buff in activeCardData.runtimeBuffs)
                         {
                             if (buff != null && buff.effectType == EffectType.DoubleUse)
                             {
@@ -788,13 +789,23 @@ namespace AlperKocasalih.Chess.Grid
             List<Vector2Int> attackOffsets = attackPattern.GetValidOffsets(currentCoords, pawn.PlayerID == 2, 0);
 
             if (attackOffsets == null || attackOffsets.Count == 0) return;
+
+            // Ninja ignores obstacles for both movement AND attack highlighting,
+            // matching the same exception already applied in HighlightMovementTargets.
+            bool ninjaIgnoresObstacles = pawn.PawnData.type == Type.Ninja;
+
             foreach (var offset in attackOffsets)
             {
                 Vector2Int targetCoords = currentCoords + offset;
-                if (IsPathBlocked(startCube, targetCoords)) continue;
+
+                // Skip cells whose path is blocked — except for Ninja who can bypass obstacles
+                if (!ninjaIgnoresObstacles && IsPathBlocked(startCube, targetCoords)) continue;
 
                 if (gridLookup.TryGetValue(targetCoords, out HexCell targetCell))
                 {
+                    // Ninja also skips cells that are themselves obstacles
+                    if (!ninjaIgnoresObstacles && targetCell.IsObstacle) continue;
+
                     Pawn occupant = FindPawnOnCell(targetCell);
                     if (occupant != null)
                     {
@@ -805,7 +816,7 @@ namespace AlperKocasalih.Chess.Grid
                         {
                             if (!highlightedCells.Contains(targetCell))
                                 highlightedCells.Add(targetCell);
-                            
+
                             targetCell.Highlight(isEnemy ? Color.white : Color.green);
                         }
                     }

@@ -97,12 +97,12 @@ namespace AlperKocasalih.Chess.Grid.Core
                     if (attackHandler != null && attackHandler.CanAttack())
                     {
                         attackHandler.ExecuteAttack(defender.OccupiedCell.Coordinates, gridLookup);
-                        
-                        AudioClip clipToPlay = (isFriendly && attacker.PawnData.isHealer) 
-                            ? attacker.PawnData.healSound 
-                            : attacker.PawnData.attackSound;
-                            
-                        if (clipToPlay != null) AudioManager.instance.PlaySfx(clipToPlay);
+
+                        // Broadcast combat sound to ALL clients (including host-client).
+                        // Previously AudioManager.PlaySfx was called here on the server only,
+                        // which meant clients never heard attack/heal sounds.
+                        bool playHeal = isFriendly && attacker.PawnData.isHealer;
+                        PlayCombatSoundClientRpc(attackerID, playHeal);
                     }
                     else
                     {
@@ -110,8 +110,26 @@ namespace AlperKocasalih.Chess.Grid.Core
                     }
                 }
                 }
-            
+
             if (endTurn && TurnManager.Instance != null) TurnManager.Instance.NextTurn();
+        }
+
+        /// <summary>
+        /// Plays the attacker's attack or heal sound on every client.
+        /// </summary>
+        [ClientRpc]
+        private void PlayCombatSoundClientRpc(ulong attackerID, bool playHeal)
+        {
+            if (!NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(attackerID, out NetworkObject attackerObj)) return;
+
+            Pawn attacker = attackerObj.GetComponent<Pawn>();
+            if (attacker == null || attacker.PawnData == null) return;
+
+            AudioClip clip = playHeal ? attacker.PawnData.healSound : attacker.PawnData.attackSound;
+            if (clip != null && AudioManager.instance != null)
+            {
+                AudioManager.instance.PlaySfx(clip);
+            }
         }
 
         [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
