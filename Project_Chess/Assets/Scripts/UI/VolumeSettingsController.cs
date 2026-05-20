@@ -42,7 +42,7 @@ public class VolumeSettingsController : MonoBehaviour
         {
             languageDropdown.ClearOptions();
             
-            var options = new System.Collections.Generic.List<string> { "Türkçe", "English", "Deutsch", "Français", "Português", "简体中文" };
+            var options = new System.Collections.Generic.List<string> { "Türkçe", "English", "Deutsch", "Français", "Português", "Español" };
             languageDropdown.AddOptions(options);
 
             // Mevcut dili eşleştir

@@ -1,0 +1,85 @@
+{
+  "Setup Phase": "Fase de Preparación",
+  "Your Turn": "Tu Turno",
+  "Opponent's Turn": "Turno del Oponente",
+  "Burn cards: ": "Quemar cartas: ",
+  "No buffs": "Sin mejoras",
+  "No debuffs": "Sin perjuicios",
+  "BLOCKED": "BLOQUEADO",
+
+  "Balyoz": "Mazo",
+  "%15 kadar ek hasar vurur.": "Inflige un 15% de daño adicional.",
+
+  "Kırılmaz irade": "Voluntad Indomable",
+  "Rakibinden 2 tur içerisinde gelebilecek saldırıyı engeller.": "Bloquea los ataques del oponente durante 2 turnos.",
+
+  "Kalkan Duvarı": "Muro de Escudos",
+  "Alınan hasarı %20 azaltır": "Reduce el daño recibido en un 20%.",
+
+  "Yaşam Kıvılcımı": "Chispa de Vida",
+  "%5 Can ilavesi sağlar": "Proporciona +5% de Vida Máxima.",
+
+  "Köylü İnadı": "Tenacidad Campesina",
+  "Piyon 2 tur boyunca hiçbir \"Debuff\"tan etkilenmez.": "El peón es inmune a cualquier perjuicio durante 2 turnos.",
+
+  "Kan Arzusu": "Sed de Sangre",
+  "Verilen hasarın %15'i kadar can yeniler": "Cura un 15% del daño infligido.",
+
+  "Tanrının Eli": "Mano de Dios",
+  "Aynı kart ile seçilen 2 birim hareket ettirilebilir.": "Permite mover 2 unidades seleccionadas con la misma carta.",
+
+  "Rüzgar İzni": "Gracia del Viento",
+  "Bu tur yapılan hareketin menzilini +1 kare artırır.": "Aumenta el rango de movimiento de este turno en +1 casilla.",
+
+  "Körlük": "Ceguera",
+  "Piyonun vereceği hasarı %30 azaltır": "Reduce el daño infligido por el peón en un 30%.",
+
+  "Kırılganlık": "Vulnerabilidad",
+  "2 turn boyunca alınan tüm hasarları %30 artırır.": "Aumenta todo el daño recibido en un 30% durante 2 turnos.",
+
+  "Suskukluk": "Silencio",
+  "Piyonun sahip olduğu debufflar 2x olarak uygulanır.": "Los perjuicios activos en el peón se aplican con el doble de fuerza (2x).",
+
+  "Rüzgar": "Vendaval",
+  "Piyonun bir sonraki hareket menzilini -1 kare düşürür.": "Reduce el rango del siguiente movimiento del peón en -1 casilla.",
+
+  "Çivili Yelek": "Cota de Espinas",
+  "Piyon saldırı yaptığında verdiği hasarın %15'ini kendi yer.": "Devuelve el 15% del daño infligido al atacante.",
+
+  "Ayak Bağı": "Grilletes",
+  "Piyon hareketini gerçekleştirdikten sonra 2 tur boyunca hareket edemez ve saldıramaz.": "El peón queda enraizado y no puede moverse ni atacar durante 2 turnos después de moverse.",
+
+  "Archer": "Arquero",
+  "Etrafındaki 2 birimlik alana hasar verebilir. Her tur saldırabilir.": "Puede infligir daño en un radio de 2 casillas. Puede atacar cada turno.",
+
+  "Cannon": "Cañón",
+  "Etrafındaki 2 birimlik alana vurabilir. Alan hasarı verir. 3turda bir saldırabilir.": "Puede atacar en un radio de 2 casillas. Inflige daño de área. Puede atacar una vez cada 3 turnos.",
+
+  "Cheriff": "Sheriff",
+  "Etrafındaki 2 birimlik alana saldırabilir. 2 turda bir saldırabilir.": "Puede atacar en un radio de 2 casillas. Puede atacar una vez cada 2 turnos.",
+
+  "Horseman": "Jinete",
+  "Seçilen alana ve arkasındaki bir bloa hasar verir. Her tur saldırabilir.": "Inflige daño a la casilla seleccionada y a la casilla detrás de ella. Puede atacar cada turno.",
+
+  "Wizard": "Mago",
+  "Etrafındaki 2 birimlik alandaki seçilen piyona can basabilir. 2 turda bir kullanılabilir.": "Puede curar a un peón aliado seleccionado en un radio de 2 casillas. Se puede usar una vez cada 2 turnos.",
+
+  "Ninja": "Ninja",
+  "Seçili alana hasar verir. Engeller ve rakipler hareketini engelleyemez. Her tur saldırabilir.": "Inflige daño a la casilla seleccionada. El movimiento no puede ser bloqueado por obstáculos o enemigos. Puede atacar cada turno.",
+
+  "Knight": "Caballero",
+  "Menzilsizdir, yakınındaki seçili alana hasar verir. Her tur saldırabilir.": "Unidad cuerpo a cuerpo. Inflige daño a la casilla adyacente seleccionada. Puede atacar cada turno.",
+
+  "Quenn": "Reina",
+  "Etrafındaki 2 birimlik alandaki dost piyonların canını arttırır.": "Aumenta la vida de los peones aliados en un radio de 2 casillas.",
+
+  "Commander": "Comandante",
+  "Etrafındaki 2 birimlik alandaki dost piyonların hasarını arttırır.": "Aumenta el daño de los peones aliados en un radio de 2 casillas.",
+
+  "Settings": "Ajustes",
+  "Music": "Música",
+  "SFX": "Efectos",
+  "Language": "Idioma",
+  "Music Volume": "Volumen de Música",
+  "SFX Volume": "Volumen de Efectos"
+}

@@ -12,7 +12,7 @@ namespace AlperKocasalih.Chess.Grid
         DE,
         FR,
         PT,
-        ZH
+        ES
     }
 
     public static class LocalizationManager
