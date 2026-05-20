@@ -297,13 +297,10 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
-        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-        public void ReRollDraftCardServerRpc(int cardIndex, RpcParams rpcParams = default)
+        public void ReRollDraftCardDirect(int playerID, int cardIndex)
         {
             if (!IsServer || !enableReRollSystem) return;
             if (!isDraftingActive || currentChoices.Count <= cardIndex) return;
-            
-            int playerID = GetPlayerIdFromClientId(rpcParams.Receive.SenderClientId);
             if (playerID != draftingPlayerID) return;
 
             if (TrySpendReRollServer(playerID))
@@ -316,6 +313,13 @@ namespace AlperKocasalih.Chess.Grid
                 
                 NotifyCurrentChoicesToClients();
             }
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        public void ReRollDraftCardServerRpc(int cardIndex, RpcParams rpcParams = default)
+        {
+            int playerID = GetPlayerIdFromClientId(rpcParams.Receive.SenderClientId);
+            ReRollDraftCardDirect(playerID, cardIndex);
         }
 
         private void NotifyCurrentChoicesToClients()
@@ -535,6 +539,23 @@ namespace AlperKocasalih.Chess.Grid
 
             // Notify clients about the fusion result
             NotifyFusionResultClientRpc(playerID, targetPawn.NetworkObjectId, targetPawn.PawnData.type, generationSeed);
+
+            // Auto-accept fusion card if player is controlled by a Bot
+            bool isBot = false;
+            BotAIController[] bots = FindObjectsByType<BotAIController>(FindObjectsSortMode.None);
+            foreach (var bot in bots)
+            {
+                if (bot.BotPlayerID == playerID)
+                {
+                    isBot = true;
+                    break;
+                }
+            }
+
+            if (isBot)
+            {
+                AddCardToHandOrQueue(playerID, resultCard);
+            }
         }
 
         [ClientRpc]

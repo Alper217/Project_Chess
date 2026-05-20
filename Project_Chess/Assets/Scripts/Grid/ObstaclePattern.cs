@@ -35,7 +35,7 @@ namespace AlperKocasalih.Chess.Grid
                     {
                         // Calculate offset from center (3,3)
                         int dq = x - centerIdxX;
-                        int dr = y - centerIdxY; // Flipped to match 3D screen projection with visual card layout
+                        int dr = -(y - centerIdxY); // Flipped to match 3D screen projection with visual card layout
 
                         activeOffsets.Add(new Vector2Int(dq, dr));
                     }

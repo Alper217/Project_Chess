@@ -376,6 +376,72 @@ namespace AlperKocasalih.Chess.Grid
             // Refresh my pawn types in case setup changed them
             RefreshMyPawnTypes();
 
+            // AI Re-roll check: if we have re-rolls and the cards are bad, re-roll
+            int reRollCount = 0;
+            while (DraftManager.Instance != null && DraftManager.Instance.EnableReRollSystem &&
+                   DraftManager.Instance.GetReRolls(botPlayerID) > 0 && reRollCount < 1 &&
+                   choices != null && choices.Count > 0)
+            {
+                // Find the card we'd keep (highest self score)
+                float bestSelfScore = float.NegativeInfinity;
+                for (int i = 0; i < choices.Count; i++)
+                {
+                    float score = EvaluateCardForSelf(choices[i]);
+                    if (score > bestSelfScore)
+                    {
+                        bestSelfScore = score;
+                    }
+                }
+
+                // If our best card has a score <= 0.5f (bad or mismatch), we re-roll the lowest score card!
+                if (bestSelfScore <= 0.5f)
+                {
+                    int worstIdx = 0;
+                    float worstScore = float.PositiveInfinity;
+                    for (int i = 0; i < choices.Count; i++)
+                    {
+                        float score = EvaluateCardForSelf(choices[i]);
+                        if (score < worstScore)
+                        {
+                            worstScore = score;
+                            worstIdx = i;
+                        }
+                    }
+
+                    // Guard: if worstIdx is out of bounds (race condition), abort re-roll
+                    if (worstIdx >= choices.Count)
+                    {
+                        if (verboseLog)
+                            Debug.LogWarning($"[BotAI P{botPlayerID}] Re-roll aborted: worstIdx {worstIdx} >= choices.Count {choices.Count}");
+                        break;
+                    }
+
+                    if (verboseLog)
+                    {
+                        Debug.Log($"[BotAI P{botPlayerID}] Re-rolling draft card at index {worstIdx} (card: '{choices[worstIdx]?.cardName ?? "null"}' score: {worstScore:F1}) because best card score is low ({bestSelfScore:F1}). Re-rolls remaining: {DraftManager.Instance.GetReRolls(botPlayerID)}");
+                    }
+
+                    DraftManager.Instance.ReRollDraftCardDirect(botPlayerID, worstIdx);
+                    reRollCount++;
+
+                    yield return new WaitForSeconds(draftThinkDelay);
+
+                    // Refresh choices; if draft turn ended mid-flight, list will be empty → exit safely
+                    choices = DraftManager.Instance.GetCurrentChoices();
+                    if (choices == null || choices.Count == 0)
+                    {
+                        if (verboseLog)
+                            Debug.LogWarning($"[BotAI P{botPlayerID}] Re-roll: choices list is now empty after re-roll (draft turn may have ended). Exiting re-roll loop.");
+                        isProcessingDraft = false;
+                        yield break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
             // Evaluate each card and decide action
             // We must consume all 3 (Keep, Give, Burn) without repeating an action this round.
             HashSet<DraftAction> usedActions = new HashSet<DraftAction>();
@@ -594,6 +660,54 @@ namespace AlperKocasalih.Chess.Grid
             {
                 isProcessingAction = false;
                 yield break;
+            }
+
+            // Refresh my pawn types first
+            RefreshMyPawnTypes();
+
+            // AI Fusion Check: If Fusion is enabled and we have at least 3 cards
+            if (DraftManager.Instance != null && DraftManager.Instance.EnableFusionSystem)
+            {
+                List<CardData> currentHand = DraftManager.Instance.GetHand(botPlayerID);
+                if (currentHand != null && currentHand.Count >= 3)
+                {
+                    // Find all mismatch cards
+                    List<(int index, float score)> mismatchCards = new List<(int, float)>();
+                    for (int i = 0; i < currentHand.Count; i++)
+                    {
+                        CardData card = currentHand[i];
+                        if (card == null || card.isObstacleCard) continue; // Skip obstacle cards for fusion
+
+                        bool classMatch = myPawnTypes.Contains(card.pawnClass) || card.pawnClass == Type.None;
+                        if (!classMatch)
+                        {
+                            float score = EvaluateCardForSelf(card);
+                            mismatchCards.Add((i, score));
+                        }
+                    }
+
+                    // If we have at least 3 mismatch cards, fuse the 3 with the lowest self score
+                    if (mismatchCards.Count >= 3)
+                    {
+                        mismatchCards.Sort((a, b) => a.score.CompareTo(b.score)); // worst scores first
+
+                        int[] indicesToFuse = new int[3];
+                        for (int i = 0; i < 3; i++)
+                        {
+                            indicesToFuse[i] = mismatchCards[i].index;
+                        }
+
+                        if (verboseLog)
+                        {
+                            Debug.Log($"[BotAI P{botPlayerID}] Fusion: Fusing 3 mismatch cards (indices: {indicesToFuse[0]}, {indicesToFuse[1]}, {indicesToFuse[2]})");
+                        }
+
+                        DraftManager.Instance.PerformFusionServerRpc(botPlayerID, indicesToFuse);
+
+                        // Wait a small moment for fusion to resolve
+                        yield return new WaitForSeconds(1.0f);
+                    }
+                }
             }
 
             List<CardData> hand = DraftManager.Instance.GetHand(botPlayerID);
@@ -903,12 +1017,87 @@ namespace AlperKocasalih.Chess.Grid
             {
                 // No playable card found → draw and skip
                 if (verboseLog)
-                    Debug.Log($"[BotAI P{botPlayerID}] No valid action found. Drawing & skipping turn.");
-                    
+                    Debug.Log($"[BotAI P{botPlayerID}] No valid action found. Check if drawing is allowed.");
+
                 if (DraftManager.Instance.IsDrawAllowed)
+                {
+                    if (verboseLog)
+                        Debug.Log($"[BotAI P{botPlayerID}] Drawing is allowed. Performing Draw and Skip.");
                     DraftManager.Instance.PerformDrawOneAndSkipTurn(botPlayerID);
-                else if (TurnManager.Instance != null)
-                    TurnManager.Instance.NextTurn();
+                }
+                else
+                {
+                    // Durum A: Kart Çekme Yasak (İlk 2 Tur - IsDrawAllowed == false)
+                    // AI pas geçmeyecek (sırayı doğrudan oyuncuya devretmeyecek).
+                    // Elindeki en verimsiz kartı seçecektir.
+                    CardData worstCard = null;
+                    float worstScore = float.MaxValue;
+
+                    foreach (CardData card in hand)
+                    {
+                        if (card == null) continue;
+                        float score = EvaluateCardForSelf(card);
+                        if (card.isObstacleCard) score += 10000f; // Penalize obstacle cards so they are kept/not chosen first
+                        if (score < worstScore)
+                        {
+                            worstScore = score;
+                            worstCard = card;
+                        }
+                    }
+
+                    // Düşman piyonlarından en uzakta olan en güvenli piyonunu seçecektir.
+                    Pawn safestPawn = null;
+                    float maxMinDist = float.MinValue;
+
+                    foreach (Pawn pawn in myPawns)
+                    {
+                        if (pawn == null || pawn.OccupiedCell == null) continue;
+                        float minDist = MinDistanceToEnemies(pawn.OccupiedCell.Coordinates, enemies);
+                        if (minDist > maxMinDist)
+                        {
+                            maxMinDist = minDist;
+                            safestPawn = pawn;
+                        }
+                    }
+
+                    if (safestPawn == null && myPawns.Count > 0)
+                    {
+                        safestPawn = myPawns[0];
+                    }
+
+                    if (worstCard != null && safestPawn != null)
+                    {
+                        int cardIndex = DeckManager.Instance != null
+                            ? DeckManager.Instance.GetCardIndex(worstCard)
+                            : -1;
+
+                        if (verboseLog)
+                        {
+                            Debug.Log($"[BotAI P{botPlayerID}] Mismatch Cycling: Playing worst card '{worstCard.cardName}' (score: {worstScore}) on safest pawn '{safestPawn.PawnData?.pawnName}' at {safestPawn.OccupiedCell?.Coordinates}");
+                        }
+
+                        if (cardIndex >= 0)
+                        {
+                            Core.PawnActionExecutor.Instance.ApplyCardEffectServerRpc(safestPawn.NetworkObjectId, cardIndex);
+                        }
+
+                        DraftManager.Instance.RemoveCardFromHand(botPlayerID, worstCard);
+                        TotalCardsUsed++;
+                        TotalMoves++;
+                    }
+                    else
+                    {
+                        if (verboseLog)
+                        {
+                            Debug.LogWarning($"[BotAI P{botPlayerID}] Worst card or safest pawn not found. Unable to cycle card.");
+                        }
+                    }
+
+                    if (TurnManager.Instance != null)
+                    {
+                        TurnManager.Instance.NextTurn();
+                    }
+                }
             }
 
             isProcessingAction = false;

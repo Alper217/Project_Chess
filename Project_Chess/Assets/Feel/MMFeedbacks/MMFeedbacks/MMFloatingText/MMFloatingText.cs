@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using MoreMountains.Tools;
 
 namespace MoreMountains.Feedbacks
@@ -107,6 +107,8 @@ namespace MoreMountains.Feedbacks
 				_initialTextColor = TargetTextMesh.color;
 			}
 			FollowTarget = this.gameObject.MMGetOrAddComponent<MMFollowTarget>();
+			FollowTarget.FollowScale = false;
+			FollowTarget.FollowRotation = false;
 		}
 
 		/// <summary>

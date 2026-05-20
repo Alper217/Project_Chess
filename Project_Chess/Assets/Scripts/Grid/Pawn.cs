@@ -113,6 +113,19 @@ namespace AlperKocasalih.Chess.Grid
             {
                 TurnManager.Instance.OnTurnChanged -= OnTurnChanged;
             }
+
+            if (currentCell != null)
+            {
+                currentCell.IsOccupied = false;
+            }
+        }
+
+        private void OnDestroy()
+        {
+            if (currentCell != null)
+            {
+                currentCell.IsOccupied = false;
+            }
         }
 
         private void OnTurnChanged(int activePlayerID)
