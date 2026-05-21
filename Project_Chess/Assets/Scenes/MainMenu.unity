@@ -14373,6 +14373,14 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2354876256247284868, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2354876256247284868, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: eb4186fced9e77641b6123605465aff2, type: 3}
+    - target: {fileID: 2354876256247284868, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_Color.b
       value: 1
       objectReference: {fileID: 0}
@@ -14385,12 +14393,16 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3314452568882004913, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: d8ee7cc915ceac542b5c08962e4e7353, type: 3}
+    - target: {fileID: 3314452568882004913, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_Color.b
-      value: 0.29411766
+      value: 0.5137255
       objectReference: {fileID: 0}
     - target: {fileID: 3314452568882004913, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_Color.g
-      value: 0.627451
+      value: 0.8117647
       objectReference: {fileID: 0}
     - target: {fileID: 3486982330259441525, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_Pivot.x
@@ -14552,6 +14564,22 @@ PrefabInstance:
       propertyPath: m_hasFontAssetChanged
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6486640389912517333, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6486640389912517333, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: eb4186fced9e77641b6123605465aff2, type: 3}
+    - target: {fileID: 6586874871545872933, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6586874871545872933, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 4cdd9aecb037f534d9ce5c3b205c7d90, type: 3}
     - target: {fileID: 7725588012490314369, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -14564,17 +14592,29 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 36.7
       objectReference: {fileID: 0}
+    - target: {fileID: 8096369390438855767, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8096369390438855767, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 4cdd9aecb037f534d9ce5c3b205c7d90, type: 3}
     - target: {fileID: 8180104019750004932, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8479564545259878248, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: d8ee7cc915ceac542b5c08962e4e7353, type: 3}
+    - target: {fileID: 8479564545259878248, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_Color.b
-      value: 0.2924527
+      value: 0.51257855
       objectReference: {fileID: 0}
     - target: {fileID: 8479564545259878248, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_Color.g
-      value: 0.62792766
+      value: 0.810716
       objectReference: {fileID: 0}
     - target: {fileID: 8479564545259878248, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_Color.r
