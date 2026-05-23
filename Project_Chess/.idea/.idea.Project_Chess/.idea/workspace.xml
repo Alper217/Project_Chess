@@ -6,26 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="3d9e23b9-49f8-4e62-afbc-c164cc147016" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Queen.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Queen.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Wizard.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Wizard.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Feel/MMFeedbacks/MMFeedbacks/MMFloatingText/MMFloatingTextSpawner.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Feel/MMFeedbacks/MMFeedbacks/MMFloatingText/MMFloatingTextSpawner.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Archer.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Archer.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Cannon.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Cannon.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Horseman.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Horseman.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Knight.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Knight.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Queen.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_A_Queen.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_B_Commander.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_B_Commander.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_Cheriff.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_Cheriff.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_Ninja.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_Ninja.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/Pawn_Wizard.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/Pawn_Wizard.prefab" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/SettingsPanel.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/SettingsPanel.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/LobbyScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/LobbyScene.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/MainMenu.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/MainMenu.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/AudioManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/AudioManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnActionExecutor.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnData.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PlayerInputController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PlayerInputController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/TooltipManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/TooltipManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/TMP Settings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/TMP Settings.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -182,6 +169,8 @@
       <workItem from="1779184992938" duration="8436000" />
       <workItem from="1779195006594" duration="1301000" />
       <workItem from="1779196339686" duration="684000" />
+      <workItem from="1779534515552" duration="4000" />
+      <workItem from="1779534523632" duration="15359000" />
     </task>
     <servers />
   </component>

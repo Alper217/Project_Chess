@@ -1,7 +1,8 @@
-using System;
+﻿using System;
 using AlperKocasalih.Chess.Grid;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 public class TooltipManager : MonoBehaviour
 { 
@@ -15,9 +16,14 @@ public class TooltipManager : MonoBehaviour
     [Header("Settings")]
     public Vector2 mouseOffset = new Vector2(15f, -15f);
 
+    private RectTransform rectTransform;
+    private VerticalLayoutGroup layoutGroup;
+
     private void Awake()
     {
         if (instance == null) instance = this;
+        rectTransform = TooltipWindow.GetComponent<RectTransform>();
+        layoutGroup = TooltipWindow.GetComponent<VerticalLayoutGroup>();
         HideTooltip();
     }
 
@@ -25,40 +31,57 @@ public class TooltipManager : MonoBehaviour
     {
         if (TooltipWindow.activeSelf)
         {
-            TooltipWindow.transform.position =  (Vector2)Input.mousePosition + mouseOffset;
+            TooltipWindow.transform.position = (Vector2)Input.mousePosition + mouseOffset;
         }
     }
 
     public void ShowTooltip(string name, string description)
     {
-        nameText.text = name;
-        descriptionText.text = description;
+        // 1. Yazıları hazırla ve temizle
+        nameText.text = name?.Trim();
+        descriptionText.text = description?.Trim();
+        
+        bool hasDesc = !string.IsNullOrWhiteSpace(descriptionText.text);
+        descriptionText.gameObject.SetActive(hasDesc);
+        
         TooltipWindow.SetActive(true); 
 
-        // Get the actual width of the tooltip window (e.g. 200) to feed into TMPro wrap calculations
-        float targetWidth = 200f;
-        if (TooltipWindow.transform is RectTransform parentRect)
+        // 2. Content Size Fitter'ı devre dışı bırakıyoruz (Manuel hesaplama ile çakışır)
+        ContentSizeFitter fitter = TooltipWindow.GetComponent<ContentSizeFitter>();
+        if (fitter != null) fitter.enabled = false;
+
+        // 3. Genişliği koru. Eğer genişlik çok küçükse dikey yazı olur.
+        // Mevcut genişliği baz alıyoruz.
+        float width = rectTransform.rect.width;
+        if (width < 50) width = 250f;
+
+        // 4. TMPro'nun o genişlikte ne kadar yüksekliğe ihtiyacı olduğunu bulalım
+        // Bu metod mesh oluşturmadan en doğru yüksekliği döndürür.
+        float nameHeight = nameText.GetPreferredValues(nameText.text, width, 0).y;
+        float descHeight = hasDesc ? descriptionText.GetPreferredValues(descriptionText.text, width, 0).y : 0;
+
+        // 5. Toplam yüksekliği hesapla (Padding + Spacing + Metinler)
+        float totalHeight = 0;
+        if (layoutGroup != null)
         {
-            targetWidth = parentRect.rect.width;
+            totalHeight += layoutGroup.padding.top + layoutGroup.padding.bottom;
+            totalHeight += nameHeight;
+            if (hasDesc)
+            {
+                totalHeight += layoutGroup.spacing;
+                totalHeight += descHeight;
+            }
+        }
+        else
+        {
+            totalHeight = nameHeight + descHeight + 20;
         }
 
-        // 1. Force the text RectTransforms to match the target width first
-        nameText.rectTransform.sizeDelta = new Vector2(targetWidth, nameText.rectTransform.sizeDelta.y);
-        descriptionText.rectTransform.sizeDelta = new Vector2(targetWidth, descriptionText.rectTransform.sizeDelta.y);
-
-        // 2. Force TMPro to wrap the text and generate geometry at this specific width
-        nameText.ForceMeshUpdate();
-        descriptionText.ForceMeshUpdate();
-
-        // 3. Set the height of the RectTransforms to the newly calculated correct preferred heights
-        nameText.rectTransform.sizeDelta = new Vector2(targetWidth, nameText.preferredHeight);
-        descriptionText.rectTransform.sizeDelta = new Vector2(targetWidth, descriptionText.preferredHeight);
-
-        // 4. Force the tooltip panel and its layout components to resize instantly
-        if (TooltipWindow.transform is RectTransform rectTransform)
-        {
-            UnityEngine.UI.LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
-        }
+        // 6. Boyutu uygula (Zorla set et)
+        rectTransform.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, totalHeight);
+        
+        // 7. İçerideki objeleri (metinleri) yerlerine dizmek için Layout Group'u tetikle
+        LayoutRebuilder.ForceRebuildLayoutImmediate(rectTransform);
     }
     
     public void HideTooltip()
