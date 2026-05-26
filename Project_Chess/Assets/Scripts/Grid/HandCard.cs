@@ -40,10 +40,17 @@ namespace AlperKocasalih.Chess.Grid
 
         #region Unity Methods
 
+        private float originalFontSize;
+
         private void Awake()
         {
             rectTransform = GetComponent<RectTransform>();
             originalScale = rectTransform.localScale;
+            
+            if (cardNameText != null)
+            {
+                originalFontSize = cardNameText.fontSize;
+            }
         }
 
         #endregion
@@ -53,7 +60,18 @@ namespace AlperKocasalih.Chess.Grid
         public void Setup(CardData data)
         {
             this.cardData = data;
-            if (cardNameText != null) cardNameText.text = data.GetBuffsText();
+            if (cardNameText != null)
+            {
+                // Enforce single line per buff/debuff (ignore word wrapping)
+                cardNameText.enableWordWrapping = false;
+                
+                // Dynamically shrink font size if translation is too long
+                cardNameText.enableAutoSizing = true;
+                cardNameText.fontSizeMin = originalFontSize * 0.5f; // Scale down to 50%
+                cardNameText.fontSizeMax = originalFontSize;
+                
+                cardNameText.text = data.GetBuffsText();
+            }
             if (cardImage != null && data.cardDesign != null) cardImage.sprite = data.cardDesign;
             else if (cardImage != null) cardImage.sprite = data.cardSprite; // Fallback
         }

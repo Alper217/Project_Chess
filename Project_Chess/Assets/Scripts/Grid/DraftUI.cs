@@ -86,6 +86,22 @@ namespace AlperKocasalih.Chess.Grid
                 slotInitialRotations[i] = cardSlots[i].transform.localRotation;   // ← cache
             }
 
+            // Configure TMPro Auto-Sizing and disable word wrapping to prevent card text overlaps
+            if (cardNameTexts != null)
+            {
+                for (int i = 0; i < cardNameTexts.Length; i++)
+                {
+                    if (cardNameTexts[i] != null)
+                    {
+                        float origSize = cardNameTexts[i].fontSize;
+                        cardNameTexts[i].enableWordWrapping = false;
+                        cardNameTexts[i].enableAutoSizing = true;
+                        cardNameTexts[i].fontSizeMin = origSize * 0.5f; // Scale down to 50%
+                        cardNameTexts[i].fontSizeMax = origSize;
+                    }
+                }
+            }
+
             if (draftPanel != null)
             {
                 draftPanel.alpha = 0;
