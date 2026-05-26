@@ -38,6 +38,11 @@ public class VolumeSettingsController : MonoBehaviour
 
     private void InitializeLanguageSelection()
     {
+        if (languageDropdown == null)
+        {
+            languageDropdown = GetComponentInChildren<TMPro.TMP_Dropdown>(true);
+        }
+
         if (languageDropdown != null)
         {
             languageDropdown.ClearOptions();
@@ -53,6 +58,11 @@ public class VolumeSettingsController : MonoBehaviour
 
     private void UpdateDropdownSelection()
     {
+        if (languageDropdown == null)
+        {
+            languageDropdown = GetComponentInChildren<TMPro.TMP_Dropdown>(true);
+        }
+
         if (languageDropdown != null)
         {
             languageDropdown.SetValueWithoutNotify((int)AlperKocasalih.Chess.Grid.LocalizationManager.CurrentLanguage);

@@ -81,5 +81,14 @@
   "SFX": "Efeitos Sonoros",
   "Language": "Idioma",
   "Music Volume": "Volume Música",
-  "SFX Volume": "Volume Efeitos"
+  "SFX Volume": "Volume Efeitos",
+  "Singleplayer": "Um Jogador",
+  "Play Host": "Hospedar Jogo",
+  "Join Host": "Entrar no Jogo",
+  "Enter text...": "Inserir texto...",
+  "My Score": "Minha Pontuação",
+  "Exit": "Sair",
+  "READY": "PRONTO",
+  "NOT READY": "NÃO PRONTO",
+  "READY!!": "PRONTO!!"
 }

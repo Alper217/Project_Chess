@@ -1,4 +1,4 @@
-﻿using TMPro;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -26,6 +26,10 @@ public class HealthUIManager : MonoBehaviour
     public TextMeshProUGUI healthText;
     public TextMeshProUGUI pawnNameText;
 
+    private float originalBuffFontSize;
+    private float originalDebuffFontSize;
+    private bool hasOriginalFontSizes = false;
+
     private void Awake()
     {
         Instance = this;
@@ -37,6 +41,18 @@ public class HealthUIManager : MonoBehaviour
             group.blocksRaycasts = false;
             group.interactable = false;
         }
+
+        if (buffText != null) originalBuffFontSize = buffText.fontSize;
+        if (debuffText != null) originalDebuffFontSize = debuffText.fontSize;
+        hasOriginalFontSizes = true;
+    }
+
+    private int GetCleanLength(string rawText)
+    {
+        if (string.IsNullOrEmpty(rawText)) return 0;
+        // Remove HTML/sprite tags to get actual text length
+        string clean = System.Text.RegularExpressions.Regex.Replace(rawText, "<.*?>", "");
+        return clean.Trim().Length;
     }
 
     public void ShowHealthBar(Transform target, int current, int max, string pawnName, string buffs = "", string debuffs = "")
@@ -50,12 +66,42 @@ public class HealthUIManager : MonoBehaviour
         string dText = AlperKocasalih.Chess.Grid.LocalizationManager.LocalizeSummary(debuffs);
 
         if (buffText != null) {
-            buffText.text = string.IsNullOrWhiteSpace(bText) ? AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("No buffs") : bText;
+            string finalBText = string.IsNullOrWhiteSpace(bText) ? AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("No buffs") : bText;
+            buffText.text = finalBText;
             buffText.enableWordWrapping = false;
+            
+            if (hasOriginalFontSizes)
+            {
+                int len = GetCleanLength(finalBText);
+                if (len > 12)
+                {
+                    float scale = Mathf.Clamp(12f / len, 0.6f, 1f);
+                    buffText.fontSize = originalBuffFontSize * scale;
+                }
+                else
+                {
+                    buffText.fontSize = originalBuffFontSize;
+                }
+            }
         }
         if (debuffText != null) {
-            debuffText.text = string.IsNullOrWhiteSpace(dText) ? AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("No debuffs") : dText;
+            string finalDText = string.IsNullOrWhiteSpace(dText) ? AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("No debuffs") : dText;
+            debuffText.text = finalDText;
             debuffText.enableWordWrapping = false;
+
+            if (hasOriginalFontSizes)
+            {
+                int len = GetCleanLength(finalDText);
+                if (len > 12)
+                {
+                    float scale = Mathf.Clamp(12f / len, 0.6f, 1f);
+                    debuffText.fontSize = originalDebuffFontSize * scale;
+                }
+                else
+                {
+                    debuffText.fontSize = originalDebuffFontSize;
+                }
+            }
         }
 
         // 2. Paneli en uzun metne göre boyutlandır

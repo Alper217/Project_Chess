@@ -81,5 +81,14 @@
   "SFX": "SFX",
   "Language": "Sprache",
   "Music Volume": "Musiklautstärke",
-  "SFX Volume": "Effektlautstärke"
+  "SFX Volume": "Effektlautstärke",
+  "Singleplayer": "Einzelspieler",
+  "Play Host": "Hosten & Spielen",
+  "Join Host": "Host beitreten",
+  "Enter text...": "Text eingeben...",
+  "My Score": "Mein Punktestand",
+  "Exit": "Beenden",
+  "READY": "BEREIT",
+  "NOT READY": "NICHT BEREIT",
+  "READY!!": "BEREIT!!"
 }

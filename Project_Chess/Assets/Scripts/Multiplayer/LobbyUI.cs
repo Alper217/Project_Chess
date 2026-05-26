@@ -25,10 +25,37 @@ namespace AlperKocasalih.Chess.Multiplayer
         [SerializeField] private Color readyColor = Color.green;
         [SerializeField] private Color notReadyColor = Color.red;
 
+        private void OnEnable()
+        {
+            AlperKocasalih.Chess.Grid.LocalizationManager.OnLanguageChanged += OnLanguageChanged;
+        }
+
+        private void OnDisable()
+        {
+            AlperKocasalih.Chess.Grid.LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+        }
+
+        private void OnLanguageChanged()
+        {
+            if (NetworkManager.Singleton.LocalClient != null && NetworkManager.Singleton.LocalClient.PlayerObject != null)
+            {
+                var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<LobbyPlayerState>();
+                if (localPlayer != null)
+                {
+                    UpdateReadyButtonUI(localPlayer.IsReady.Value);
+                    return;
+                }
+            }
+            UpdateReadyButtonUI(false);
+        }
+
         private void Start()
         {
             if (readyButton != null)
+            {
                 readyButton.onClick.AddListener(OnReadyClicked);
+                UpdateReadyButtonUI(false);
+            }
 
             if (startButton != null)
             {
@@ -120,7 +147,7 @@ namespace AlperKocasalih.Chess.Multiplayer
             var text = readyButton.GetComponentInChildren<TextMeshProUGUI>();
             if (text != null)
             {
-                text.text = isReady ? readyText : notReadyText;
+                text.text = AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation(isReady ? "READY" : "NOT READY");
                 readyButton.image.color = isReady ? readyColor : notReadyColor;
             }
         }

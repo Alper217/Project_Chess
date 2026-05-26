@@ -20,12 +20,33 @@ namespace AlperKocasalih.Chess.Multiplayer
             playerState = state;
             UpdateUI();
             UpdateAvatar(); // Fotoğrafı ilk başta bir kere dene
-            
-            // Listen for changes
-            playerState.IsReady.OnValueChanged += (oldVal, newVal) => UpdateUI();
-            playerState.PlayerName.OnValueChanged += (oldVal, newVal) => UpdateUI();
-            playerState.PlayerSteamId.OnValueChanged += (oldVal, newVal) => UpdateAvatar();
         }
+
+        private void OnEnable()
+        {
+            AlperKocasalih.Chess.Grid.LocalizationManager.OnLanguageChanged += UpdateUI;
+            if (playerState != null)
+            {
+                playerState.IsReady.OnValueChanged += OnReadyChanged;
+                playerState.PlayerName.OnValueChanged += OnNameChanged;
+                playerState.PlayerSteamId.OnValueChanged += OnAvatarChanged;
+            }
+        }
+
+        private void OnDisable()
+        {
+            AlperKocasalih.Chess.Grid.LocalizationManager.OnLanguageChanged -= UpdateUI;
+            if (playerState != null)
+            {
+                playerState.IsReady.OnValueChanged -= OnReadyChanged;
+                playerState.PlayerName.OnValueChanged -= OnNameChanged;
+                playerState.PlayerSteamId.OnValueChanged -= OnAvatarChanged;
+            }
+        }
+
+        private void OnReadyChanged(bool oldVal, bool newVal) => UpdateUI();
+        private void OnNameChanged(Unity.Collections.FixedString32Bytes oldVal, Unity.Collections.FixedString32Bytes newVal) => UpdateUI();
+        private void OnAvatarChanged(ulong oldVal, ulong newVal) => UpdateAvatar();
 
         private void UpdateUI()
         {
@@ -34,7 +55,9 @@ namespace AlperKocasalih.Chess.Multiplayer
             playerNameText.text = playerState.PlayerName.Value.ToString();
             
             bool isReady = playerState.IsReady.Value;
-            readyStatusText.text = isReady ? "READY" : "NOT READY";
+            readyStatusText.text = isReady ? 
+                AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("READY") : 
+                AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("NOT READY");
             readyStatusText.color = isReady ? readyColor : notReadyColor;
         }
 

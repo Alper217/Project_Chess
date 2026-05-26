@@ -81,5 +81,14 @@
   "SFX": "SFX",
   "Language": "Language",
   "Music Volume": "Music Volume",
-  "SFX Volume": "SFX Volume"
+  "SFX Volume": "SFX Volume",
+  "Singleplayer": "Singleplayer",
+  "Play Host": "Play Host",
+  "Join Host": "Join Host",
+  "Enter text...": "Enter text...",
+  "My Score": "My Score",
+  "Exit": "Exit",
+  "READY": "READY",
+  "NOT READY": "NOT READY",
+  "READY!!": "READY!!"
 }

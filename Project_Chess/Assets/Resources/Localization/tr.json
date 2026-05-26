@@ -81,5 +81,14 @@
   "SFX": "Ses Efektleri",
   "Language": "Dil",
   "Music Volume": "Müzik Sesi",
-  "SFX Volume": "Efekt Sesi"
+  "SFX Volume": "Efekt Sesi",
+  "Singleplayer": "Tek Oyunculu",
+  "Play Host": "Oda Kur",
+  "Join Host": "Odaya Katıl",
+  "Enter text...": "Metin Gir...",
+  "My Score": "Skorum",
+  "Exit": "Çıkış",
+  "READY": "HAZIR",
+  "NOT READY": "HAZIR DEĞİL",
+  "READY!!": "HAZIR!!"
 }

@@ -152,10 +152,6 @@ namespace AlperKocasalih.Chess.Grid
             return string.Join("\n", lines);
         }
 
-        /// <summary>
-        /// Nuclear option: Invokes the event and scans the active scene for ALL TextMeshProUGUI elements.
-        /// If an element's text matches a key in our localization dictionary, it translates it instantly.
-        /// </summary>
         private static void TriggerSceneWideRefresh()
         {
             // 1. Invoke event for scripts that have explicitly registered listeners (e.g. TurnManager, DraftUI)
@@ -169,13 +165,65 @@ namespace AlperKocasalih.Chess.Grid
             {
                 if (tmp == null) continue;
 
-                // Try to find direct translation matching the trimmed text
-                string textToLookUp = tmp.text.Trim();
-                if (localizedStrings.TryGetValue(textToLookUp, out string translatedValue))
+                // Check if it already has LocalizedText
+                var localizedComp = tmp.GetComponent<LocalizedText>();
+                if (localizedComp == null)
                 {
-                    tmp.text = translatedValue;
+                    // Only add if the text matches a key in our localization dictionary
+                    string textToLookUp = tmp.text.Trim();
+                    if (localizedStrings.ContainsKey(textToLookUp))
+                    {
+                        // Dynamically add LocalizedText so it registers for future changes and preserves the key
+                        localizedComp = tmp.gameObject.AddComponent<LocalizedText>();
+                    }
+                }
+                else
+                {
+                    // If it already has LocalizedText, trigger its update
+                    localizedComp.UpdateText();
                 }
             }
         }
+
+        /// <summary>
+        /// Highly robust utility to set a localized card text and automatically adjust its font size
+        /// based on the character length of the translated string, ignoring rich text tags.
+        /// </summary>
+        public static void SetLocalizedCardText(TMPro.TextMeshProUGUI tmp, string rawText)
+        {
+            if (tmp == null) return;
+            tmp.text = rawText;
+
+            var cache = tmp.GetComponent<TextSizeCache>();
+            if (cache == null)
+            {
+                cache = tmp.gameObject.AddComponent<TextSizeCache>();
+                cache.originalFontSize = tmp.fontSize;
+            }
+
+            // Strip rich text/sprite tags
+            string cleanText = System.Text.RegularExpressions.Regex.Replace(rawText, "<.*?>", "");
+            int cleanLength = cleanText.Trim().Length;
+
+            // Reference length is 16 for cards
+            int referenceLength = 16;
+            if (cleanLength > referenceLength)
+            {
+                float scale = UnityEngine.Mathf.Clamp((float)referenceLength / cleanLength, 0.5f, 1f);
+                tmp.fontSize = cache.originalFontSize * scale;
+            }
+            else
+            {
+                tmp.fontSize = cache.originalFontSize;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Simple utility component to cache the original font size of a TMPro component.
+    /// </summary>
+    public class TextSizeCache : MonoBehaviour
+    {
+        public float originalFontSize;
     }
 }

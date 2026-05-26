@@ -85,9 +85,17 @@ namespace AlperKocasalih.Chess.Grid
                 UpdateScoreUI();
             };
             
+            // Dil değiştiğinde skoru anında güncelle
+            AlperKocasalih.Chess.Grid.LocalizationManager.OnLanguageChanged += UpdateScoreUI;
+
             // Initial handle for current state
             HandleStateChange(currentState.Value);
             UpdateScoreUI();
+        }
+
+        private void OnDestroy()
+        {
+            AlperKocasalih.Chess.Grid.LocalizationManager.OnLanguageChanged -= UpdateScoreUI;
         }
 
         private void UpdateScoreUI()
@@ -99,17 +107,18 @@ namespace AlperKocasalih.Chess.Grid
             }
 
             bool shouldShow = currentState.Value != GameState.Setup;
+            string scoreLabel = AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("My Score");
 
             if (player1ScoreText != null) 
             {
-                player1ScoreText.text = $"My Score: {player1Score.Value}";
+                player1ScoreText.text = $"{scoreLabel}: {player1Score.Value}";
                 player1ScoreText.gameObject.SetActive(shouldShow && localPlayerID == 1);
                 player1UI.SetActive(shouldShow);
             }
 
             if (player2ScoreText != null) 
             {
-                player2ScoreText.text = $"My Score: {player2Score.Value}";
+                player2ScoreText.text = $"{scoreLabel}: {player2Score.Value}";
                 player2ScoreText.gameObject.SetActive(shouldShow && localPlayerID == 2);
                 player2UI.SetActive(shouldShow);
             }

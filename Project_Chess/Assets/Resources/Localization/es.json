@@ -81,5 +81,14 @@
   "SFX": "Efectos",
   "Language": "Idioma",
   "Music Volume": "Volumen de Música",
-  "SFX Volume": "Volumen de Efectos"
+  "SFX Volume": "Volumen de Efectos",
+  "Singleplayer": "Un jugador",
+  "Play Host": "Crear partida",
+  "Join Host": "Unirse a partida",
+  "Enter text...": "Escribir texto...",
+  "My Score": "Mi puntuación",
+  "Exit": "Salir",
+  "READY": "PREPARADO",
+  "NOT READY": "NO PREPARADO",
+  "READY!!": "PREPARADO!!"
 }
