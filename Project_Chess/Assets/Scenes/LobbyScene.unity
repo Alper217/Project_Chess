@@ -501,8 +501,8 @@ MonoBehaviour:
   readyButton: {fileID: 247377078}
   startButton: {fileID: 906765813}
   roomCodeText: {fileID: 1798644551}
-  readyText: READY
-  notReadyText: NOT READY
+  readyText: Ready
+  notReadyText: Not Ready
   readyColor: {r: 0, g: 1, b: 0, a: 1}
   notReadyColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!1 &247377076
