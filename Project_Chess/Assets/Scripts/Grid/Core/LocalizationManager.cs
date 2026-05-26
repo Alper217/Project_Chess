@@ -19,7 +19,7 @@ namespace AlperKocasalih.Chess.Grid
     {
         public static event Action OnLanguageChanged;
 
-        private static Language currentLanguage = Language.TR;
+        private static Language currentLanguage = Language.EN;
         private static Dictionary<string, string> localizedStrings = new Dictionary<string, string>();
 
         private const string PrefKeyLanguage = "SelectedLanguage";
@@ -47,14 +47,22 @@ namespace AlperKocasalih.Chess.Grid
 
         private static void LoadLanguagePreference()
         {
-            string savedLang = PlayerPrefs.GetString(PrefKeyLanguage, "TR");
+            // One-time migration/reset to force default English on this version
+            if (PlayerPrefs.GetInt("LanguageInitialized_v2", 0) == 0)
+            {
+                PlayerPrefs.SetString(PrefKeyLanguage, "EN");
+                PlayerPrefs.SetInt("LanguageInitialized_v2", 1);
+                PlayerPrefs.Save();
+            }
+
+            string savedLang = PlayerPrefs.GetString(PrefKeyLanguage, "EN");
             if (Enum.TryParse(savedLang, out Language parsedLang))
             {
                 currentLanguage = parsedLang;
             }
             else
             {
-                currentLanguage = Language.TR;
+                currentLanguage = Language.EN;
             }
             LoadLanguageFile();
         }
