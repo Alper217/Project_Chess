@@ -55,7 +55,7 @@ public class HealthUIManager : MonoBehaviour
         return clean.Trim().Length;
     }
 
-    public void ShowHealthBar(Transform target, int current, int max, string pawnName, string buffs = "", string debuffs = "")
+    public void ShowHealthBar(Transform target, int current, int max, string pawnName, string buffs = "", string debuffs = "", int currentDamage = 0)
     {
         if (pawnNameText != null) pawnNameText.text = AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation(pawnName);
         if (healthSlider != null) { healthSlider.maxValue = max; healthSlider.value = current; }
@@ -64,15 +64,16 @@ public class HealthUIManager : MonoBehaviour
         // 1. Metinleri güncelle
         string bText = AlperKocasalih.Chess.Grid.LocalizationManager.LocalizeSummary(buffs);
         string dText = AlperKocasalih.Chess.Grid.LocalizationManager.LocalizeSummary(debuffs);
+        string damageLine = $"{AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("Damage")}: {currentDamage}";
 
         if (buffText != null) {
             string finalBText = string.IsNullOrWhiteSpace(bText) ? AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("No buffs") : bText;
-            buffText.text = finalBText;
+            buffText.text = $"{damageLine}\n{finalBText}";
             buffText.enableWordWrapping = false;
             
             if (hasOriginalFontSizes)
             {
-                int len = GetCleanLength(finalBText);
+                int len = GetCleanLength(buffText.text);
                 if (len > 12)
                 {
                     float scale = Mathf.Clamp(12f / len, 0.6f, 1f);

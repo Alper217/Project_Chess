@@ -46,6 +46,9 @@ namespace AlperKocasalih.Chess.Grid
 
         public bool IsActive => currentState != SelectionState.None;
         public bool IsMultiActionInProgress => activeCardData != null && activeCardRemainingUses > 0 && activeCardRemainingUses < initialCardUses;
+        public SelectionState CurrentState => currentState;
+        public Pawn SelectedPawn => selectedPawn;
+        public bool IsCellHighlighted(HexCell cell) => cell != null && highlightedCells.Contains(cell);
 
         public event System.Action OnSelectionCancelled;
 

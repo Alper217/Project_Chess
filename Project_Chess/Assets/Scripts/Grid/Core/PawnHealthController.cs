@@ -8,10 +8,14 @@ using MoreMountains.Feedbacks;
 public class PawnHealthController : NetworkBehaviour, IHoverable
 {
     private Pawn _pawn;
+    private AttackHandler _attackHandler;
     public GameObject pawn;
     private bool isHovered = false;
     [SerializeField] private Color attackHighlightColor = Color.blue;
+    [SerializeField] private Color aoeStrongHighlightColor = new Color(1f, 0.25f, 0.1f);
+    [SerializeField] private Color aoeWeakHighlightColor = new Color(1f, 0.7f, 0.25f);
     private readonly List<HexCell> highlightedCells = new List<HexCell>();
+    private readonly List<HexCell> aoeHighlightedCells = new List<HexCell>();
     private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
     public MMF_Player targetPlayer;
 
@@ -20,6 +24,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     private void Awake()
     {
         _pawn = GetComponent<Pawn>();
+        _attackHandler = GetComponent<AttackHandler>();
         _originalScale = transform.localScale;
     }
 
@@ -33,9 +38,11 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     {
         base.OnNetworkDespawn();
         if (_pawn != null)
+        {
             _pawn.currentHealth.OnValueChanged -= OnHealthChanged;
+        }
 
-        ClearAttackRange();
+        ClearHoverPreviews();
         if (isHovered && HealthUIManager.Instance != null)
         {
             HealthUIManager.Instance.HideHealthBar();
@@ -45,7 +52,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
     public override void OnDestroy()
     {
         base.OnDestroy();
-        ClearAttackRange();
+        ClearHoverPreviews();
     }
 
     private void OnHealthChanged(int previousValue, int newValue)
@@ -61,12 +68,16 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         if (_pawn == null) return;
 
         isHovered = true;
+        ClearHoverPreviews();
         if (HealthUIManager.Instance != null)
         {
             ShowPawnHoverUI(_pawn.currentHealth.Value);
         }
 
-        ShowAttackRange();
+        if (!TryShowSelectedPawnAoePreview())
+        {
+            ShowAttackRange();
+        }
     }
 
     public void OnHoverExit()
@@ -79,7 +90,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             HealthUIManager.Instance.HideHealthBar();
         }
 
-        ClearAttackRange();
+        ClearHoverPreviews();
     }
 
     private void ShowPawnHoverUI(int currentHealth)
@@ -90,6 +101,7 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         }
 
         string buffsText = _pawn.BuffSummary;
+        string debuffsText = BuildDebuffText(_pawn.DebuffSummary);
 
         HealthUIManager.Instance.ShowHealthBar(
             transform,
@@ -97,7 +109,27 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             _pawn.maxHealth.Value,
             _pawn.PawnData.pawnName,
             buffsText,
-            _pawn.DebuffSummary);
+            debuffsText,
+            _pawn.HoverDamagePreview);
+    }
+
+    private string BuildDebuffText(string baseDebuffs)
+    {
+        int cooldown = _attackHandler != null ? _attackHandler.currentCooldown.Value : 0;
+        if (cooldown <= 0)
+        {
+            return baseDebuffs;
+        }
+
+        string cooldownLabel = AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("Cooldown");
+        string turnLabel = AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation(cooldown == 1 ? "Turn" : "Turns");
+        string cooldownLine = $"{cooldownLabel} ({cooldown} {turnLabel})";
+        if (string.IsNullOrWhiteSpace(baseDebuffs))
+        {
+            return cooldownLine;
+        }
+
+        return $"{cooldownLine}\n{baseDebuffs}";
     }
 
     void Update()
@@ -281,6 +313,61 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
         }
     }
 
+    private bool TryShowSelectedPawnAoePreview()
+    {
+        if (_pawn == null || _pawn.OccupiedCell == null) return false;
+        if (PlayerInputController.Instance == null) return false;
+        if (PlayerInputController.Instance.CurrentState != PlayerInputController.SelectionState.PawnSelected) return false;
+
+        Pawn selectedPawn = PlayerInputController.Instance.SelectedPawn;
+        if (selectedPawn == null || selectedPawn == _pawn) return false;
+        if (selectedPawn.PlayerID == _pawn.PlayerID) return false;
+        if (selectedPawn.PawnData == null || !selectedPawn.PawnData.isAoE) return false;
+
+        AttackHandler attackHandler = selectedPawn.GetComponent<AttackHandler>();
+        if (attackHandler == null || !attackHandler.CanAttack()) return false;
+
+        if (!PlayerInputController.Instance.IsCellHighlighted(_pawn.OccupiedCell)) return false;
+        if (!EnsureGridLookup()) return false;
+
+        ClearAoePreview();
+
+        Vector2Int currentPos = _pawn.OccupiedCell.Coordinates;
+        Dictionary<Vector2Int, int> areaTiles = HexGridMath.GetHexesWithDistance(currentPos, selectedPawn.PawnData.AoERadius);
+        int maxDistance = Mathf.Max(1, selectedPawn.PawnData.AoERadius);
+        int baseDamage = Mathf.Max(1, selectedPawn.damage.Value);
+        int falloff = Mathf.Max(0, selectedPawn.PawnData.AoEDamageFallOff);
+
+        foreach (var tile in areaTiles)
+        {
+            Vector2Int targetCoords = tile.Key;
+            int distance = tile.Value;
+
+            int finalDamage = selectedPawn.damage.Value - (distance * falloff);
+            if (finalDamage <= 0) continue;
+
+            if (!gridLookup.TryGetValue(targetCoords, out HexCell targetCell)) continue;
+
+            float intensity = Mathf.Clamp01(finalDamage / (float)baseDamage);
+            if (maxDistance > 0)
+            {
+                float radiusIntensity = 1f - Mathf.Clamp01(distance / (float)maxDistance);
+                intensity = Mathf.Max(intensity, radiusIntensity);
+            }
+
+            Color previewColor = Color.Lerp(aoeWeakHighlightColor, aoeStrongHighlightColor, intensity);
+            if (distance == 0)
+            {
+                previewColor = aoeStrongHighlightColor;
+            }
+
+            aoeHighlightedCells.Add(targetCell);
+            targetCell.Highlight(previewColor);
+        }
+
+        return true;
+    }
+
     private void ClearAttackRange()
     {
         foreach (var cell in highlightedCells)
@@ -288,6 +375,21 @@ public class PawnHealthController : NetworkBehaviour, IHoverable
             if (cell != null) cell.ResetHighlight();
         }
         highlightedCells.Clear();
+    }
+
+    private void ClearAoePreview()
+    {
+        foreach (var cell in aoeHighlightedCells)
+        {
+            if (cell != null) cell.ResetHighlight();
+        }
+        aoeHighlightedCells.Clear();
+    }
+
+    private void ClearHoverPreviews()
+    {
+        ClearAttackRange();
+        ClearAoePreview();
     }
 
     private bool EnsureGridLookup()

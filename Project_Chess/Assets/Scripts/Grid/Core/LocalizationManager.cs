@@ -92,9 +92,126 @@ namespace AlperKocasalih.Chess.Grid
             {
                 return value;
             }
+
+            if (TryGetBuiltInTranslation(key, out string builtInValue))
+            {
+                return builtInValue;
+            }
             
             // Return key as fallback
             return key;
+        }
+
+        private static bool TryGetBuiltInTranslation(string key, out string value)
+        {
+            value = key;
+
+            switch (currentLanguage)
+            {
+                case Language.TR:
+                    switch (key)
+                    {
+                        case "Damage":
+                            value = "Hasar";
+                            return true;
+                        case "Cooldown":
+                            value = "Bekleme Süresi";
+                            return true;
+                        case "Turn":
+                        case "Turns":
+                            value = "tur";
+                            return true;
+                    }
+                    break;
+                case Language.DE:
+                    switch (key)
+                    {
+                        case "Damage":
+                            value = "Schaden";
+                            return true;
+                        case "Cooldown":
+                            value = "Abklingzeit";
+                            return true;
+                        case "Turn":
+                            value = "Zug";
+                            return true;
+                        case "Turns":
+                            value = "Züge";
+                            return true;
+                    }
+                    break;
+                case Language.FR:
+                    switch (key)
+                    {
+                        case "Damage":
+                            value = "Dégâts";
+                            return true;
+                        case "Cooldown":
+                            value = "Recharge";
+                            return true;
+                        case "Turn":
+                            value = "tour";
+                            return true;
+                        case "Turns":
+                            value = "tours";
+                            return true;
+                    }
+                    break;
+                case Language.PT:
+                    switch (key)
+                    {
+                        case "Damage":
+                            value = "Dano";
+                            return true;
+                        case "Cooldown":
+                            value = "Recarga";
+                            return true;
+                        case "Turn":
+                            value = "turno";
+                            return true;
+                        case "Turns":
+                            value = "turnos";
+                            return true;
+                    }
+                    break;
+                case Language.ES:
+                    switch (key)
+                    {
+                        case "Damage":
+                            value = "Daño";
+                            return true;
+                        case "Cooldown":
+                            value = "Enfriamiento";
+                            return true;
+                        case "Turn":
+                            value = "turno";
+                            return true;
+                        case "Turns":
+                            value = "turnos";
+                            return true;
+                    }
+                    break;
+                case Language.EN:
+                default:
+                    switch (key)
+                    {
+                        case "Damage":
+                            value = "Damage";
+                            return true;
+                        case "Cooldown":
+                            value = "Cooldown";
+                            return true;
+                        case "Turn":
+                            value = "turn";
+                            return true;
+                        case "Turns":
+                            value = "turns";
+                            return true;
+                    }
+                    break;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -179,7 +296,7 @@ namespace AlperKocasalih.Chess.Grid
                 {
                     // Only add if the text matches a key in our localization dictionary
                     string textToLookUp = tmp.text.Trim();
-                    if (localizedStrings.ContainsKey(textToLookUp))
+                    if (localizedStrings.ContainsKey(textToLookUp) || TryGetBuiltInTranslation(textToLookUp, out _))
                     {
                         // Dynamically add LocalizedText so it registers for future changes and preserves the key
                         localizedComp = tmp.gameObject.AddComponent<LocalizedText>();
