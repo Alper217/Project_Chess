@@ -17,7 +17,9 @@ namespace AlperKocasalih.Chess.Multiplayer
 
         public void SetPlayer(LobbyPlayerState state)
         {
+            UnsubscribeToEvents();
             playerState = state;
+            SubscribeToEvents();
             UpdateUI();
             UpdateAvatar(); // Fotoğrafı ilk başta bir kere dene
         }
@@ -25,6 +27,17 @@ namespace AlperKocasalih.Chess.Multiplayer
         private void OnEnable()
         {
             AlperKocasalih.Chess.Grid.LocalizationManager.OnLanguageChanged += UpdateUI;
+            SubscribeToEvents();
+        }
+
+        private void OnDisable()
+        {
+            AlperKocasalih.Chess.Grid.LocalizationManager.OnLanguageChanged -= UpdateUI;
+            UnsubscribeToEvents();
+        }
+
+        private void SubscribeToEvents()
+        {
             if (playerState != null)
             {
                 playerState.IsReady.OnValueChanged += OnReadyChanged;
@@ -33,9 +46,8 @@ namespace AlperKocasalih.Chess.Multiplayer
             }
         }
 
-        private void OnDisable()
+        private void UnsubscribeToEvents()
         {
-            AlperKocasalih.Chess.Grid.LocalizationManager.OnLanguageChanged -= UpdateUI;
             if (playerState != null)
             {
                 playerState.IsReady.OnValueChanged -= OnReadyChanged;

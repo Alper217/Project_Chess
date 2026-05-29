@@ -125,7 +125,21 @@ namespace AlperKocasalih.Chess.Multiplayer
                 if (entryUI != null)
                 {
                     entryUI.SetPlayer(players[i]);
-                    players[i].IsReady.OnValueChanged += (oldVal, newVal) => UpdateStartButton();
+                    
+                    // Capture local index/variable to be safe
+                    var playerState = players[i];
+                    playerState.IsReady.OnValueChanged += (oldVal, newVal) => {
+                        UpdateStartButton();
+                        if (playerState.IsOwner)
+                        {
+                            UpdateReadyButtonUI(newVal);
+                        }
+                    };
+                }
+
+                if (players[i].IsOwner)
+                {
+                    UpdateReadyButtonUI(players[i].IsReady.Value);
                 }
             }
 
