@@ -36,6 +36,11 @@ public class HealthUIManager : MonoBehaviour
         if (healthCanvas != null)
         {
             healthCanvas.SetActive(false);
+            Canvas canvas = healthCanvas.GetComponentInParent<Canvas>();
+            if (canvas != null)
+            {
+                canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            }
             CanvasGroup group = healthCanvas.GetComponent<CanvasGroup>();
             if (group == null) group = healthCanvas.AddComponent<CanvasGroup>();
             group.blocksRaycasts = false;
@@ -121,6 +126,7 @@ public class HealthUIManager : MonoBehaviour
         if (healthCanvas != null)
         {
             healthCanvas.SetActive(true);
+            
             currentTarget = target;
             UpdateHealthCanvasPosition();
         }
@@ -176,14 +182,32 @@ public class HealthUIManager : MonoBehaviour
 
         if (healthCanvas != null && healthCanvas.activeSelf)
         {
-            Camera mainCam = Camera.main;
-            if (mainCam != null)
+            if (mainLayoutContainer != null)
             {
-                Vector3 dirToCam = (mainCam.transform.position - healthCanvas.transform.position).normalized;
-                healthCanvas.transform.position = currentTarget.position 
-                                                  + (mainCam.transform.up * heightOffsetMultiplier) 
-                                                  + (dirToCam * zOffset);
-                healthCanvas.transform.rotation = mainCam.transform.rotation;
+                Canvas canvas = healthCanvas.GetComponentInParent<Canvas>();
+                
+                // Eğer Canvas Screen Space Overlay ise, ekran piksellerini doğrudan atayabiliriz.
+                if (canvas != null && canvas.renderMode == RenderMode.ScreenSpaceOverlay)
+                {
+                    Vector2 mousePos = Input.mousePosition;
+                    mainLayoutContainer.position = mousePos + new Vector2(25f, -25f);
+                }
+                else
+                {
+                    // Eğer Canvas World Space veya Camera mode ise, ekran pozisyonunu dünya pozisyonuna çevirmeliyiz.
+                    RectTransform parentRect = mainLayoutContainer.parent as RectTransform;
+                    if (parentRect != null && Camera.main != null)
+                    {
+                        RectTransformUtility.ScreenPointToWorldPointInRectangle(
+                            parentRect, 
+                            Input.mousePosition, 
+                            canvas != null ? canvas.worldCamera : Camera.main, 
+                            out Vector3 worldPoint);
+                        
+                        // İsteğe bağlı offset eklenebilir, fakat world space'de Vector2 piksel offseti çalışmaz.
+                        mainLayoutContainer.position = worldPoint;
+                    }
+                }
             }
         }
     }

@@ -122,7 +122,7 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
-  SyncOwnerTransformWhenParented: 1
+  SyncOwnerTransformWhenParented: 0
   AllowOwnerToParent: 0
 --- !u!114 &1035197707702850511
 MonoBehaviour:
@@ -173,6 +173,8 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   pawn: {fileID: 2345411019101084424}
   attackHighlightColor: {r: 0, g: 0, b: 1, a: 1}
+  aoeStrongHighlightColor: {r: 1, g: 0.25, b: 0.1, a: 1}
+  aoeWeakHighlightColor: {r: 1, g: 0.7, b: 0.25, a: 1}
   targetPlayer: {fileID: -5533492159500775519}
 --- !u!114 &7377934261828448416
 MonoBehaviour:

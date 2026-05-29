@@ -7,13 +7,13 @@ namespace AlperKocasalih.Chess.Multiplayer
     public class LobbyPlayerState : NetworkBehaviour
     {
         public NetworkVariable<FixedString32Bytes> PlayerName = new NetworkVariable<FixedString32Bytes>(
-            default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+            default, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
             
         public NetworkVariable<bool> IsReady = new NetworkVariable<bool>(
-            false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+            false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         public NetworkVariable<ulong> PlayerSteamId = new NetworkVariable<ulong>(
-            0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Owner);
+            0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
 
         public override void OnNetworkSpawn()
         {
@@ -24,12 +24,13 @@ namespace AlperKocasalih.Chess.Multiplayer
                     ? SteamManager.Instance.PlayerName 
                     : (IsHost ? "Host Player" : "Client Player");
                 
-                PlayerName.Value = finalName;
-
+                ulong finalSteamId = 0;
                 if (SteamManager.Instance != null && SteamManager.Instance.IsSteamRunning)
                 {
-                    PlayerSteamId.Value = SteamManager.Instance.PlayerSteamId;
+                    finalSteamId = SteamManager.Instance.PlayerSteamId;
                 }
+
+                SetPlayerDataServerRpc(finalName, finalSteamId);
             }
             
             // Lobi UI'sını güncellemek için LobbyManager'a haber ver
@@ -37,6 +38,13 @@ namespace AlperKocasalih.Chess.Multiplayer
             {
                 LobbyManager.Instance.RefreshLobbyUI();
             }
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        private void SetPlayerDataServerRpc(FixedString32Bytes name, ulong steamId)
+        {
+            PlayerName.Value = name;
+            PlayerSteamId.Value = steamId;
         }
 
         public override void OnNetworkDespawn()
@@ -51,9 +59,15 @@ namespace AlperKocasalih.Chess.Multiplayer
         {
             if (IsOwner)
             {
-                IsReady.Value = !IsReady.Value;
-                Debug.Log($"Player {PlayerName.Value} ready status: {IsReady.Value}");
+                ToggleReadyServerRpc(!IsReady.Value);
             }
+        }
+
+        [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+        private void ToggleReadyServerRpc(bool newReadyState)
+        {
+            IsReady.Value = newReadyState;
+            Debug.Log($"Player {PlayerName.Value} ready status updated on server: {IsReady.Value}");
         }
     }
 }

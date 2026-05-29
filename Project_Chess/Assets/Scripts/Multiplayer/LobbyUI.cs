@@ -30,23 +30,26 @@ namespace AlperKocasalih.Chess.Multiplayer
             AlperKocasalih.Chess.Grid.LocalizationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
+        private List<LobbyPlayerState> subscribedPlayers = new List<LobbyPlayerState>();
+
         private void OnDisable()
         {
             AlperKocasalih.Chess.Grid.LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+            ClearSubscribedPlayers();
+            CancelInvoke(nameof(UpdatePlayerList));
         }
 
         private void OnLanguageChanged()
         {
-            if (NetworkManager.Singleton.LocalClient != null && NetworkManager.Singleton.LocalClient.PlayerObject != null)
+            LobbyPlayerState localPlayer = GetLocalPlayer();
+            if (localPlayer != null)
             {
-                var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<LobbyPlayerState>();
-                if (localPlayer != null)
-                {
-                    UpdateReadyButtonUI(localPlayer.IsReady.Value);
-                    return;
-                }
+                UpdateReadyButtonUI(localPlayer.IsReady.Value);
             }
-            UpdateReadyButtonUI(false);
+            else
+            {
+                UpdateReadyButtonUI(false);
+            }
         }
 
         private void Start()
@@ -73,18 +76,15 @@ namespace AlperKocasalih.Chess.Multiplayer
 
         private void OnReadyClicked()
         {
-            if (NetworkManager.Singleton.LocalClient == null || NetworkManager.Singleton.LocalClient.PlayerObject == null)
+            LobbyPlayerState localPlayer = GetLocalPlayer();
+            if (localPlayer == null)
             {
                 Debug.LogWarning("Local player object not found yet!");
                 return;
             }
 
-            var localPlayer = NetworkManager.Singleton.LocalClient.PlayerObject.GetComponent<LobbyPlayerState>();
-            if (localPlayer != null)
-            {
-                localPlayer.ToggleReady();
-                UpdateReadyButtonUI(localPlayer.IsReady.Value);
-            }
+            localPlayer.ToggleReady();
+            UpdateReadyButtonUI(localPlayer.IsReady.Value);
         }
 
         private void OnStartClicked()
@@ -97,6 +97,8 @@ namespace AlperKocasalih.Chess.Multiplayer
 
         public void UpdatePlayerList()
         {
+            ClearSubscribedPlayers();
+
             // Önce slotların içini temizle
             if (player1Slot != null) foreach (Transform child in player1Slot) Destroy(child.gameObject);
             if (player2Slot != null) foreach (Transform child in player2Slot) Destroy(child.gameObject);
@@ -126,15 +128,9 @@ namespace AlperKocasalih.Chess.Multiplayer
                 {
                     entryUI.SetPlayer(players[i]);
                     
-                    // Capture local index/variable to be safe
                     var playerState = players[i];
-                    playerState.IsReady.OnValueChanged += (oldVal, newVal) => {
-                        UpdateStartButton();
-                        if (playerState.IsOwner)
-                        {
-                            UpdateReadyButtonUI(newVal);
-                        }
-                    };
+                    playerState.IsReady.OnValueChanged += OnPlayerReadyChanged;
+                    subscribedPlayers.Add(playerState);
                 }
 
                 if (players[i].IsOwner)
@@ -146,9 +142,45 @@ namespace AlperKocasalih.Chess.Multiplayer
             UpdateStartButton();
         }
 
+        private void OnPlayerReadyChanged(bool oldVal, bool newVal)
+        {
+            UpdateStartButton();
+            
+            LobbyPlayerState localPlayer = GetLocalPlayer();
+            if (localPlayer != null)
+            {
+                UpdateReadyButtonUI(localPlayer.IsReady.Value);
+            }
+        }
+
+        private LobbyPlayerState GetLocalPlayer()
+        {
+            var players = FindObjectsByType<LobbyPlayerState>(FindObjectsSortMode.None);
+            foreach (var player in players)
+            {
+                if (player.IsOwner)
+                {
+                    return player;
+                }
+            }
+            return null;
+        }
+
+        private void ClearSubscribedPlayers()
+        {
+            foreach (var player in subscribedPlayers)
+            {
+                if (player != null)
+                {
+                    player.IsReady.OnValueChanged -= OnPlayerReadyChanged;
+                }
+            }
+            subscribedPlayers.Clear();
+        }
+
         private void UpdateStartButton()
         {
-            if (NetworkManager.Singleton.IsServer && startButton != null)
+            if (NetworkManager.Singleton.IsServer && startButton != null && LobbyManager.Instance != null)
             {
                 startButton.interactable = LobbyManager.Instance.AreAllPlayersReady();
             }

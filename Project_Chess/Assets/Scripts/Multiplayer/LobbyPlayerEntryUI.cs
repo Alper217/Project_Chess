@@ -64,13 +64,19 @@ namespace AlperKocasalih.Chess.Multiplayer
         {
             if (playerState == null) return;
 
-            playerNameText.text = playerState.PlayerName.Value.ToString();
+            if (playerNameText != null)
+            {
+                playerNameText.text = playerState.PlayerName.Value.ToString();
+            }
             
             bool isReady = playerState.IsReady.Value;
-            readyStatusText.text = isReady ? 
-                AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("READY") : 
-                AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("NOT READY");
-            readyStatusText.color = isReady ? readyColor : notReadyColor;
+            if (readyStatusText != null)
+            {
+                readyStatusText.text = isReady ? 
+                    AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("READY") : 
+                    AlperKocasalih.Chess.Grid.LocalizationManager.GetTranslation("NOT READY");
+                readyStatusText.color = isReady ? readyColor : notReadyColor;
+            }
         }
 
         private async void UpdateAvatar()
