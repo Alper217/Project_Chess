@@ -35,10 +35,18 @@ namespace AlperKocasalih.Chess.Multiplayer
         private async void Start()
         {
             Application.targetFrameRate = 60;
-            await UnityServices.InitializeAsync();
-            if (!AuthenticationService.Instance.IsSignedIn)
+            try
             {
-                await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                await UnityServices.InitializeAsync();
+                if (!AuthenticationService.Instance.IsSignedIn)
+                {
+                    await AuthenticationService.Instance.SignInAnonymouslyAsync();
+                }
+                Debug.Log("[NetworkBootstrap] Unity Services initialized and signed in anonymously.");
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError($"[NetworkBootstrap] Services initialization failed: {e.Message}");
             }
         }
 

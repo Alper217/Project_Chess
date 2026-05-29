@@ -50,12 +50,17 @@ namespace AlperKocasalih.Chess.Multiplayer
             RefreshLobbyUI();
         }
 
+        private Coroutine refreshCoroutine;
+
         public void RefreshLobbyUI()
         {
             if (lobbyUI != null)
             {
-                StopAllCoroutines();
-                StartCoroutine(RefreshNextFrame());
+                if (refreshCoroutine != null)
+                {
+                    StopCoroutine(refreshCoroutine);
+                }
+                refreshCoroutine = StartCoroutine(RefreshNextFrame());
             }
         }
 
@@ -63,6 +68,7 @@ namespace AlperKocasalih.Chess.Multiplayer
         {
             yield return null; // Wait 1 frame
             if (lobbyUI != null) lobbyUI.UpdatePlayerList();
+            refreshCoroutine = null;
         }
 
         public bool AreAllPlayersReady()

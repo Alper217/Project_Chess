@@ -79,12 +79,19 @@ namespace AlperKocasalih.Chess.Multiplayer
             if (playerState == null || playerState.PlayerSteamId.Value == 0) return;
             if (SteamManager.Instance == null || !SteamManager.Instance.IsSteamRunning) return;
 
-            var texture = await SteamManager.Instance.GetAvatarTexture(playerState.PlayerSteamId.Value);
-            
-            if (texture != null && playerPhoto != null)
+            try
             {
-                // Texture2D'yi Sprite'a çevirip Image komponentine basıyoruz
-                playerPhoto.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+                var texture = await SteamManager.Instance.GetAvatarTexture(playerState.PlayerSteamId.Value);
+                
+                if (texture != null && playerPhoto != null)
+                {
+                    // Texture2D'yi Sprite'a çevirip Image komponentine basıyoruz
+                    playerPhoto.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), Vector2.one * 0.5f);
+                }
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogWarning($"[LobbyPlayerEntryUI] Failed to load Steam avatar: {e.Message}");
             }
         }
     }
