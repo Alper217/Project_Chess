@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,6 +30,7 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private Vector3 pawnVisualOffset = new Vector3(0, 0.5f, 0);
         [SerializeField] private int maxPawns = 5;
         [SerializeField] private bool debugAuraRefresh = true;
+        [SerializeField] private Color placementZoneColor = Color.red;
 
         [Header("Placement Zone Rows")]
         [SerializeField] private int p1MinRow = 6;
@@ -649,6 +650,51 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (pawnSelectionPanel == null) return;
             pawnSelectionPanel.SetActive(newState == GameState.Setup);
+
+            if (newState == GameState.Setup)
+            {
+                HighlightPlacementZones();
+            }
+            else
+            {
+                ResetPlacementZones();
+            }
+        }
+
+        private void HighlightPlacementZones()
+        {
+            int localPlayerID = 1;
+            if (NetworkManager.Singleton != null && NetworkManager.Singleton.IsListening)
+            {
+                localPlayerID = NetworkManager.Singleton.IsHost ? 1 : 2;
+            }
+
+            foreach (var cell in gridLookup.Values)
+            {
+                int row = cell.Coordinates.y;
+                bool isMyZone = false;
+                if (localPlayerID == 1)
+                {
+                    isMyZone = (row >= p1MinRow && row <= p1MaxRow);
+                }
+                else
+                {
+                    isMyZone = (row >= p2MinRow && row <= p2MaxRow);
+                }
+
+                if (isMyZone)
+                {
+                    cell.Highlight(placementZoneColor);
+                }
+            }
+        }
+
+        private void ResetPlacementZones()
+        {
+            foreach (var cell in gridLookup.Values)
+            {
+                cell.ResetHighlight();
+            }
         }
 
         [ContextMenu("Finish Setup")]

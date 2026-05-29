@@ -10446,8 +10446,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 906750002}
   m_HandleRect: {fileID: 906750001}
   m_Direction: 2
-  m_Value: 1.0000013
-  m_Size: 0.37609062
+  m_Value: 1.0000012
+  m_Size: 0.3575436
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -10526,7 +10526,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 5.2167, y: 295.2395}
+  m_AnchoredPosition: {x: 5.2167, y: 269.9}
   m_SizeDelta: {x: 557.67, y: 452.3883}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &998722669
@@ -11144,8 +11144,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -15.708984, y: -295.67447}
-  m_SizeDelta: {x: 423.7334, y: 946.1158}
+  m_AnchoredPosition: {x: -15.708984, y: -272.48306}
+  m_SizeDelta: {x: 423.7334, y: 1030.5662}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1053106252
 MonoBehaviour:
@@ -18014,6 +18014,7 @@ MonoBehaviour:
   pawnVisualOffset: {x: -0.65, y: 0, z: 0}
   maxPawns: 3
   debugAuraRefresh: 1
+  placementZoneColor: {r: 1, g: 0, b: 0, a: 1}
   p1MinRow: 5
   p1MaxRow: 7
   p2MinRow: 0
@@ -23633,10 +23634,10 @@ MonoBehaviour:
   m_Padding:
     m_Left: 0
     m_Right: 0
-    m_Top: 45
+    m_Top: 19
     m_Bottom: 60
   m_ChildAlignment: 4
-  m_Spacing: 27.49
+  m_Spacing: 34.29
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 0

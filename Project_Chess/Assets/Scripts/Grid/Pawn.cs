@@ -261,15 +261,13 @@ namespace AlperKocasalih.Chess.Grid
                 Debug.Log($"Pawn: ResetSynergyServer pre max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");
             }
             
-            // If this pawn had an aura health bonus applied, subtract it before resetting
-            // This preserves combat damage (currentHealth) while removing aura bonuses from max
+            // If this pawn had an aura health bonus applied, subtract it before resetting.
+            // This preserves combat damage while removing aura bonuses from both max and current health.
             if (hasSynergy.Value)
             {
                 int auraBonusMax = maxHealth.Value - pawnData.maxHealth;
                 maxHealth.Value = pawnData.maxHealth;
-                // Only clamp currentHealth to new max, do NOT add back — preserves combat damage
-                if (currentHealth.Value > maxHealth.Value)
-                    currentHealth.Value = maxHealth.Value;
+                currentHealth.Value = Mathf.Clamp(currentHealth.Value - auraBonusMax, 0, maxHealth.Value);
             }
             
             damage.Value = pawnData.damage;
@@ -292,10 +290,12 @@ namespace AlperKocasalih.Chess.Grid
             hasSynergy.Value = true;
             
             maxHealth.Value += bonusHealth;
+            currentHealth.Value += bonusHealth;
+            if (currentHealth.Value > maxHealth.Value)
+            {
+                currentHealth.Value = maxHealth.Value;
+            }
             damage.Value += bonusDamage;
-            // NOTE: We intentionally do NOT touch currentHealth here.
-            // Aura bonuses increase the max capacity but do not heal combat damage.
-            // This prevents HP appearing to "restore" after the player deals damage.
             if (debugBuffs)
             {
                 Debug.Log($"Pawn: ApplyBuffsServer post max={maxHealth.Value} dmg={damage.Value} cur={currentHealth.Value}");

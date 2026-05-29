@@ -6,13 +6,9 @@
   <component name="ChangeListManager">
     <list default="true" id="3d9e23b9-49f8-4e62-afbc-c164cc147016" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/SettingsPanel.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/SettingsPanel.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/GameScene.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scenes/MainMenu.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/MainMenu.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/TooltipManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/TooltipManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/TMP Settings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/TMP Settings.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnPlacementManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PawnPlacementManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Tests/PlayMode/BuffSystemTests.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Tests/PlayMode/BuffSystemTests.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -171,6 +167,8 @@
       <workItem from="1779196339686" duration="684000" />
       <workItem from="1779534515552" duration="4000" />
       <workItem from="1779534523632" duration="15359000" />
+      <workItem from="1780047522754" duration="410000" />
+      <workItem from="1780048118694" duration="3824000" />
     </task>
     <servers />
   </component>

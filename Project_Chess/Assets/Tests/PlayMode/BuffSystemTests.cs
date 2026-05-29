@@ -61,7 +61,24 @@ namespace Tests.PlayMode
             _pawn.ApplyRuntimeBuffsServer(new List<BuffData> { debuff });
             _pawn.ResetSynergyServer();
 
-            Assert.AreEqual(1, _pawn.activeBuffs.Count, "ResetSynergyServer timed buff'ı silmemeli.");
+            Assert.AreEqual(1, _pawn.activeBuffs.Count, "ResetSynergyServer timed buff should not be removed.");
+            yield return null;
+        }
+
+        [UnityTest]
+        public IEnumerator BuffSystem_SynergyHealthBonus_ShouldUpdateCurrentHealth()
+        {
+            _pawn.ApplyBuffsServer(20, 0);
+
+            Assert.AreEqual(120, _pawn.maxHealth.Value, "Synergy max health bonus should be applied.");
+            Assert.AreEqual(120, _pawn.currentHealth.Value, "Synergy health bonus should also update current health.");
+
+            _pawn.currentHealth.Value = 90;
+            _pawn.ResetSynergyServer();
+
+            Assert.AreEqual(100, _pawn.maxHealth.Value, "Synergy reset should restore base max health.");
+            Assert.AreEqual(70, _pawn.currentHealth.Value, "Synergy reset should remove the bonus from current health too.");
+            Assert.IsFalse(_pawn.hasSynergy.Value, "Synergy flag should be cleared after reset.");
             yield return null;
         }
 
