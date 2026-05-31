@@ -78,7 +78,26 @@ public class AttackHandler : NetworkBehaviour
 
     private void ApplySingleDamage(Vector2Int targetPos, Dictionary<Vector2Int, HexCell> gridLookup, int damageAmount)
     {
-        if (gridLookup.TryGetValue(targetPos, out HexCell targetCell))
+        HexCell targetCell = null;
+        if (gridLookup != null && gridLookup.TryGetValue(targetPos, out targetCell))
+        {
+            // Found cell through lookup
+        }
+        else
+        {
+            // Fallback: If gridLookup is missing or doesn't have the cell (e.g. server timing/initialization issues), search by coordinate directly
+            HexCell[] allCells = FindObjectsByType<HexCell>(FindObjectsSortMode.None);
+            foreach (var cell in allCells)
+            {
+                if (cell != null && cell.Coordinates == targetPos)
+                {
+                    targetCell = cell;
+                    break;
+                }
+            }
+        }
+
+        if (targetCell != null)
         {
             Pawn targetPawn = FindPawnOnCell(targetCell);
             if (targetPawn != null && targetPawn.PlayerID != pawn.PlayerID)
@@ -159,7 +178,7 @@ public class AttackHandler : NetworkBehaviour
         Pawn[] allPawns = FindObjectsByType<Pawn>(FindObjectsSortMode.None);
         foreach (var p in allPawns)
         {
-            if(p.OccupiedCell == cell) return p;
+            if (p.OccupiedCell != null && p.OccupiedCell.Coordinates == cell.Coordinates) return p;
         }
         return null;
     }

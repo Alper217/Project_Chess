@@ -76,6 +76,14 @@ namespace AlperKocasalih.Chess.Grid
             else if (cardImage != null) cardImage.sprite = data.cardSprite; // Fallback
         }
 
+        public void UpdateTranslation()
+        {
+            if (cardData != null && cardNameText != null)
+            {
+                cardNameText.text = cardData.GetBuffsText();
+            }
+        }
+
         public void SetOriginalState(Vector3 pos, Vector3 rot, int siblingIndex)
         {
             layoutPosition = pos;

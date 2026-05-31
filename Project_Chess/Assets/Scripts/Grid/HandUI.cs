@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
@@ -93,6 +93,8 @@ namespace AlperKocasalih.Chess.Grid
             {
                 PlayerInputController.Instance.OnSelectionCancelled += () => SetHandVisibility(true);
             }
+
+            LocalizationManager.OnLanguageChanged += OnLanguageChanged;
         }
 
         private void OnDestroy()
@@ -101,6 +103,19 @@ namespace AlperKocasalih.Chess.Grid
             {
                 DraftManager.Instance.OnHandUpdated -= OnHandUpdated;
                 DraftManager.Instance.OnOverflowBurnRequested -= OnOverflowBurnRequested;
+            }
+
+            LocalizationManager.OnLanguageChanged -= OnLanguageChanged;
+        }
+
+        private void OnLanguageChanged()
+        {
+            foreach (var card in spawnedCards)
+            {
+                if (card != null)
+                {
+                    card.UpdateTranslation();
+                }
             }
         }
 
