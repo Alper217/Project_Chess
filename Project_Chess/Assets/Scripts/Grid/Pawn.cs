@@ -344,6 +344,26 @@ namespace AlperKocasalih.Chess.Grid
                     continue;
                 }
 
+                // Avoid duplicate debuff applications
+                if (!buff.isPositiveEffect)
+                {
+                    ServerActiveBuff existingDebuff = null;
+                    foreach (var ab in activeBuffs)
+                    {
+                        if (ab.buffData == buff || (ab.buffData.effectType == buff.effectType && ab.buffData.buffName == buff.buffName))
+                        {
+                            existingDebuff = ab;
+                            break;
+                        }
+                    }
+                    if (existingDebuff != null)
+                    {
+                        existingDebuff.remainingTurns = Mathf.Max(existingDebuff.remainingTurns, buff.durationTurns);
+                        Debug.Log($"Debuff {buff.buffName} ({buff.effectType}) already present on pawn, refreshed duration to {existingDebuff.remainingTurns} turns.");
+                        continue;
+                    }
+                }
+
                 if (buff.durationTurns == 0)
                 {
                     // Instant effects

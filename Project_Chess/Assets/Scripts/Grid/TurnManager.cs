@@ -90,6 +90,17 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (!IsServer) return;
             if (GameManager.Instance == null || GameManager.Instance.CurrentState != GameState.ActionPhase) return;
+
+            // Safety net: If both players have empty hands in ActionPhase, return to DraftPhase immediately
+            if (DraftManager.Instance != null && 
+                DraftManager.Instance.GetHand(1).Count == 0 && 
+                DraftManager.Instance.GetHand(2).Count == 0)
+            {
+                Debug.Log("TurnManager: Both hands empty in ActionPhase. Transitioning to DraftPhase.");
+                GameManager.Instance.ChangeState(GameState.DraftPhase);
+                return;
+            }
+
             if (remainingTurnTime.Value <= 0f) return;
 
             remainingTurnTime.Value = Mathf.Max(0f, remainingTurnTime.Value - Time.deltaTime);

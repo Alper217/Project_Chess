@@ -114,6 +114,7 @@ namespace AlperKocasalih.Chess.Multiplayer
             try
             {
                 JoinAllocation joinAllocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
+                JoinCode = joinCode;
                 var transport = NetworkManager.Singleton.GetComponent<UnityTransport>();
                 transport.SetClientRelayData(
                     joinAllocation.RelayServer.IpV4,
