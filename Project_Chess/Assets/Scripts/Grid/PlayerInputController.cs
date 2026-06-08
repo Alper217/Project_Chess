@@ -18,6 +18,8 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private LayerMask cellLayer;
         [SerializeField] private Color moveHighlightColor = new Color(1f, 0.5f, 0f); // Orange
         [SerializeField] private Color combatHighlightColor = Color.red;
+        [SerializeField] private Color selectablePawnCellColor = new Color(0.2f, 0.65f, 1f, 0.45f);
+        [SerializeField] private Color selectedPawnCellColor = new Color(1f, 0.85f, 0.25f, 0.7f);
 
         [Header("Test Patterns (Inspector)")]
         [SerializeField] private MovementPattern testPatternA;
@@ -30,6 +32,7 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField, ReadOnly] private int activeCardRemainingUses = 1;
         [SerializeField, ReadOnly] private int initialCardUses = 1;
         [SerializeField, ReadOnly] private Pawn selectedPawn;
+        [SerializeField, ReadOnly] private HexCell selectedPawnCell;
 
         [Header("Dynamic Obstacle State")]
         [SerializeField, ReadOnly] private HexCell dynamicObstacleCenter;
@@ -41,7 +44,6 @@ namespace AlperKocasalih.Chess.Grid
         private readonly List<HexCell> hoverHighlightedCells = new List<HexCell>();
 
         private readonly List<HexCell> highlightedCells = new List<HexCell>();
-        private readonly List<Pawn> highlightedPawns = new List<Pawn>();
         private Dictionary<Vector2Int, HexCell> gridLookup = new Dictionary<Vector2Int, HexCell>();
 
         public bool IsActive => currentState != SelectionState.None;
@@ -175,14 +177,7 @@ namespace AlperKocasalih.Chess.Grid
                 }
                 currentState = SelectionState.CardSelected;
                 int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-
-                foreach (var pObj in GameObject.FindObjectsByType<Pawn>(FindObjectsSortMode.None))
-                {
-                    if (pObj.PlayerID != localPlayerID || pObj.HasStun()) continue;
-                    
-                    SetPawnLayer(pObj.gameObject, "Outline_Selectable");
-                    highlightedPawns.Add(pObj);
-                }
+                HighlightSelectablePawnCells(localPlayerID);
                 
                 Debug.Log($"PlayerInputController: Card '{card.cardName}' selected. Select a pawn.");
             }
@@ -199,15 +194,7 @@ namespace AlperKocasalih.Chess.Grid
             currentState = SelectionState.CardSelected;
 
             int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-
-            foreach (var pObj in GameObject.FindObjectsByType<Pawn>(FindObjectsSortMode.None))
-            {
-                if (pObj.PlayerID != localPlayerID) continue;
-                
-                SetPawnLayer(pObj.gameObject, "Outline_Selectable");
-                highlightedPawns.Add(pObj);
-               
-            }
+            HighlightSelectablePawnCells(localPlayerID);
             
         }
 
@@ -284,6 +271,7 @@ namespace AlperKocasalih.Chess.Grid
                 }
 
                 selectedPawn = pawn;
+                ClearSelectedPawnHighlight();
 
                 // --- Double Use Class Restriction ---
                 // Guard: activeCardData can be null when SelectMovementPattern() is used directly
@@ -304,9 +292,6 @@ namespace AlperKocasalih.Chess.Grid
                 }
 
                 currentState = SelectionState.PawnSelected;
-                
-                ClearPawnHighlights();
-                SetPawnLayer(selectedPawn.gameObject, "Outline");
 
                 MovementPattern resolvedPattern = ResolveMovementPatternForPawn(selectedPawn);
                 if (resolvedPattern == null)
@@ -318,6 +303,7 @@ namespace AlperKocasalih.Chess.Grid
                 activePattern = resolvedPattern;
 
                 ShowValidMoves(selectedPawn);
+                HighlightSelectedPawnCell(selectedPawn);
             }
         }
 
@@ -400,6 +386,7 @@ namespace AlperKocasalih.Chess.Grid
                         }
                         
                         ClearCellHighlights();
+                        ClearSelectedPawnHighlight();
                         CancelSelection();
                     }
                     else
@@ -408,20 +395,11 @@ namespace AlperKocasalih.Chess.Grid
                         Debug.Log("Tanrının Eli aktif: Kart halen elde, başka bir birim seçin.");
                         
                         int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-                        SetPawnLayer(selectedPawn.gameObject, "Default");
-                        
+                        ClearSelectedPawnHighlight();
                         selectedPawn = null;
                         currentState = SelectionState.CardSelected;
                         ClearCellHighlights();
-                        
-                        foreach (var pObj in GameObject.FindObjectsByType<Pawn>(FindObjectsSortMode.None))
-                        {
-                            if (pObj.PlayerID == localPlayerID)
-                            {
-                                SetPawnLayer(pObj.gameObject, "Outline_Selectable");
-                                highlightedPawns.Add(pObj);
-                            }
-                        }
+                        HighlightSelectablePawnCells(localPlayerID);
 
                         if (HandUI.Instance != null)
                         {
@@ -432,6 +410,7 @@ namespace AlperKocasalih.Chess.Grid
                 else
                 {
                     ClearCellHighlights();
+                    ClearSelectedPawnHighlight();
                     CancelSelection();
                 }
             }
@@ -690,30 +669,18 @@ namespace AlperKocasalih.Chess.Grid
             {
                 // During multi-action, Escape only clears the pawn selection, not the card
                 ClearCellHighlights();
-                ClearPawnHighlights();
-                if (selectedPawn != null) SetPawnLayer(selectedPawn.gameObject, "Default");
+                ClearSelectedPawnHighlight();
                 selectedPawn = null;
                 currentState = SelectionState.CardSelected;
                 
-                // Redraw outlines for selectable pawns
+                // Redraw selectable pawn cells
                 int localPlayerID = NetworkManager.Singleton.LocalClientId == 0 ? 1 : 2;
-                foreach (var pObj in GameObject.FindObjectsByType<Pawn>(FindObjectsSortMode.None))
-                {
-                    if (pObj.PlayerID == localPlayerID && !pObj.HasStun())
-                    {
-                        SetPawnLayer(pObj.gameObject, "Outline_Selectable");
-                        highlightedPawns.Add(pObj);
-                    }
-                }
+                HighlightSelectablePawnCells(localPlayerID);
                 return;
             }
 
             ClearCellHighlights();
-            ClearPawnHighlights();
-            if (selectedPawn != null) 
-            {
-                SetPawnLayer(selectedPawn.gameObject, "Default");
-            }
+            ClearSelectedPawnHighlight();
             selectedPawn = null;
             activePattern = null;
             activeCardData = null;
@@ -906,28 +873,39 @@ namespace AlperKocasalih.Chess.Grid
             highlightedCells.Clear();
         }
 
-        private void ClearPawnHighlights()
+        private void HighlightSelectablePawnCells(int localPlayerID)
         {
-            foreach (var p in highlightedPawns)
+            ClearCellHighlights();
+            ClearSelectedPawnHighlight();
+
+            foreach (var pObj in GameObject.FindObjectsByType<Pawn>(FindObjectsSortMode.None))
             {
-                if (p != null && selectedPawn != p)
-                {
-                    SetPawnLayer(p.gameObject, "Default");
-                }
+                if (pObj == null) continue;
+                if (pObj.PlayerID != localPlayerID || pObj.HasStun()) continue;
+
+                HexCell cell = pObj.OccupiedCell;
+                if (cell == null) continue;
+
+                HighlightCell(cell, selectablePawnCellColor);
             }
-            highlightedPawns.Clear();
         }
 
-        private void SetPawnLayer(GameObject pawnObj, string layerName)
+        private void HighlightSelectedPawnCell(Pawn pawn)
         {
-            int layerIndex = LayerMask.NameToLayer(layerName);
-            if (layerIndex == -1) layerIndex = 0;
+            ClearSelectedPawnHighlight();
 
-            pawnObj.layer = layerIndex;
-            foreach (Transform child in pawnObj.transform)
-            {
-                child.gameObject.layer = layerIndex;
-            }
+            if (pawn == null || pawn.OccupiedCell == null) return;
+
+            selectedPawnCell = pawn.OccupiedCell;
+            selectedPawnCell.Highlight(selectedPawnCellColor);
+        }
+
+        private void ClearSelectedPawnHighlight()
+        {
+            if (selectedPawnCell == null) return;
+
+            selectedPawnCell.ResetHighlight();
+            selectedPawnCell = null;
         }
 
         #endregion

@@ -6,12 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="3d9e23b9-49f8-4e62-afbc-c164cc147016" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Project_Chess/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cannon.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/DataSO/PawnDatas/Cannon.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/HealthUIManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/LocalizationManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/LocalizationManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Core/PawnHealthController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/Pawn.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CombinedBuffs_Fixed.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/CombinedBuffs_Fixed.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Objects/Hexagon/Materials/wood_albedo.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Objects/Hexagon/Materials/wood_albedo.mat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Prefabs/HexBase.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Prefabs/HexBase.prefab" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scripts/Grid/PlayerInputController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scripts/Grid/PlayerInputController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/DefaultVolumeProfile.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/DefaultVolumeProfile.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Settings/SampleSceneProfile.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Settings/SampleSceneProfile.asset" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -173,6 +174,7 @@
       <workItem from="1779534523632" duration="15359000" />
       <workItem from="1780047522754" duration="410000" />
       <workItem from="1780048118694" duration="8755000" />
+      <workItem from="1780914916042" duration="6187000" />
     </task>
     <servers />
   </component>
