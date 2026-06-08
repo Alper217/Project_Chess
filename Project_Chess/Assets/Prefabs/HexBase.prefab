@@ -29,7 +29,7 @@ Transform:
   m_GameObject: {fileID: 2123927593519135495}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 10.81169, y: 0, z: -56.66132}
+  m_LocalPosition: {x: 10.81169, y: -0.13, z: -56.66132}
   m_LocalScale: {x: 0.0185, y: 0.0185, z: 0.0185}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -106,6 +106,8 @@ MonoBehaviour:
   q: 0
   r: 0
   isOccupied: 0
+  isObstacle: 0
+  meshRenderer: {fileID: 0}
 --- !u!64 &1934650553267869917
 MeshCollider:
   m_ObjectHideFlags: 0
