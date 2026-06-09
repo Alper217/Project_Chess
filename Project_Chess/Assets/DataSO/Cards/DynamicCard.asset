@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: GameCore::AlperKocasalih.Chess.Grid.CardData
   cardName: Select Your Obstacle
   cardSprite: {fileID: 0}
-  cardDesign: {fileID: 0}
+  cardDesign: {fileID: 21300000, guid: 3beaff1b1c0b0c944808edead8f3d85b, type: 3}
   pattern: {fileID: 0}
   healthToAdd: 0
   damageToAdd: 0

@@ -411,8 +411,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5b4c9221693e2ff4babb38ac57cc4dad, type: 2}
+  m_sharedMaterial: {fileID: 2926109200287357677, guid: 5b4c9221693e2ff4babb38ac57cc4dad, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -577,8 +577,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Piyonun verece\u011Fi hasar\u0131 %30 azalt\u0131r."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -788,8 +788,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: ARCHER
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+  m_sharedMaterial: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1547,8 +1547,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "%5 Can ilavesi sa\u011Flar."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1683,8 +1683,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1830,8 +1830,8 @@ MonoBehaviour:
   m_text: "Piyon sald\u0131r\u0131 yapt\u0131\u011F\u0131nda verdi\u011Fi hasar\u0131n
     %15'ini kendi yer."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2814,7 +2814,7 @@ GameObject:
   - component: {fileID: 251276343}
   - component: {fileID: 251276346}
   m_Layer: 5
-  m_Name: Button
+  m_Name: InfoButton
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3661,8 +3661,8 @@ MonoBehaviour:
   m_text: "Piyon sald\u0131r\u0131 yapt\u0131\u011F\u0131nda verdi\u011Fi hasar\u0131n
     %15'ini kendi yer."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -3923,8 +3923,8 @@ MonoBehaviour:
   m_text: "Piyon hareketini ger\xE7ekle\u015Ftirdikten sonra 2 tur boyunca hareket
     edemez ve sald\u0131ramaz."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4067,8 +4067,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Setup
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5b4c9221693e2ff4babb38ac57cc4dad, type: 2}
+  m_sharedMaterial: {fileID: 2926109200287357677, guid: 5b4c9221693e2ff4babb38ac57cc4dad, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4389,8 +4389,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Piyonun bir sonraki hareket menzilini -1 kare d\xFC\u015F\xFCr\xFCr."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4671,8 +4671,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: READY!!
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5b4c9221693e2ff4babb38ac57cc4dad, type: 2}
+  m_sharedMaterial: {fileID: 2926109200287357677, guid: 5b4c9221693e2ff4babb38ac57cc4dad, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4809,8 +4809,8 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4926,8 +4926,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 5
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+  m_sharedMaterial: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5210,8 +5210,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Current Debuffs:'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5441,8 +5441,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Piyonun sahip oldu\u011Fu debufflar 2x olarak uygulan\u0131r."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5577,8 +5577,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Piyon 2 tur boyunca hi\xE7bir \"Debuff\"tan etkilenmez."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -5889,8 +5889,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: CardName
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6290,8 +6290,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Current Buffs:'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -6688,8 +6688,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Rakibinden 2 tur i\xE7erisinde gelebilecek sald\u0131r\u0131y\u0131 engeller."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7157,8 +7157,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Bu tur yap\u0131lan hareketin menzilini +1 kare art\u0131r\u0131r."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7402,8 +7402,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "2 tur boyunca al\u0131nan t\xFCm hasarlar\u0131 %30 art\u0131r\u0131r."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -7616,8 +7616,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Bu tur yap\u0131lan hareketin menzilini +1 kare art\u0131r\u0131r."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8834,8 +8834,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: AAAAAAAAAAAAAAAAAAAA
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -8989,8 +8989,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Al\u0131nan hasar\u0131 %20 azalt\u0131r."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -9130,8 +9130,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 5
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+  m_sharedMaterial: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -9417,8 +9417,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: CardName
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -9553,8 +9553,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "2 tur boyunca al\u0131nan t\xFCm hasarlar\u0131 %30 art\u0131r\u0131r."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -9764,8 +9764,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Ayn\u0131 kart ile se\xE7ilen 2 birim hareket ettirilebilir."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -10266,8 +10266,8 @@ MonoBehaviour:
   m_text: "Piyon hareketini ger\xE7ekle\u015Ftirdikten sonra 2 tur boyunca hareket
     edemez ve sald\u0131ramaz."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -10639,8 +10639,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Archer
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -10894,8 +10894,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 427.57053, y: 10}
-  m_SizeDelta: {x: 674.1689, y: 110.0968}
+  m_AnchoredPosition: {x: 427.57053, y: -3.4857}
+  m_SizeDelta: {x: 674.1689, y: 137.0682}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &994080703
 MonoBehaviour:
@@ -10994,8 +10994,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Al\u0131nan hasar\u0131 %20 azalt\u0131r."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -11541,8 +11541,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Cancel
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+  m_sharedMaterial: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -11677,8 +11677,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -11813,8 +11813,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Accept
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+  m_sharedMaterial: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -12722,6 +12722,10 @@ PrefabInstance:
       propertyPath: languageDropdown
       value: 
       objectReference: {fileID: 1502892887}
+    - target: {fileID: 1972804437359322985, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2211493986390117978, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -12837,7 +12841,7 @@ PrefabInstance:
     - target: {fileID: 3500797680436554473, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+      objectReference: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
     - target: {fileID: 3500797680436554473, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_fontColor.b
       value: 0.039215688
@@ -12853,10 +12857,18 @@ PrefabInstance:
     - target: {fileID: 3500797680436554473, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+      objectReference: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
     - target: {fileID: 3500797680436554473, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4278881723
+      objectReference: {fileID: 0}
+    - target: {fileID: 3500797680436554473, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3577559555784874718, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3865198662723355886, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_Name
@@ -12868,11 +12880,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4287240445039978373, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -175
+      value: -155.6
       objectReference: {fileID: 0}
     - target: {fileID: 4287240445039978373, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 60
+      objectReference: {fileID: 0}
+    - target: {fileID: 4394944862594252744, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4394944862594252744, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4905030222737866589, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+    - target: {fileID: 4905030222737866589, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+    - target: {fileID: 4905030222737866589, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5382374147190680723, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_margin.z
@@ -12881,7 +12913,7 @@ PrefabInstance:
     - target: {fileID: 5382374147190680723, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_fontAsset
       value: 
-      objectReference: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+      objectReference: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
     - target: {fileID: 5382374147190680723, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_fontColor.b
       value: 0.039215688
@@ -12897,10 +12929,14 @@ PrefabInstance:
     - target: {fileID: 5382374147190680723, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_sharedMaterial
       value: 
-      objectReference: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+      objectReference: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
     - target: {fileID: 5382374147190680723, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_fontColor32.rgba
       value: 4278881723
+      objectReference: {fileID: 0}
+    - target: {fileID: 5382374147190680723, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6486640389912517333, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_Type
@@ -12910,6 +12946,18 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: eb4186fced9e77641b6123605465aff2, type: 3}
+    - target: {fileID: 6584111722565712607, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6584111722565712607, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6584111722565712607, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6586874871545872933, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_Type
       value: 0
@@ -12918,6 +12966,18 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 4cdd9aecb037f534d9ce5c3b205c7d90, type: 3}
+    - target: {fileID: 6970543388300363862, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_fontAsset
+      value: 
+      objectReference: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+    - target: {fileID: 6970543388300363862, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_sharedMaterial
+      value: 
+      objectReference: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+    - target: {fileID: 6970543388300363862, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
+      propertyPath: m_hasFontAssetChanged
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7725588012490314369, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_AnchorMax.y
       value: 1
@@ -12952,11 +13012,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8719438744761722253, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: -175
+      value: -136.8
       objectReference: {fileID: 0}
     - target: {fileID: 8719438744761722253, guid: 2d2b0a69b84d4fc44accf83fd28460eb, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 63
+      value: 55.8
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -13859,8 +13919,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Piyonun verece\u011Fi hasar\u0131 %30 azalt\u0131r."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -14310,8 +14370,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Verilen hasar\u0131n %15'i kadar can yeniler."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -14677,8 +14737,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Ayn\u0131 kart ile se\xE7ilen 2 birim hareket ettirilebilir."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -14799,8 +14859,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'P2 Score:'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5b4c9221693e2ff4babb38ac57cc4dad, type: 2}
+  m_sharedMaterial: {fileID: 2926109200287357677, guid: 5b4c9221693e2ff4babb38ac57cc4dad, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -15606,8 +15666,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "%5 Can ilavesi sa\u011Flar."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -16058,8 +16118,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Confirm
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+  m_sharedMaterial: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -16560,8 +16620,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Piyonun bir sonraki hareket menzilini -1 kare d\xFC\u015F\xFCr\xFCr."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -17588,8 +17648,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 100  /  100
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+  m_sharedMaterial: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -17857,8 +17917,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Verilen hasar\u0131n %15'i kadar can yeniler."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -17993,8 +18053,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 5
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+  m_sharedMaterial: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -18524,8 +18584,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5b4c9221693e2ff4babb38ac57cc4dad, type: 2}
+  m_sharedMaterial: {fileID: 2926109200287357677, guid: 5b4c9221693e2ff4babb38ac57cc4dad, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -18808,8 +18868,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Piyon 2 tur boyunca hi\xE7bir \"Debuff\"tan etkilenmez."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -19469,8 +19529,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Burn
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+  m_sharedMaterial: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -20015,8 +20075,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'P1 Score:'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 5b4c9221693e2ff4babb38ac57cc4dad, type: 2}
+  m_sharedMaterial: {fileID: 2926109200287357677, guid: 5b4c9221693e2ff4babb38ac57cc4dad, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -20593,8 +20653,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 5
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+  m_sharedMaterial: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -20996,8 +21056,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Give
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+  m_sharedMaterial: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -21134,8 +21194,8 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -21270,8 +21330,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: Keep
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
+  m_sharedMaterial: {fileID: 4427218135886785435, guid: 44653f3b756632a4ea59f65b37bfe7c4, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -24501,6 +24561,8 @@ MonoBehaviour:
     m_Bits: 64
   moveHighlightColor: {r: 1, g: 0.5, b: 0, a: 1}
   combatHighlightColor: {r: 1, g: 0, b: 0, a: 1}
+  selectablePawnCellColor: {r: 0.2, g: 0.65, b: 1, a: 0.45}
+  selectedPawnCellColor: {r: 1, g: 0.85, b: 0.25, a: 0.7}
   testPatternA: {fileID: 11400000, guid: 1430dad23950a99439d9fed19599b806, type: 2}
   testPatternB: {fileID: 11400000, guid: 3e48cef3f79fdc14fb7563874f809249, type: 2}
   currentState: 0
@@ -24509,6 +24571,7 @@ MonoBehaviour:
   activeCardRemainingUses: 1
   initialCardUses: 1
   selectedPawn: {fileID: 0}
+  selectedPawnCell: {fileID: 0}
   dynamicObstacleCenter: {fileID: 0}
 --- !u!1 &1930345817
 GameObject:
@@ -24895,8 +24958,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Piyonun sahip oldu\u011Fu debufflar 2x olarak uygulan\u0131r."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -25279,8 +25342,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: CardName
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -25754,7 +25817,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.0010212137}
+  m_AnchoredPosition: {x: 0, y: -0.0010108888}
   m_SizeDelta: {x: -424.2873, y: 0}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &2057335239
@@ -25953,8 +26016,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: CardName
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -26089,8 +26152,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: "Rakibinden 2 tur i\xE7erisinde gelebilecek sald\u0131r\u0131y\u0131 engeller."
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -26429,8 +26492,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: New Text
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
-  m_sharedMaterial: {fileID: 1636936194341929921, guid: a3c162244119af243af17c2dfce5bb0c, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: a1a2adace6540174dab303c3b3578093, type: 2}
+  m_sharedMaterial: {fileID: -7233419449186824529, guid: a1a2adace6540174dab303c3b3578093, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
