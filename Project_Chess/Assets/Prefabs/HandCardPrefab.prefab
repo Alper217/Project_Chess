@@ -306,3 +306,4 @@ MonoBehaviour:
   hoverScale: 1.1
   hoverMoveY: 30
   animationDuration: 0.2
+  shineDuration: 1.2

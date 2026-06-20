@@ -44,7 +44,7 @@ Material:
     - _ColorMask: 15
     - _ShineGlow: 2
     - _ShineLocation: 0
-    - _ShineSpeed: 5
+    - _ShineSpeed: 50
     - _ShineWidth: 30
     - _Stencil: 0
     - _StencilComp: 8

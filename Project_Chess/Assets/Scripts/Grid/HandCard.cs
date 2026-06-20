@@ -23,6 +23,7 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private float hoverScale = 1.8f;
         [SerializeField] private float hoverMoveY = 120f;
         [SerializeField] private float animationDuration = 0.25f;
+        [SerializeField] private float shineDuration = 0.6f; // NEW: Exposes shine speed/duration in the Inspector
 
         private bool isHovered = false;
         private bool isSelected = false; // NEW: Selection state
@@ -201,11 +202,11 @@ namespace AlperKocasalih.Chess.Grid
 
             DOTween.To(() => hoverYOffset, x => hoverYOffset = x, moveY, duration).SetEase(Ease.OutCubic);
             
-            // Sync the shine sweep with the hover animation (fixed to 0.6 seconds for a smooth, visible sweep)
+            // Sync the shine sweep with the hover animation (uses the Inspector-defined shineDuration)
             if (cardImage != null && cardImage.material != null)
             {
                 cardImage.material.SetFloat("_ShineLocation", 0f);
-                cardImage.material.DOFloat(1f, "_ShineLocation", 0.6f).SetEase(Ease.OutCubic);
+                cardImage.material.DOFloat(1f, "_ShineLocation", shineDuration).SetEase(Ease.OutCubic);
             }
             // Scale handled in Update
         }
