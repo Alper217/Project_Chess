@@ -53,7 +53,7 @@ namespace AlperKocasalih.Chess.Grid
                 if (buff == null) continue;
                 string sign = buff.amount > 0 ? "+" : "";
                 string percent = buff.isPercentage ? "%" : "";
-                string color = buff.isPositiveEffect ? "#0b6d0eff" : "#c90000ff"; // Green for buff, Red for debuff
+                string color = buff.isPositiveEffect ? "#2C5E43" : "#A83838"; // Warm Sage Green for buff, Rust Red for debuff
                 
                 // Use buffName for a cleaner, name-only display (TFT style)
                 string displayName = !string.IsNullOrEmpty(buff.buffName) ? buff.buffName : buff.effectType.ToString();

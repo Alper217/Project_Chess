@@ -74,6 +74,13 @@ namespace AlperKocasalih.Chess.Grid
             }
             if (cardImage != null && data.cardDesign != null) cardImage.sprite = data.cardDesign;
             else if (cardImage != null) cardImage.sprite = data.cardSprite; // Fallback
+
+            // Instantiate material dynamically so each card has its own independent shader instance
+            if (cardImage != null && cardImage.material != null)
+            {
+                cardImage.material = Instantiate(cardImage.material);
+                cardImage.material.SetFloat("_ShineLocation", 0f);
+            }
         }
 
         public void UpdateTranslation()
@@ -193,6 +200,13 @@ namespace AlperKocasalih.Chess.Grid
             float duration = HandUI.Instance != null ? HandUI.Instance.GlobalHoverDuration : animationDuration;
 
             DOTween.To(() => hoverYOffset, x => hoverYOffset = x, moveY, duration).SetEase(Ease.OutCubic);
+            
+            // Sync the shine sweep with the hover animation (fixed to 0.6 seconds for a smooth, visible sweep)
+            if (cardImage != null && cardImage.material != null)
+            {
+                cardImage.material.SetFloat("_ShineLocation", 0f);
+                cardImage.material.DOFloat(1f, "_ShineLocation", 0.6f).SetEase(Ease.OutCubic);
+            }
             // Scale handled in Update
         }
 
@@ -204,6 +218,12 @@ namespace AlperKocasalih.Chess.Grid
             float duration = HandUI.Instance != null ? HandUI.Instance.GlobalHoverDuration : animationDuration;
 
             DOTween.To(() => hoverYOffset, x => hoverYOffset = x, 0f, duration).SetEase(Ease.OutCubic);
+            
+            // Reset the shine sweep back to 0 when exiting hover
+            if (cardImage != null && cardImage.material != null)
+            {
+                cardImage.material.DOFloat(0f, "_ShineLocation", duration).SetEase(Ease.OutCubic);
+            }
             // Scale handled in Update
         }
 

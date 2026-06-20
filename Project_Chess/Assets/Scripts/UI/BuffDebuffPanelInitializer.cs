@@ -13,11 +13,11 @@ public class BuffDebuffPanelInitializer : MonoBehaviour
     [Tooltip("Buff isimlerini yeşil, Debuff isimlerini kırmızı olarak renklendirmeyi açar/kapatır.")]
     [SerializeField] private bool useColorCoding = true;
 
-    [Tooltip("Buff başlıkları için kullanılacak renk (Örn: Canlı Premium Yeşil)")]
-    [SerializeField] private Color buffColor = new Color(0.27f, 0.83f, 0.44f); // Sleek Premium Green
+    [Tooltip("Buff başlıkları için kullanılacak renk (Sage Green)")]
+    [SerializeField] private Color buffColor = new Color(0.17f, 0.37f, 0.26f); // Warm Sage Green (#2C5E43)
 
-    [Tooltip("Debuff başlıkları için kullanılacak renk (Örn: Canlı Premium Kırmızı)")]
-    [SerializeField] private Color debuffColor = new Color(0.92f, 0.26f, 0.35f); // Sleek Premium Red
+    [Tooltip("Debuff başlıkları için kullanılacak renk (Rust Red)")]
+    [SerializeField] private Color debuffColor = new Color(0.66f, 0.22f, 0.22f); // Rust Red (#A83838)
 
     private void Awake()
     {

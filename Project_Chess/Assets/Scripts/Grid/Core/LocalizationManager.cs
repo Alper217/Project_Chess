@@ -7,7 +7,6 @@ namespace AlperKocasalih.Chess.Grid
 {
     public enum Language
     {
-        TR,
         EN,
         DE,
         FR,
@@ -108,21 +107,6 @@ namespace AlperKocasalih.Chess.Grid
 
             switch (currentLanguage)
             {
-                case Language.TR:
-                    switch (key)
-                    {
-                        case "Damage":
-                            value = "Hasar";
-                            return true;
-                        case "Cooldown":
-                            value = "Bekleme Süresi";
-                            return true;
-                        case "Turn":
-                        case "Turns":
-                            value = "tur";
-                            return true;
-                    }
-                    break;
                 case Language.DE:
                     switch (key)
                     {

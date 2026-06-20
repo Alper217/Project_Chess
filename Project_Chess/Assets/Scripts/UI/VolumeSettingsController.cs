@@ -47,7 +47,7 @@ public class VolumeSettingsController : MonoBehaviour
         {
             languageDropdown.ClearOptions();
             
-            var options = new System.Collections.Generic.List<string> { "Türkçe", "English", "Deutsch", "Français", "Português", "Español" };
+            var options = new System.Collections.Generic.List<string> { "English", "Deutsch", "Français", "Português", "Español" };
             languageDropdown.AddOptions(options);
 
             // Mevcut dili eşleştir
@@ -75,15 +75,6 @@ public class VolumeSettingsController : MonoBehaviour
     private void OnLanguageDropdownChanged(int index)
     {
         AlperKocasalih.Chess.Grid.LocalizationManager.CurrentLanguage = (AlperKocasalih.Chess.Grid.Language)index;
-    }
-
-    /// <summary>
-    /// Doğrudan Türkçe butonuna tıklanıldığında çağrılabilir.
-    /// </summary>
-    public void SetLanguageTR()
-    {
-        AlperKocasalih.Chess.Grid.LocalizationManager.CurrentLanguage = AlperKocasalih.Chess.Grid.Language.TR;
-        UpdateDropdownSelection();
     }
 
     /// <summary>
