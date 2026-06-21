@@ -13375,6 +13375,7 @@ GameObject:
   - component: {fileID: 1659779538}
   - component: {fileID: 1659779537}
   - component: {fileID: 1659779535}
+  - component: {fileID: 1659779539}
   m_Layer: 0
   m_Name: AudioManager
   m_TagString: Untagged
@@ -13393,7 +13394,7 @@ AudioSource:
   serializedVersion: 4
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 8300000, guid: 06ece8e3825f925429079396a457b122, type: 3}
+  m_Resource: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
@@ -13606,6 +13607,22 @@ MonoBehaviour:
   sfxSource: {fileID: 1659779537}
   musicSource: {fileID: 1659779535}
   buttonClickSound: {fileID: 8300000, guid: 8deef6aaf2d01b346b1317c1ad06ebbe, type: 3}
+--- !u!114 &1659779539
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1659779534}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: babb999967fce8b48afd69438de74078, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: GameCore::SceneMusicManager
+  setupClip: {fileID: 8300000, guid: 06ece8e3825f925429079396a457b122, type: 3}
+  actionIntroClip: {fileID: 8300000, guid: e395175ec220ebd43afb170b102acc01, type: 3}
+  actionLoopClip: {fileID: 8300000, guid: a2454dd8019ff434f9b173d3faedb1d0, type: 3}
+  playSetupOnStart: 1
 --- !u!1 &1668755096
 GameObject:
   m_ObjectHideFlags: 0

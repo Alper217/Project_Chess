@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using UnityEngine;
 
@@ -73,6 +73,9 @@ public class AudioManager : MonoBehaviour
         {
             StopCoroutine(musicCoroutine);
         }
+
+        // Explicitly stop any currently playing music (like setup music) to cut it instantly
+        musicSource.Stop();
 
         musicCoroutine = StartCoroutine(MusicSequenceCoroutine(introClip, loopClip));
     }

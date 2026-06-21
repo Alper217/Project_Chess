@@ -25,6 +25,10 @@ namespace AlperKocasalih.Chess.Grid
         [SerializeField] private float animationDuration = 0.25f;
         [SerializeField] private float shineDuration = 0.6f; // NEW: Exposes shine speed/duration in the Inspector
 
+        [Header("Card Text Colors")]
+        [SerializeField] private Color buffTextColor = new Color(0.17f, 0.37f, 0.26f);  // Sage Green (#2C5E43)
+        [SerializeField] private Color debuffTextColor = new Color(0.66f, 0.22f, 0.22f); // Rust Red (#A83838)
+
         private bool isHovered = false;
         private bool isSelected = false; // NEW: Selection state
         public bool IsSelected => isSelected;
@@ -71,7 +75,7 @@ namespace AlperKocasalih.Chess.Grid
                 cardNameText.fontSizeMin = originalFontSize * 0.5f; // Scale down to 50%
                 cardNameText.fontSizeMax = originalFontSize;
                 
-                cardNameText.text = data.GetBuffsText();
+                cardNameText.text = data.GetBuffsText(buffTextColor, debuffTextColor);
             }
             if (cardImage != null && data.cardDesign != null) cardImage.sprite = data.cardDesign;
             else if (cardImage != null) cardImage.sprite = data.cardSprite; // Fallback
@@ -88,7 +92,7 @@ namespace AlperKocasalih.Chess.Grid
         {
             if (cardData != null && cardNameText != null)
             {
-                cardNameText.text = cardData.GetBuffsText();
+                cardNameText.text = cardData.GetBuffsText(buffTextColor, debuffTextColor);
             }
         }
 

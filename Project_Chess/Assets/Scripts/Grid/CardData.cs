@@ -46,6 +46,15 @@ namespace AlperKocasalih.Chess.Grid
         /// </summary>
         public string GetBuffsText()
         {
+            // Default fallback colors if called without parameters
+            return GetBuffsText(new Color(0.17f, 0.37f, 0.26f), new Color(0.66f, 0.22f, 0.22f));
+        }
+
+        /// <summary>
+        /// Gets a formatted string of the applied runtime buffs to display on the UI using custom colors.
+        /// </summary>
+        public string GetBuffsText(Color positiveColor, Color negativeColor)
+        {
             if (runtimeBuffs == null || runtimeBuffs.Count == 0) return "";
             string desc = "";
             foreach (var buff in runtimeBuffs)
@@ -53,7 +62,8 @@ namespace AlperKocasalih.Chess.Grid
                 if (buff == null) continue;
                 string sign = buff.amount > 0 ? "+" : "";
                 string percent = buff.isPercentage ? "%" : "";
-                string color = buff.isPositiveEffect ? "#2C5E43" : "#A83838"; // Warm Sage Green for buff, Rust Red for debuff
+                string hexColor = ColorUtility.ToHtmlStringRGBA(buff.isPositiveEffect ? positiveColor : negativeColor);
+                string color = "#" + hexColor;
                 
                 // Use buffName for a cleaner, name-only display (TFT style)
                 string displayName = !string.IsNullOrEmpty(buff.buffName) ? buff.buffName : buff.effectType.ToString();
