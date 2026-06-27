@@ -2450,7 +2450,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Enter text...
+  m_text: Enter code...
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -13622,7 +13622,6 @@ MonoBehaviour:
   setupClip: {fileID: 8300000, guid: 06ece8e3825f925429079396a457b122, type: 3}
   actionIntroClip: {fileID: 8300000, guid: e395175ec220ebd43afb170b102acc01, type: 3}
   actionLoopClip: {fileID: 8300000, guid: a2454dd8019ff434f9b173d3faedb1d0, type: 3}
-  playSetupOnStart: 1
 --- !u!1 &1668755096
 GameObject:
   m_ObjectHideFlags: 0
