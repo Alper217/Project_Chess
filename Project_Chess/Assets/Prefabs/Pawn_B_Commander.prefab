@@ -60,6 +60,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: f75e88556c9f1c640ac6d6a7d6e541f8, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 196b9e7ab0038004fae9ddd4292b961b, type: 2}
     - target: {fileID: 919132149155446097, guid: f75e88556c9f1c640ac6d6a7d6e541f8, type: 3}
       propertyPath: m_Name
       value: Pawn_B_Commander
@@ -149,8 +153,8 @@ MonoBehaviour:
   activeBuffs: []
   meshRenderer: {fileID: 0}
   highlightMaterialIndex: 0
-  player1Color: {r: 1, g: 1, b: 1, a: 1}
-  player2Color: {r: 0, g: 0, b: 0, a: 1}
+  player1Color: {r: 0.8509804, g: 0.8, b: 0.75686276, a: 1}
+  player2Color: {r: 0.6431373, g: 0.53333336, b: 0.4117647, a: 1}
   debugBuffs: 1
   debugMaxHealth: 0
   debugCurrentHealth: 0
