@@ -154,7 +154,7 @@ MonoBehaviour:
   meshRenderer: {fileID: 0}
   highlightMaterialIndex: 0
   player1Color: {r: 0.8509804, g: 0.8, b: 0.75686276, a: 1}
-  player2Color: {r: 0.6431373, g: 0.53333336, b: 0.4117647, a: 1}
+  player2Color: {r: 0.37254903, g: 0.4862745, b: 0.5411765, a: 1}
   debugBuffs: 1
   debugMaxHealth: 0
   debugCurrentHealth: 0
