@@ -1,6 +1,8 @@
-using UnityEngine;
+#if UNITY_STANDALONE
 using Steamworks;
 using Steamworks.Data;
+#endif
+using UnityEngine;
 using System;
 using System.Threading.Tasks;
 
@@ -13,8 +15,13 @@ namespace AlperKocasalih.Chess.Multiplayer
         [SerializeField] private uint appId = 480; // Spacewar (Test için)
         
         public bool IsSteamRunning { get; private set; }
-        public string PlayerName => IsSteamRunning ? SteamClient.Name : "Offline Player";
+        public string PlayerName => IsSteamRunning ? GetSteamPlayerName() : "Offline Player";
+
+#if UNITY_STANDALONE
         public SteamId PlayerSteamId => IsSteamRunning ? SteamClient.SteamId : 0;
+#else
+        public ulong PlayerSteamId => 0;
+#endif
 
         private void Awake()
         {
@@ -32,6 +39,7 @@ namespace AlperKocasalih.Chess.Multiplayer
 
         private void InitializeSteam()
         {
+#if UNITY_STANDALONE
             try
             {
                 SteamClient.Init(appId);
@@ -47,11 +55,24 @@ namespace AlperKocasalih.Chess.Multiplayer
                 IsSteamRunning = false;
                 Debug.LogError($"[Steam] Başlatılamadı! Hata: {e.Message}");
             }
+#else
+            IsSteamRunning = false;
+#endif
+        }
+
+        private string GetSteamPlayerName()
+        {
+#if UNITY_STANDALONE
+            return SteamClient.Name;
+#else
+            return "Offline Player";
+#endif
         }
 
         // Host için: Steam Lobisi kur ve Relay kodunu içine yaz
         public async void CreateSteamLobby(string relayJoinCode)
         {
+#if UNITY_STANDALONE
             if (!IsSteamRunning) return;
 
             var lobby = await SteamMatchmaking.CreateLobbyAsync(2);
@@ -62,8 +83,10 @@ namespace AlperKocasalih.Chess.Multiplayer
                 lobby.Value.SetData("RelayCode", relayJoinCode); // Relay kodunu buraya gizliyoruz
                 Debug.Log("[Steam] Lobi kuruldu ve Relay kodu işlendi.");
             }
+#endif
         }
 
+#if UNITY_STANDALONE
         private void OnLobbyInvite(Friend friend, Lobby lobby)
         {
             Debug.Log($"[Steam] {friend.Name} sizi oyuna davet etti!");
@@ -83,18 +106,22 @@ namespace AlperKocasalih.Chess.Multiplayer
                 }
             }
         }
+#endif
 
         private void Update()
         {
+#if UNITY_STANDALONE
             if (IsSteamRunning)
             {
                 SteamClient.RunCallbacks();
             }
+#endif
         }
 
         // Steam'den büyük boy fotoğrafı çeker ve Unity Texture2D formatına çevirir
         public async Task<Texture2D> GetAvatarTexture(ulong steamId)
         {
+#if UNITY_STANDALONE
             if (!IsSteamRunning) return null;
 
             // Büyük boy avatarı iste
@@ -126,16 +153,21 @@ namespace AlperKocasalih.Chess.Multiplayer
 
             Debug.Log($"[Steam] Avatar yüklendi: {width}x{height}");
             return texture;
+#else
+            return null;
+#endif
         }
 
         private void OnApplicationQuit()
         {
+#if UNITY_STANDALONE
             if (IsSteamRunning)
             {
                 SteamMatchmaking.OnLobbyInvite -= OnLobbyInvite;
                 SteamMatchmaking.OnLobbyEntered -= OnLobbyEntered;
                 SteamClient.Shutdown();
             }
+#endif
         }
     }
 }

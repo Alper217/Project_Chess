@@ -53,8 +53,9 @@ namespace AlperKocasalih.Chess.Grid
             LocalizationManager.OnLanguageChanged += UpdateTurnInfoUI;
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
+            base.OnDestroy();
             LocalizationManager.OnLanguageChanged -= UpdateTurnInfoUI;
         }
 

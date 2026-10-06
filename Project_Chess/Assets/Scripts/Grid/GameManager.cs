@@ -93,8 +93,9 @@ namespace AlperKocasalih.Chess.Grid
             UpdateScoreUI();
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
+            base.OnDestroy();
             AlperKocasalih.Chess.Grid.LocalizationManager.OnLanguageChanged -= UpdateScoreUI;
         }
 

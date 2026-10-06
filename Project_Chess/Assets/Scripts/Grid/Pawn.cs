@@ -120,8 +120,9 @@ namespace AlperKocasalih.Chess.Grid
             }
         }
 
-        private void OnDestroy()
+        public override void OnDestroy()
         {
+            base.OnDestroy();
             if (currentCell != null)
             {
                 currentCell.IsOccupied = false;

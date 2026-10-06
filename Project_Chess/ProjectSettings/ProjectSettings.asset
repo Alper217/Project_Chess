@@ -526,6 +526,9 @@ PlayerSettings:
   - m_BuildTarget: Standalone
     m_StaticBatching: 1
     m_DynamicBatching: 0
+  - m_BuildTarget: WebGL
+    m_StaticBatching: 0
+    m_DynamicBatching: 0
   m_BuildTargetShaderSettings: []
   m_BuildTargetGraphicsJobs: []
   m_BuildTargetGraphicsJobMode: []
@@ -840,7 +843,7 @@ PlayerSettings:
     ReservedCFE: DOTWEEN;DOTWEEN_UITOOLKIT
     Standalone: DOTWEEN;DOTWEEN_UITOOLKIT;MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED
     VisionOS: DOTWEEN;DOTWEEN_UITOOLKIT
-    WebGL: DOTWEEN;DOTWEEN_UITOOLKIT
+    WebGL: DOTWEEN;DOTWEEN_UITOOLKIT;MOREMOUNTAINS_NICEVIBRATIONS_INSTALLED
     Windows Store Apps: DOTWEEN;DOTWEEN_UITOOLKIT
     XboxOne: DOTWEEN;DOTWEEN_UITOOLKIT
     iPhone: DOTWEEN;DOTWEEN_UITOOLKIT
